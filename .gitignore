@@ -1,0 +1,36 @@
+# Dependency dirs
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+out
+build
+*.tsbuildinfo
+apps/console/next-env.d.ts
+
+# Turbo cache
+.turbo
+
+# Foundry artifacts
+contracts/out
+contracts/cache
+
+# Environment — real values never committed
+.env
+.env.local
+.env.production
+secrets.env
+secrets.env.enc
+
+# Media (add to repo manually)
+apps/console/public/media/*.mp4
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp
