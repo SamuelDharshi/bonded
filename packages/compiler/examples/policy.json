@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "budget": {
+    "asset": "USDC",
+    "period": "7d",
+    "max": "500000000"
+  },
+  "forbid": [
+    "approve_unlimited",
+    "delegatecall",
+    "selfdestruct"
+  ],
+  "irreversible_above": "100000000",
+  "premises": [
+    {
+      "field": "liquidityPool.totalValueLockedUSD",
+      "id": "tvl",
+      "op": "gte",
+      "schema": "messari-dex-amm",
+      "tolerance_bps": 200,
+      "value": "50000000000000000000000000"
+    },
+    {
+      "field": "liquidityPool.createdTimestamp",
+      "id": "pool_age",
+      "op": "older_than",
+      "schema": "messari-dex-amm",
+      "value": "2592000"
+    }
+  ]
+}
