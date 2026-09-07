@@ -1,0 +1,31 @@
+type Policy @entity {
+  id: ID!          # owner address
+  owner: Bytes!
+  policyHash: Bytes!
+  version: BigInt!
+  committedAt: BigInt!
+  transactionHash: Bytes!
+}
+
+type VerdictRecord @entity {
+  id: ID!          # proposalHash
+  proposalHash: Bytes!
+  agent: Bytes!
+  outcome: Int!    # 0=CLEARED, 1=REFUSED, 2=HELD_FOR_STEPUP
+  reasonCode: Int!
+  valueUSDC: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  stepUp: StepUpRecord
+}
+
+type StepUpRecord @entity {
+  id: ID!          # proposalHash
+  proposalHash: Bytes!
+  agent: Bytes!
+  armedAt: BigInt!
+  confirmedAt: BigInt
+  confirmed: Boolean!
+  verdict: VerdictRecord!
+}
