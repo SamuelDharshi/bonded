@@ -34,3 +34,6 @@ Thumbs.db
 # Editor
 .vscode/settings.json
 *.swp
+
+# Claude Code local session state
+.claude/
