@@ -15,6 +15,9 @@ export function canonicalJson(obj: unknown): string {
     return String(obj);
   }
   if (typeof obj === 'string') return JSON.stringify(obj);
+  if (typeof obj === 'bigint') {
+    throw new Error(`canonicalJson: BigInt not serializable. Convert to string first.`);
+  }
   if (Array.isArray(obj)) {
     return '[' + obj.map(canonicalJson).join(',') + ']';
   }
