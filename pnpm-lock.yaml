@@ -23,6 +23,9 @@ importers:
       '@bonded/compiler':
         specifier: workspace:*
         version: link:../../packages/compiler
+      '@bonded/enforcer':
+        specifier: workspace:*
+        version: link:../../packages/enforcer
       '@bonded/seam':
         specifier: workspace:*
         version: link:../../packages/seam
