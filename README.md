@@ -51,15 +51,26 @@ Verified in this environment, not asserted:
   collapsing either check into the other is a real bug this test suite
   catches).
 - ✅ `contracts/BondedRegistry.sol` + `BondedVault.sol` — Foundry-tested,
-  **8/8 tests pass including two fuzz suites** (`pnpm contracts:test`).
-  Compiled against OpenZeppelin v5.7 with `via_ir` enabled.
-- ✅ `packages/standardized`, `packages/compiler`, `packages/quarantine`,
-  `packages/authority`, `packages/proposer` — all typecheck and build clean
-  across the workspace (`pnpm typecheck`, `pnpm build`).
+  **16/16 tests pass across both contracts, including three fuzz suites**
+  (`pnpm contracts:test`). Compiled against OpenZeppelin v5.7 with `via_ir`
+  enabled.
+- ✅ `packages/compiler` (23/23 tests), `packages/quarantine` (9/9 tests),
+  `packages/proposer` (15/15 tests) — including a fail-safe check that an
+  unrecognized field defaults to `QUARANTINED` (never `TRUSTED`), and a test
+  proving injected text in a premise's `claimedValue` stays inert data rather
+  than becoming executable structure.
+- ✅ `packages/standardized`, `packages/authority` — typecheck and build
+  clean across the workspace (`pnpm typecheck`, `pnpm build`).
 - ✅ `packages/attack-corpus/harness/run.ts` calls the **real** `enforce()`
   from `@bonded/enforcer` against a real policy — not a heuristic string
   match. Currently refuses the injected `approve_unlimited` action via
   `POLICY_FORBIDDEN_ACTION` on the documented fixture query path.
+- ✅ `apps/console` — `/live` (four preset scenarios, each a real `enforce()`
+  call via `/api/enforce`, rendering the actual premise diff and verdict),
+  `/policy` (real `hashPolicy()` on the example artifact), `/corpus` (reads
+  the real `results.json`, `force-dynamic` so a harness re-run shows up
+  without a rebuild), `/architecture`, and `/log` (honest empty state — no
+  subgraph deployed yet, states that plainly rather than faking entries).
 - ⏳ Not yet deployed anywhere: Arc testnet (contracts build and test locally
   but have no live address), Subgraph Studio (schema/mappings written, not
   pushed), Chainlink CRE (handler written, not run against `cre simulate` or
@@ -67,19 +78,19 @@ Verified in this environment, not asserted:
 - ⏳ Not yet run: the naive-agent side of the attack corpus (`results.json`
   honestly reports `NOT_YET_RUN` for all three starter kits — see
   `docs/FUTURE.md`).
-- ⏳ Console (`apps/console`) has a placeholder landing page using the real
-  design tokens; `/live`, `/log`, `/policy`, `/corpus`, `/architecture` and
-  the named Aceternity/React Bits components from the design spec are not
-  yet built.
+- ⏳ Console has not yet had the named Aceternity/React Bits components
+  (Compare slider, Tracing Beam, Decrypted Text, Multi Step Loader) swapped
+  in over the current hand-built equivalents, and has no captured media yet.
 
 ## Run it yourself
 
 ```bash
 pnpm install
 pnpm build
-pnpm test                    # enforcer unit tests
-pnpm contracts:test          # Foundry tests, including fuzz suites
+pnpm test                    # 86 unit tests across enforcer/compiler/quarantine/proposer
+pnpm contracts:test          # 16 Foundry tests, including three fuzz suites
 pnpm --filter @bonded/attack-corpus run-harness   # real enforce() calls, fixture query path
+pnpm --filter @bonded/console dev                 # console at /live, /policy, /corpus, /architecture, /log
 ```
 
 Nothing above requires a wallet, an RPC endpoint, or an API key — the
@@ -109,6 +120,23 @@ onto the live Graph Gateway / Arc testnet / Chainlink CRE path.
   `fs.writeFileSync`; fixed by using `fileURLToPath()` instead, in both
   `packages/attack-corpus/harness/run.ts` and
   `packages/standardized/scripts/proof.ts`.
+- `packages/compiler/src/hash.ts` has its own `canonicalJson`, separate from
+  `packages/enforcer/src/policyHash.ts`'s — the enforcer's version throws a
+  specific "BigInt not serializable" error, the compiler's fell through to a
+  generic "unsupported type" message because the `bigint` branch was missing
+  entirely. Same underlying discipline, one copy of it was incomplete. Fixed
+  by adding the explicit branch; the deeper fix (one shared implementation)
+  is still two copies of the same logic in two packages.
+- `apps/console/app/api/enforce/route.ts` hit the same
+  `bigint`-through-`JSON.stringify` failure as `buildLogRef` did, this time
+  at the API boundary rather than inside the enforcer — `PremiseRecord.blockChecked`
+  has to be converted to a string every time it crosses a serialization
+  boundary, and each new boundary has needed its own explicit conversion so
+  far rather than there being one place that handles it.
+- The attack-corpus harness's `runBondedEnforcer` originally guessed the
+  verdict by checking whether the task prompt contained the word
+  "unlimited" — a heuristic standing in for the actual product. Replaced
+  with a real `enforce()` call; see `docs/FUTURE.md`.
 
 ## What is deliberately not built
 
