@@ -1,0 +1,49 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: BondedRegistry
+    network: arc-testnet
+    source:
+      address: "PENDING_DEPLOY"
+      abi: BondedRegistry
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Policy
+      abis:
+        - name: BondedRegistry
+          file: ./abis/BondedRegistry.json
+      eventHandlers:
+        - event: PolicyCommitted(indexed bytes32,indexed address,uint256)
+          handler: handlePolicyCommitted
+      file: ./src/mappings.ts
+  - kind: ethereum
+    name: BondedVault
+    network: arc-testnet
+    source:
+      address: "PENDING_DEPLOY"
+      abi: BondedVault
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VerdictRecord
+        - StepUpRecord
+      abis:
+        - name: BondedVault
+          file: ./abis/BondedVault.json
+      eventHandlers:
+        - event: VerdictSettled(indexed bytes32,indexed address,uint8,uint16,uint256)
+          handler: handleVerdictSettled
+        - event: StepUpArmed(indexed bytes32,indexed address)
+          handler: handleStepUpArmed
+        - event: StepUpConfirmed(indexed bytes32)
+          handler: handleStepUpConfirmed
+      file: ./src/mappings.ts
