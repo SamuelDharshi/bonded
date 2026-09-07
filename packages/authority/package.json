@@ -1,0 +1,30 @@
+{
+  "name": "@bonded/authority",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Authority layer — Chainlink CRE confidential workflow interface. Interface is identical regardless of CRE or Ledger path.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "simulate": "tsx scripts/simulate.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@bonded/seam": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0"
+  }
+}
