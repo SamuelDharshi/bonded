@@ -17,7 +17,7 @@ export interface ProposerConfig {
  * Parse the model's JSON output into a typed Proposal.
  * Throws if the output cannot be parsed — never silently accepts malformed proposals.
  */
-function parseModelOutput(raw: string, agent: Address): Omit<Proposal, 'id' | 'createdAt'> {
+export function parseModelOutput(raw: string, agent: Address): Omit<Proposal, 'id' | 'createdAt'> {
   let parsed: unknown;
   try {
     // Extract JSON block if model wraps it in markdown
