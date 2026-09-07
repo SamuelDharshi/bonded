@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --harbor:    #0B1A22;
+  --deepwater: #122733;
+  --hairline:  #1E3A47;
+  --manifest:  #ECEEEA;
+  --ink:       #0E1614;
+  --seal:      #3FA37A;
+  --stamp:     #C2452C;
+  --hold:      #E0A33C;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0B1A22; /* harbor */
+  color: #ECEEEA;             /* manifest — default text on dark canvas */
+  font-family: 'Instrument Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── The stamp animation ────────────────────────────────────────────────────
+   The ONLY animation with overshoot on this site.
+   Appears once: on REFUSED verdict reveal.
+   Everything else: 120ms crossfade, no overshoot.
+────────────────────────────────────────────────────────────────────────── */
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    transform: scale(1.6) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
+.stamp-animate {
+  animation: stamp-in 180ms cubic-bezier(0.2, 0.9, 0.3, 1.4) forwards;
+}
+
+/* Respect reduced motion — stamp becomes instant opacity change */
+@media (prefers-reduced-motion: reduce) {
+  .stamp-animate {
+    animation: none;
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
+/* ── Layout transitions ─────────────────────────────────────────────────── */
+.fade-transition {
+  transition: opacity 120ms ease;
+}
+
+/* ── Document surfaces (paper on harbor canvas) ─────────────────────────── */
+.document {
+  background-color: #ECEEEA; /* manifest */
+  color: #0E1614;             /* ink */
+  border-radius: 4px;         /* doc radius */
+}
+
+/* ── Tables — always 0 radius ────────────────────────────────────────────── */
+table {
+  border-radius: 0 !important;
+}
+
+/* ── Hairline rules — 1px only, never decorative ─────────────────────────── */
+.hairline-rule {
+  border-color: #1E3A47;
+  border-width: 1px;
+}
+
+/* ── Typography scale ───────────────────────────────────────────────────── */
+.text-display {
+  font-size: 56px;
+  line-height: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.text-h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 600;
+}
+
+.text-h2 {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.text-small {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+/* Max line length for readability */
+.prose {
+  max-width: 72ch;
+}
