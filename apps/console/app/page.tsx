@@ -12,6 +12,24 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-harbor">
 
+      {/* ── Top nav ───────────────────────────────────────────────────────── */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-hairline">
+        <span className="text-body text-manifest font-medium">Bonded</span>
+        <nav className="flex items-center gap-6">
+          {[
+            ['/live', 'Live'],
+            ['/log', 'Log'],
+            ['/policy', 'Policy'],
+            ['/corpus', 'Corpus'],
+            ['/architecture', 'Architecture'],
+          ].map(([href, label]) => (
+            <Link key={href} href={href} className="text-small text-manifest/50 hover:text-manifest transition-colors">
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="flex flex-col items-center justify-center px-6 pt-24 pb-16 text-center">
         <p className="text-small text-manifest/50 uppercase tracking-widest mb-6">
