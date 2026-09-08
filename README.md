@@ -32,7 +32,7 @@ See `docs/ARCHITECTURE.md` for the full layer breakdown and
 |---|---|---|
 | **The Graph** | `packages/standardized` re-derives every premise via Messari-standardized subgraphs through the Graph Gateway, `cache: 'no-store'` on the enforcement path | The enforcement mechanism doesn't exist — nothing to check the model's claims against |
 | **Arc** | `contracts/BondedVault.sol` holds USDC, releases only against a signed `Verdict` | No spending account to protect — the verdict has nothing to gate |
-| **Chainlink CRE** | `packages/authority` — `handlerInTee` custodies the enforcer's signing key and keeps `irreversible_above` confidential inside the enclave | The authority layer becomes a soft target — thresholds become probeable, the key sits in plaintext on a compromisable host |
+| **Chainlink CRE** | `cre/stepup-threshold` — real `handlerInTee` workflow, simulated and passing, keeps `irreversible_above` confidential inside the enclave (`packages/authority` documents the same design) | The authority layer becomes a soft target — thresholds become probeable, the key sits in plaintext on a compromisable host |
 
 **Note on the authority layer:** the original design spec'd Ledger's Key
 Ring + DMK for this role. This build uses Chainlink CRE instead — see
@@ -71,10 +71,32 @@ Verified in this environment, not asserted:
   the real `results.json`, `force-dynamic` so a harness re-run shows up
   without a rebuild), `/architecture`, and `/log` (honest empty state — no
   subgraph deployed yet, states that plainly rather than faking entries).
+- ✅ `cre/stepup-threshold` — the **real** confidential `handlerInTee`
+  workflow (Implementation PRD §D.6), not the hello-world template: an HTTP
+  trigger carries the (non-confidential) proposal amount, the enclave
+  fetches the policy's `irreversible_above` threshold as a Vault DON secret,
+  computes `requiresStepUp` by strict `BigInt` comparison, and crosses back
+  only the boolean — the threshold never leaves the enclave, never gets
+  logged. **8/8 unit tests pass** (`bun test`), and it **simulates
+  successfully** for both above- and below-threshold cases — transcript at
+  `docs/evidence/cre-stepup-threshold-simulation.txt`. Deployment itself is
+  still pending private-beta access (requested, org `org_lgyLfW5Ebah6miLW`,
+  awaiting Chainlink).
 - ⏳ Not yet deployed anywhere: Arc testnet (contracts build and test locally
-  but have no live address), Subgraph Studio (schema/mappings written, not
-  pushed), Chainlink CRE (handler written, not run against `cre simulate` or
-  a live DON).
+  but have no live address — blocked on a funded deployer wallet).
+- ✅ / ⏳ Subgraph deployed to Studio (`bonded-subgraph`) — the deploy
+  pipeline itself works, but **The Graph does not yet support Arc testnet as
+  an indexing network** (verified against
+  `thegraph.com/docs/en/supported-networks/` — only Arc mainnet is listed),
+  so it never leaves "not started syncing." This blocks only `/log` (our
+  own contracts' event index); it does **not** block premise re-derivation,
+  which queries external Messari subgraphs on their own established
+  networks. See `FEEDBACK/THEGRAPH.md` for the reproduced finding.
+- ⏳ The hardcoded Messari DEX-AMM subgraph IDs in
+  `packages/standardized/schemas/messari-dex-amm.ts` are confirmed stale
+  (two don't resolve, one resolves to an unrelated subgraph) — the query
+  *pattern* is real and tested, the specific IDs need a human to look up
+  current ones via Graph Explorer's search UI. See `FEEDBACK/THEGRAPH.md`.
 - ⏳ Not yet run: the naive-agent side of the attack corpus (`results.json`
   honestly reports `NOT_YET_RUN` for all three starter kits — see
   `docs/FUTURE.md`).
