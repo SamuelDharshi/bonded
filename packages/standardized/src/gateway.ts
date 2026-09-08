@@ -3,11 +3,23 @@ import { Decimal } from 'decimal.js';
 Decimal.set({ precision: 78, rounding: Decimal.ROUND_DOWN, toExpPos: 78, toExpNeg: -78 });
 
 export interface GatewayConfig {
-  /** Graph Gateway base URL — e.g. https://gateway.thegraph.com/api */
+  /**
+   * Either:
+   *  (a) the production Graph Gateway base URL, e.g.
+   *      https://gateway.thegraph.com/api — combined with apiKey/subgraphId
+   *      below into /{apiKey}/subgraphs/id/{subgraphId}, or
+   *  (b) a full Studio dev query endpoint, e.g.
+   *      https://api.studio.thegraph.com/query/{id}/{name}/{version} — used
+   *      as-is. Studio's dev endpoint is directly queryable before a
+   *      subgraph is published to the decentralized network, which is the
+   *      path this project's testnet build uses; apiKey/subgraphId are
+   *      ignored in this mode. Detected by the presence of '/query/' in the
+   *      URL — the production Gateway URL never contains that segment.
+   */
   gatewayBaseUrl: string;
-  /** API key from Subgraph Studio — NEVER committed, lives in CRE TEE */
+  /** API key from Subgraph Studio — NEVER committed, lives in CRE TEE. Unused in Studio dev-endpoint mode. */
   apiKey: string;
-  /** Subgraph deployment ID from Subgraph Studio */
+  /** Subgraph deployment ID from Subgraph Studio. Unused in Studio dev-endpoint mode. */
   subgraphId: string;
 }
 
@@ -18,12 +30,15 @@ export interface GraphQLResponse<T> {
 
 /**
  * Build the full Gateway URL for a subgraph.
- * Format: https://gateway.thegraph.com/api/{apiKey}/subgraphs/id/{subgraphId}
+ * Production format: https://gateway.thegraph.com/api/{apiKey}/subgraphs/id/{subgraphId}
+ * Studio dev-endpoint format: used verbatim, see GatewayConfig.gatewayBaseUrl.
  *
  * NOTE: Copy this URL verbatim from Subgraph Studio — do not type from memory.
- * The Gateway format is exactly as shown above as of 2024. Confirm on Day 2.
  */
 export function buildGatewayUrl(config: GatewayConfig): string {
+  if (config.gatewayBaseUrl.includes('/query/')) {
+    return config.gatewayBaseUrl;
+  }
   return `${config.gatewayBaseUrl}/${config.apiKey}/subgraphs/id/${config.subgraphId}`;
 }
 
