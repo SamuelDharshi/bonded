@@ -1,4 +1,6 @@
-type Policy @entity {
+# Mutable: the same owner's Policy entity is updated in place on every
+# recommit (policyHash/version change) — see handlePolicyCommitted.
+type Policy @entity(immutable: false) {
   id: ID!          # owner address
   owner: Bytes!
   policyHash: Bytes!
@@ -7,7 +9,9 @@ type Policy @entity {
   transactionHash: Bytes!
 }
 
-type VerdictRecord @entity {
+# Immutable: a given proposalHash settles exactly once and is never
+# rewritten after creation — see handleVerdictSettled.
+type VerdictRecord @entity(immutable: true) {
   id: ID!          # proposalHash
   proposalHash: Bytes!
   agent: Bytes!
@@ -20,7 +24,10 @@ type VerdictRecord @entity {
   stepUp: StepUpRecord
 }
 
-type StepUpRecord @entity {
+# Mutable: created on StepUpArmed (confirmed: false), then updated in
+# place on StepUpConfirmed (confirmedAt/confirmed set) — see
+# handleStepUpArmed / handleStepUpConfirmed.
+type StepUpRecord @entity(immutable: false) {
   id: ID!          # proposalHash
   proposalHash: Bytes!
   agent: Bytes!
