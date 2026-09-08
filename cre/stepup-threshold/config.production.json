@@ -1,0 +1,4 @@
+{
+  "authorizedKeys": ["YOUR_ENFORCER_ADDRESS_HERE"],
+  "secretId": "IRREVERSIBLE_THRESHOLD_USDC"
+}
