@@ -6,7 +6,7 @@ dataSources:
     name: BondedRegistry
     network: arc-testnet
     source:
-      address: "PENDING_DEPLOY"
+      address: "0x0000000000000000000000000000000000000000"
       abi: BondedRegistry
       startBlock: 0
     mapping:
@@ -26,7 +26,7 @@ dataSources:
     name: BondedVault
     network: arc-testnet
     source:
-      address: "PENDING_DEPLOY"
+      address: "0x0000000000000000000000000000000000000000"
       abi: BondedVault
       startBlock: 0
     mapping:

@@ -1,0 +1,17 @@
+{
+  "name": "bonded-subgraph",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy bonded-subgraph"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.38.0"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.98.1"
+  }
+}
