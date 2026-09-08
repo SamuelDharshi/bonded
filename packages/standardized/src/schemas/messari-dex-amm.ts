@@ -13,10 +13,18 @@ export const MESSARI_DEX_AMM_SCHEMA = 'messari-dex-amm' as const;
 
 /**
  * Known Messari DEX-AMM standardized subgraph deployment IDs.
- * Verify these are current in Subgraph Studio on Day 2 — IDs can change.
+ *
+ * CONFIRMED STALE as of 2026-09-08 — see FEEDBACK/THEGRAPH.md for the
+ * exact Gateway queries and error responses. Two of the three IDs below
+ * don't resolve at all; the third resolves to a real subgraph that is NOT
+ * a Messari DEX-AMM deployment (no `liquidityPools` field). Do not treat
+ * these as usable without re-verifying against Subgraph Studio / Graph
+ * Explorer first — the query PATTERN in this file is real and tested, but
+ * these specific IDs are not currently live.
  *
  * These are the deployments used in the Composable track proof script.
- * The SAME query resolves against all of them — that's the proof.
+ * The SAME query resolves against all of them — that's the proof, once
+ * the IDs are current.
  */
 export const KNOWN_DEPLOYMENTS = {
   'uniswap-v3-ethereum': 'ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH5XNovGR',
