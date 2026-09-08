@@ -37,3 +37,13 @@ Thumbs.db
 
 # Claude Code local session state
 .claude/
+
+# Scratch CRE hello-world scaffold used only to verify the CLI/SDK setup —
+# not part of the Bonded product; the real CRE integration lives in
+# packages/authority.
+cre-workflows/
+
+# graph-cli build output
+subgraph/build/
+subgraph/generated/
+subgraph/node_modules/
