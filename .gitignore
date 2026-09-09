@@ -16,6 +16,7 @@ apps/console/next-env.d.ts
 # Foundry artifacts
 contracts/out
 contracts/cache
+contracts/broadcast/**/dry-run/
 
 # Environment — real values never committed
 .env
