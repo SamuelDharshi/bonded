@@ -31,7 +31,7 @@ See `docs/ARCHITECTURE.md` for the full layer breakdown and
 | Sponsor | Role | What breaks without it |
 |---|---|---|
 | **The Graph** | `packages/standardized` re-derives every premise via Messari-standardized subgraphs through the Graph Gateway, `cache: 'no-store'` on the enforcement path | The enforcement mechanism doesn't exist — nothing to check the model's claims against |
-| **Arc** | `contracts/BondedVault.sol` holds USDC, releases only against a signed `Verdict` | No spending account to protect — the verdict has nothing to gate |
+| **Arc** | `contracts/BondedVault.sol` holds USDC, releases only against a signed `Verdict` — **deployed live** on Arc testnet at `0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE`, wired to the real Arc testnet USDC (`0x3600...0000`) | No spending account to protect — the verdict has nothing to gate |
 | **Chainlink CRE** | `cre/stepup-threshold` — real `handlerInTee` workflow, simulated and passing, keeps `irreversible_above` confidential inside the enclave (`packages/authority` documents the same design) | The authority layer becomes a soft target — thresholds become probeable, the key sits in plaintext on a compromisable host |
 
 **Note on the authority layer:** the original design spec'd Ledger's Key
@@ -69,8 +69,11 @@ Verified in this environment, not asserted:
   call via `/api/enforce`, rendering the actual premise diff and verdict),
   `/policy` (real `hashPolicy()` on the example artifact), `/corpus` (reads
   the real `results.json`, `force-dynamic` so a harness re-run shows up
-  without a rebuild), `/architecture`, and `/log` (honest empty state — no
-  subgraph deployed yet, states that plainly rather than faking entries).
+  without a rebuild), `/architecture`, and `/log` — **fully live**: queries
+  the real deployed subgraph, renders a real committed `Policy` entity with
+  a working link to its real Arc testnet explorer transaction. Verified
+  end-to-end: called `BondedRegistry.commitPolicy()` on-chain, watched it
+  get indexed, watched it render on the page.
 - ✅ `cre/stepup-threshold` — the **real** confidential `handlerInTee`
   workflow (Implementation PRD §D.6), not the hello-world template: an HTTP
   trigger carries the (non-confidential) proposal amount, the enclave
@@ -82,16 +85,26 @@ Verified in this environment, not asserted:
   `docs/evidence/cre-stepup-threshold-simulation.txt`. Deployment itself is
   still pending private-beta access (requested, org `org_lgyLfW5Ebah6miLW`,
   awaiting Chainlink).
-- ⏳ Not yet deployed anywhere: Arc testnet (contracts build and test locally
-  but have no live address — blocked on a funded deployer wallet).
-- ✅ / ⏳ Subgraph deployed to Studio (`bonded-subgraph`) — the deploy
-  pipeline itself works, but **The Graph does not yet support Arc testnet as
-  an indexing network** (verified against
-  `thegraph.com/docs/en/supported-networks/` — only Arc mainnet is listed),
-  so it never leaves "not started syncing." This blocks only `/log` (our
-  own contracts' event index); it does **not** block premise re-derivation,
-  which queries external Messari subgraphs on their own established
-  networks. See `FEEDBACK/THEGRAPH.md` for the reproduced finding.
+- ✅ **Live on Arc testnet** (chain id `5042002`): `BondedRegistry` at
+  [`0xB825225163aEf4353d0110BA63d0d811A17B8205`](https://testnet.arcscan.app/address/0xB825225163aEf4353d0110BA63d0d811A17B8205),
+  `BondedVault` at
+  [`0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE`](https://testnet.arcscan.app/address/0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE),
+  wired to the real Arc testnet USDC (`0x3600...0000`, verified via
+  `symbol()`/`decimals()` on-chain — returns `"USDC"` / `6`, not assumed).
+  `AttackToken` deployed at
+  [`0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5`](https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5) —
+  its `name()` really does return the injected instruction on a live chain.
+  `enrolledSigner` is currently the deployer's own address as a documented
+  placeholder (`BondedVault.enrolledSigner` is immutable, so this will need
+  a redeploy once CRE deploy access issues a real enclave-custodied key —
+  see `FEEDBACK/CHAINLINK.md`).
+- ✅ **Subgraph deployed and confirmed syncing** against the real contracts
+  above (`v0.0.2`, redeployed after the addresses went live). An earlier
+  finding claimed Arc testnet wasn't indexable — that was reproduced against
+  placeholder zero-address contracts and turned out to be wrong; corrected
+  in `FEEDBACK/THEGRAPH.md` with the real end-to-end proof (on-chain
+  `commitPolicy()` call → indexed `Policy` entity → queried and rendered on
+  `/log`, in that order, in this environment).
 - ⏳ The hardcoded Messari DEX-AMM subgraph IDs in
   `packages/standardized/schemas/messari-dex-amm.ts` are confirmed stale
   (two don't resolve, one resolves to an unrelated subgraph) — the query
