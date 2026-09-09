@@ -4,34 +4,161 @@ import { ScrollText } from 'lucide-react';
 /**
  * The decision log is backed by our own subgraph indexing BondedRegistry
  * and BondedVault events (see subgraph/schema.graphql) — not a database.
- * Nothing is deployed to Subgraph Studio yet, so this page states that
- * plainly rather than rendering fabricated entries. Once deployed, this
- * becomes a live query against the Gateway URL in .env, one paper record
- * per proposalHash, each hash linking to a real Arc explorer transaction.
+ * Live query against the real Gateway URL in .env. bonded-subgraph is
+ * deployed and confirmed syncing against the real Arc testnet contracts
+ * (see FEEDBACK/THEGRAPH.md) -- this is real chain data, not a fixture.
  */
-export default function LogPage() {
+export const dynamic = 'force-dynamic';
+
+interface PolicyEntity {
+  id: string;
+  owner: string;
+  policyHash: string;
+  version: string;
+  committedAt: string;
+  transactionHash: string;
+}
+
+interface VerdictEntity {
+  id: string;
+  agent: string;
+  outcome: number;
+  reasonCode: number;
+  valueUSDC: string;
+  blockNumber: string;
+  transactionHash: string;
+}
+
+interface LogData {
+  policies: PolicyEntity[];
+  verdictRecords: VerdictEntity[];
+  blockNumber: string | null;
+  error: string | null;
+}
+
+async function loadLog(): Promise<LogData> {
+  const url = process.env.GRAPH_GATEWAY_URL;
+  if (!url) {
+    return { policies: [], verdictRecords: [], blockNumber: null, error: 'GRAPH_GATEWAY_URL not set' };
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({
+        query: `{
+          _meta { block { number } }
+          policies(first: 20, orderBy: committedAt, orderDirection: desc) {
+            id owner policyHash version committedAt transactionHash
+          }
+          verdictRecords(first: 20, orderBy: timestamp, orderDirection: desc) {
+            id agent outcome reasonCode valueUSDC blockNumber transactionHash
+          }
+        }`,
+      }),
+    });
+
+    const json = await res.json();
+    if (json.errors) {
+      return { policies: [], verdictRecords: [], blockNumber: null, error: json.errors[0]?.message ?? 'unknown error' };
+    }
+
+    return {
+      policies: json.data.policies,
+      verdictRecords: json.data.verdictRecords,
+      blockNumber: json.data._meta.block.number,
+      error: null,
+    };
+  } catch (err) {
+    return { policies: [], verdictRecords: [], blockNumber: null, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+// Verified against docs.arc.io/arc/references/connect-to-arc and confirmed
+// live by loading our own deploy transaction there (200, real page).
+const EXPLORER_TX = (hash: string) => `https://testnet.arcscan.app/tx/${hash}`;
+
+export default async function LogPage() {
+  const data = await loadLog();
+
   return (
     <Shell>
       <div className="max-w-content mx-auto px-8 py-10">
         <h1 className="text-h1 text-manifest">Decision log</h1>
         <p className="text-body text-manifest/60 mt-2 max-w-xl">
-          Every proposal, premise, re-derivation, and verdict, indexed by our own subgraph —
-          not a database.
+          Every policy commitment and settled verdict, indexed by our own subgraph — not a
+          database.
+          {data.blockNumber && (
+            <span className="text-manifest/40"> Synced to block {data.blockNumber}.</span>
+          )}
         </p>
 
-        <div className="mt-16 flex flex-col items-center text-center max-w-md mx-auto">
-          <ScrollText size={32} strokeWidth={1.5} className="text-manifest/30" />
-          <p className="text-body text-manifest/70 mt-4">
-            The subgraph is not deployed to Subgraph Studio yet.
-          </p>
-          <p className="text-small text-manifest/40 mt-2">
-            No decisions have been indexed, because none have been committed on-chain. Deploy{' '}
-            <code className="font-mono">subgraph/</code> and set{' '}
-            <code className="font-mono">GRAPH_GATEWAY_URL</code> /{' '}
-            <code className="font-mono">BONDED_SUBGRAPH_ID</code> in <code className="font-mono">.env</code> to
-            populate this page.
-          </p>
-        </div>
+        {data.error && (
+          <div className="mt-8 border border-hold/40 rounded-control p-4 bg-hold/10">
+            <p className="text-small text-hold">Subgraph query error: {data.error}</p>
+          </div>
+        )}
+
+        {!data.error && data.policies.length === 0 && data.verdictRecords.length === 0 && (
+          <div className="mt-16 flex flex-col items-center text-center max-w-md mx-auto">
+            <ScrollText size={32} strokeWidth={1.5} className="text-manifest/30" />
+            <p className="text-body text-manifest/70 mt-4">
+              The subgraph is live and synced, but nothing has been committed on-chain yet.
+            </p>
+          </div>
+        )}
+
+        {data.policies.length > 0 && (
+          <div className="mt-8">
+            <p className="text-small text-manifest/50 mb-3">Policy commitments</p>
+            <div className="space-y-3">
+              {data.policies.map((p) => (
+                <div key={p.id} className="document rounded-doc p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-small font-mono text-ink">{p.owner}</p>
+                    <span className="text-small font-mono text-ink/50">v{p.version}</span>
+                  </div>
+                  <p className="text-small font-mono text-ink/60 mt-1 break-all">{p.policyHash}</p>
+                  <a
+                    href={EXPLORER_TX(p.transactionHash)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-small font-mono text-seal mt-2 inline-block hover:underline"
+                  >
+                    {p.transactionHash.slice(0, 18)}... ↗
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {data.verdictRecords.length === 0 ? (
+          <div className="mt-8 border border-hairline rounded-control p-4 bg-deepwater">
+            <p className="text-small text-manifest/50">
+              No verdicts settled yet — BondedVault.settle() hasn&apos;t been called on-chain.
+              The enforcer&apos;s real logic already works end-to-end against the fixture path
+              (see <code className="font-mono">/live</code>); wiring a live proposal through to
+              an on-chain settlement is the next real step here.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-8">
+            <p className="text-small text-manifest/50 mb-3">Settled verdicts</p>
+            <div className="space-y-3">
+              {data.verdictRecords.map((v) => (
+                <div key={v.id} className="document rounded-doc p-4">
+                  <p className="text-small font-mono text-ink">{v.agent}</p>
+                  <p className="text-small font-mono text-ink/60 mt-1">
+                    outcome={v.outcome} reasonCode={v.reasonCode} value={v.valueUSDC}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Shell>
   );
