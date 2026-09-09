@@ -4,38 +4,60 @@ Findings land here only after being independently reproduced against the
 live Subgraph Studio / Gateway, with the exact query and response that
 triggers them.
 
-## Arc testnet is not a supported indexing network (reproduced 2026-09-08)
+## Arc testnet indexing: initial finding was wrong — corrected (2026-09-08)
+
+**Update, same day, after real contracts existed:** the finding below (kept
+verbatim for the record) was reproduced against a subgraph pointed at
+placeholder zero addresses with `startBlock: 0`. Once real `BondedRegistry`/
+`BondedVault` contracts were deployed to Arc testnet and the subgraph was
+redeployed (`v0.0.2`) with their real addresses and a `startBlock` near the
+deploy block, **it synced immediately and correctly**:
+
+```
+$ curl .../v0.0.2 -d '{"query":"{ _meta { block { number } hasIndexingErrors } } }"}'
+{"data":{"_meta":{"block":{"number":61234064},"hasIndexingErrors":false}}}
+```
+
+Confirmed end-to-end, not just `_meta`: called `BondedRegistry.commitPolicy()`
+on-chain (tx `0xcfe385b0...`, block `61234114`), waited ~20s, queried the
+subgraph, and got the real indexed entity back:
+
+```json
+{"policies":[{"id":"0xac13a62f...","owner":"0xac13a62f...","policyHash":"0x1111...1111","version":"1"}]}
+```
+
+**So Arc testnet is indexable.** The most likely explanation for the
+original finding: `startBlock: 0` on a chain whose current height is in the
+tens of millions may have caused the indexer to never catch up in the
+observed window, or a zero/placeholder contract address is treated
+differently by the indexer than a real one — not confirmed which, and not
+worth further digging now that the real thing works. The lesson worth
+keeping: **retest with real inputs before writing off a platform
+capability** — the placeholder-address test wasn't representative of the
+actual deployment.
+
+**This un-blocks `/log`.** See README's current-state section.
+
+<details>
+<summary>Original finding (reproduced against placeholder addresses, superseded above)</summary>
 
 `subgraph/` deployed successfully to Studio
 (`https://thegraph.com/studio/subgraph/bonded-subgraph`, deployment
 `QmYYtse1wYNeLJLy3uDdHVTn4qSFeBnCc1AG1kC6dX7dzB`) with `network: arc-testnet`
-in `subgraph.yaml`. `graph deploy` did not reject the network name. Querying
-the resulting endpoint (`https://api.studio.thegraph.com/query/1758829/bonded-subgraph/v0.0.1`)
-consistently returns:
+in `subgraph.yaml`, addresses set to `0x000...000`, `startBlock: 0`. Querying
+the resulting endpoint (`v0.0.1`) consistently returned:
 
 ```json
 {"errors":[{"message":"Store error: query execution failed: Subgraph `Qm...` has not started syncing yet. Wait for it to ingest a few blocks before querying it"}]}
 ```
 
 with no progress after several minutes. Cross-checked against
-`https://thegraph.com/docs/en/supported-networks/` — **only `arc` (Arc
-mainnet, chain id `eip155:5042`) is listed as a supported network; no Arc
-testnet/Sepolia identifier is documented.** This is consistent with the
-subgraph silently never being picked up by an indexer rather than a
-`graph deploy`-time validation error.
+`https://thegraph.com/docs/en/supported-networks/` — only `arc` (Arc
+mainnet) was listed there, no Arc testnet identifier — which looked
+consistent with the symptom but, per the update above, was not actually
+the cause.
 
-**Impact, scoped correctly:** this only blocks the decision-log subgraph
-(`subgraph/` indexing our own `BondedRegistry`/`BondedVault` events, i.e.
-the `/log` console screen) — it does **not** block the enforcer's premise
-re-derivation, which queries external Messari-standardized subgraphs
-(Uniswap/Curve/Balancer, etc.) on their own established networks via
-`packages/standardized`, unrelated to which chain Bonded's own contracts
-live on.
-
-**Not yet resolved.** Options once Arc testnet contracts exist: keep
-`/log` on its honest "not deployed" empty state until The Graph adds Arc
-testnet support, or point the decision-log subgraph at Arc mainnet once/if
-a mainnet deployment happens (see `docs/FUTURE.md`).
+</details>
 
 ## Hardcoded Messari DEX-AMM subgraph IDs are stale (reproduced 2026-09-08)
 
