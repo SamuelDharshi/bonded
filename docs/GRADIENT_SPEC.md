@@ -7,6 +7,15 @@ slot that used to want a hero video, a recorded clip, or a generated
 still now gets a **noisy mesh gradient**: pure CSS + SVG, zero external
 asset files, fully code-defined and reviewable like any other component.
 
+> **Scope note — the hero is the exception.** The hero now uses the React
+> Bits `Grainient` WebGL component (`components/landing/Grainient.tsx`,
+> `ogl` dependency) rather than the CSS gradient described here; see
+> `docs/LANDING_PAGE_SPEC.md` §5.1 for its color mapping and required
+> scrim. Everything in *this* file still applies to the **section panels**
+> (evidence strip, three-layer band, receipt strip, compare placeholders),
+> and the `.mesh-gradient` class additionally serves as the hero's
+> no-WebGL fallback layer.
+
 This is a stronger fit for this project than AI media was: nothing here
 makes a factual claim, so there's no real-vs-generated tension to manage
 — but it's also not a black-box asset someone generated once and dropped

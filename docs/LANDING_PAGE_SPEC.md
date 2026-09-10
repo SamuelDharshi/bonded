@@ -69,10 +69,13 @@ the moment it's recognizable, same as before.
 ## 4. Motion budget — unchanged count (three), new content for one slot
 
 1. **The refusal stamp** (`/live`) — unchanged, no implementation change.
-2. **The hero mesh gradient drift** — replaces the hero video loop as
-   this budget slot. See `docs/GRADIENT_SPEC.md` §3 for the exact
-   `@keyframes`. Same "quiet, not an attention grab" requirement (28s
-   period, slow ease).
+2. **The hero grainient** — replaces the hero video loop as this budget
+   slot. Implemented with the React Bits `Grainient` WebGL component
+   (`components/landing/Grainient.tsx`, `ogl` dependency), not the CSS
+   drift. Same "quiet, not an attention grab" requirement — hence
+   `timeSpeed={0.18}` rather than the component's `0.25` default. The
+   CSS `.mesh-gradient` drift from `docs/GRADIENT_SPEC.md` §3 is still
+   used by the section panels and remains the hero's no-WebGL fallback.
 3. **The hero typewriter** — unchanged mechanism, new copy above.
 
 Same prohibitions as before: no fade-and-slide-up per section, no
@@ -104,12 +107,26 @@ Left-aligned, `max-w-content` (1160px) below the hero; hero is full-bleed.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-- `<MeshGradient animated>` wraps the full hero (`docs/GRADIENT_SPEC.md`
-  §5), no `<video>` element anywhere.
-- No scrim needed on top of the gradient the way video needed one — tune
-  gradient opacity/darkness directly (favor `mesh-dark`/`mesh-black`
-  dominance in the blob mix under the text zone) so Space Grotesk and
-  Geist Pixel stay legible without an extra overlay layer.
+- `<Grainient>` (WebGL, `components/landing/Grainient.tsx`) fills the
+  hero as an absolutely-positioned layer. No `<video>` element anywhere.
+- **Colors** — the requested white → light blue → blue → dark blue →
+  black range maps onto Grainient's three blend anchors, because the
+  shader mixes dark↔mid and mid↔light and produces the two intermediate
+  blues on its own:
+  | Prop | Value | Role |
+  |---|---|---|
+  | `color1` | `#F5F7FA` (`mesh-white`) | primary light |
+  | `color2` | `#2E6FD9` (`mesh-blue`) | mid / accent |
+  | `color3` | `#050608` (`mesh-black`) | deep base |
+- **A scrim IS required**, reversing the pre-Grainient guidance here. That
+  earlier note assumed a gradient kept dark by construction; with
+  `mesh-white` as an anchor and `manifest` text on top, the warp can put a
+  light band anywhere, so hero copy needs contrast that doesn't depend on
+  where the shader happens to land. Currently `bg-harbor/65` over the
+  canvas, under the content.
+- **No-WebGL fallback**: the hero wrapper keeps the `.mesh-gradient` CSS
+  class, so a failed WebGL context degrades to the CSS gradient rather
+  than a flat empty block.
 - Two CTAs, unchanged: primary → `/live` ("Watch it refuse"), secondary →
   `/architecture` ("Read the architecture").
 
