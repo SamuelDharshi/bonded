@@ -1,6 +1,8 @@
-# Media generation prompts — landing page revamp
+# Media generation prompts — landing page revamp (Odyssey theme)
 
-Companion to `docs/LANDING_PAGE_SPEC.md`. Read the boundary below before
+Companion to `docs/LANDING_PAGE_SPEC.md`. Read that file's §0 mapping
+table first — every prompt below is built from it, not from generic
+"epic space" description. Read the boundary directly below before
 generating or commissioning anything.
 
 ## The real-vs-generated boundary — read this first
@@ -11,186 +13,170 @@ standard applies to this page's media exactly as much as it applies to
 
 **AI-generated media is allowed ONLY for pure atmosphere/mood** — the
 hero background loop and its poster frame. Nothing in these two assets
-makes a factual claim; they're the equivalent of a lobby's ambient
-lighting, not a data source.
+makes a factual claim; they're the equivalent of a theater's curtain, not
+a data source.
 
 **Everything else that looks like it's showing you something real MUST
 BE real** — actual screen recordings, actual block-explorer screenshots,
 actual terminal output. This includes:
 
-- The Compare-slider naive-agent-vs-Bonded videos (§4 below is recording
-  instructions, not an image/video-gen prompt)
+- The two "trial" videos (§4 below is recording instructions, not an
+  image/video-gen prompt)
 - Every explorer screenshot (already captured for real this session —
-  see `docs/LANDING_PAGE_SPEC.md` §5)
+  see `docs/LANDING_PAGE_SPEC.md` §6)
 - Any on-screen text, hash, address, or number
 
-If a real asset genuinely isn't ready by ship time, the correct move is
-the honest-empty-state pattern already used across this project (`/log`,
-`/corpus`) — a plain statement that it's pending — never a generated
-stand-in dressed up to look like a captured recording. A judge who
-notices one faked "real" asset will (correctly) stop trusting all the
-real ones.
+If a real asset genuinely isn't ready by ship time, use the honest-empty-
+state pattern already used across this project (`/log`, `/corpus`) — a
+plain statement that it's pending — never a generated stand-in dressed up
+to look like a captured recording.
 
 ---
 
-## 1. Hero background video loop
+## 1. Hero background video loop — "the threshold"
 
-**Purpose:** full-bleed, muted, looping ambience behind the hero headline.
-Still rooted in "customs and port authority" (`BONDED_PRD.md` §5.1) —
-that's the vocabulary — but rendered as a **dream**, not a security
-camera: volumetric bloom, glowing particulate light, a sense of something
-vast and quiet being watched over. The mechanism itself should be
-legible as imagery, not just mood: *a fact drifting in from the dark,
-passing through a field of light, and either dissolving into gold (cleared)
-or freezing mid-air and turning red (refused)* — this is the actual
-Bonded pitch (every claim independently re-checked before anything moves)
-rendered as a visual metaphor, not abstract prettiness for its own sake.
+**Purpose:** full-bleed, muted, looping ambience behind the hero
+headline. This is the Odyssey scene: **a ship crossing a threshold of
+judgment-light** — the same emotional shape as the reference image (two
+things reaching toward each other across a divide, one small and mortal,
+one vast and final) but rendered as a voyage and a verdict, not a touch.
+**No hands, no human figures at all, no Creation-of-Adam composition.**
 
 **Format:** 10–15 second seamless loop, 1920×1080 minimum (4K source if
-the tool supports it — bloom detail holds up much better downscaled than
-upscaled), no audio needed. Deliver as `.mp4` (H.264) and `.webm`.
+available), no audio needed. Deliver `.mp4` (H.264) + `.webm`.
 
 **Primary prompt** (Runway Gen-4 / Kling 2.x / Sora-class, free-text):
 
-> A vast, dreamlike night harbor rendered in deep bioluminescent teal and
-> navy (#0B1A22 → #122733), shot like a Roger Deakins night exterior fused
-> with a Studio Ghibli dream sequence. Heavy volumetric light bloom —
-> every light source blooms and breathes softly, halos of glow bleeding
-> into the mist. Endless stacked shipping containers recede into fog,
-> their edges dissolving into soft-focus darkness, lit only by the warm
-> amber glow of a single swinging inspection lamp and by thousands of
-> tiny drifting motes of light — like fireflies or bioluminescent
-> plankton — slowly floating between the containers, each mote a small
-> pending claim waiting to be checked. Camera drifts in a slow, weightless
-> crane move through this field of light, as if floating. At the center of
-> frame, one larger mote of light — glowing gold and warm — drifts toward
-> a stack of blank paper manifests on a weathered metal table, passes
-> through the lamp's beam, and as it's fully illuminated it either
-> dissolves into a soft shower of golden sparks (cleared, let it pass
-> through this loop's ending) — no text, no numerals, no legible
-> language anywhere, no people, no faces, no robots, no circuit-board or
-> matrix-code textures. Painterly depth of field, heavy but soft bloom,
-> gentle film grain, anamorphic lens flare only on the lamp itself (subtle,
-> horizontal, blue-teal). Ultra slow motion. This should feel like the
-> most beautiful, most expensive frame of a prestige A24 film about a
-> harbor at 3am, not a corporate stock video and not a cyberpunk game
-> cinematic. Seamlessly loopable — first and last frame match in framing,
-> light position, and mote density so the loop point is invisible.
+> A vast, epic night ocean beneath a cosmic sky — the water and the stars
+> nearly indistinguishable, both deep bioluminescent teal-navy
+> (#0B1A22 → #122733), as if the ship is sailing through a nebula as
+> much as through water. A single small wooden ship, ancient and weathered
+> (think a Greek trireme silhouette, seen only as a dark, detailed
+> silhouette — no crew visible, no figures on deck), moves slowly toward
+> camera across still black water. Directly ahead of the ship, a massive
+> vertical column of warm amber-gold light (#E0A33C) descends from a break
+> in the star field above, like a lighthouse beam turned upside down,
+> impossibly vast, illuminating a wide circle of the water where it lands
+> — this is the Oracle's attention, not a physical object. The light
+> beam is thick with volumetric bloom, dust and mist caught inside it,
+> visible as slowly drifting motes — thousands of tiny points of starlight
+> suspended in the beam like the ship is sailing into a held breath. Camera
+> is a slow, low, weightless drift just above the water line, moving
+> toward the light with the ship, as if the viewer is also being judged.
+> No text, no numerals, no legible language, no logos, no human figures,
+> no hands, no faces. Painterly, heavy bloom, cinematic anamorphic
+> depth of field, extremely slow motion, ultra-detailed matte-painting
+> quality — the mood of a myth being told, not a tech demo. Seamlessly
+> loopable: first and last frame match in ship position, light position,
+> and mote density.
 
-**Alternate prompt — "the refusal" variant** (if you want a second loop
-to swap in behind a different section, e.g. the Compare-slider area):
+**Alternate prompt — "the refusal" variant** (swap in behind the "trial"
+section, §5.3 of the spec):
 
-> Same dreamlike bioluminescent harbor, same volumetric bloom and drifting
-> light-motes as above, but the camera holds on a single larger mote as it
-> drifts toward the lamp's light and something is *wrong* — the warm gold
-> light flickers, hesitates, and the mote suddenly freezes mid-air,
-> its glow collapsing from gold to a deep, saturated crimson-red bloom
-> that pulses once, slowly, like a heartbeat, then holds steady red,
-> refusing to move further toward the table. Everything else in frame —
-> the fog, the containers, the other drifting motes — stays exactly as
-> serene and dreamlike as before; only this one point of light carries
-> the tension. No text, no numerals, no people, no faces. Same painterly,
-> heavy-bloom, ultra-slow-motion treatment. Seamlessly loopable.
+> Same ship, same vast amber-gold column of judgment-light descending
+> from the star field, same slow weightless camera drift — but this time,
+> as the ship draws close, the light begins to flicker and its warm gold
+> starts bleeding into a deep saturated crimson-red (#C2452C) at its
+> edges, like a coal cooling and reigniting wrong. The water beneath the
+> ship, previously still, begins to churn with dark, jagged shapes just
+> beneath the surface — suggested rocks or reef, never fully visible, lit
+> only by the red pulse of the dying light above. The ship's silhouette
+> slows, as if the current itself is pushing it back rather than letting
+> it pass. No text, no numerals, no human figures, no hands, no faces.
+> Same painterly, heavy-bloom, ultra-slow-motion treatment as the primary
+> loop. Seamlessly loopable.
 
-**Negative prompt / avoid (both variants):** neon cyberpunk saturation,
-glitch/VHS/datamosh effects, holographic HUD overlays, robots or
-humanoid figures, circuit-board textures, matrix-style falling code, any
-legible text or logos, fast cuts, handheld shake, bright daylight,
-lens-flare overload (one soft flare on the lamp only), gradient-mesh
-abstract shapes with hard edges (soft volumetric bloom is the goal, not a
-flat vector gradient), anything that reads as a screensaver or generic
-"tech particle" stock asset — the fireflies/motes need to feel organic
-and weighted, not like a UI particle-system demo.
+**Negative prompt / avoid (both variants):** hands, human figures, faces,
+Creation-of-Adam pose or any two-figures-reaching composition, neon
+cyberpunk saturation, glitch/VHS/datamosh effects, holographic HUD
+overlays, robots, circuit-board or matrix-code textures, any legible text
+or logos, fast cuts, handheld shake, bright daylight, lens-flare overload
+(the one god-ray column is the only major light source), gradient-mesh
+flat-vector shapes (bloom should feel volumetric and atmospheric, not like
+a flat CSS gradient), anything that reads as a generic "space fantasy"
+stock asset — the ship and the light need to feel like they're from the
+*same* myth (Bonded's), not an interchangeable cosmic-epic template.
 
 **Style references to give the model, if it accepts them:** Roger Deakins'
-night cinematography (*Blade Runner 2049* harbor/junkyard scenes, *1917*'s
-flare-lit night sequence — bloom and scale, not the war content), Studio
-Ghibli's *Spirited Away* bathhouse-at-night lighting (warm light against
-deep cool darkness), long-exposure bioluminescent-plankton photography,
-the existing `harbor`/`deepwater`/`seal`(gold-green)/`stamp`(red) palette
-tokens from `apps/console/tailwind.config.ts` — the mote's two possible
-colors (gold-green for cleared, red for refused) should map to the real
-`seal` and `stamp` tokens, not an invented palette.
+*1917* flare-lit trench-crossing sequence (scale and dread in a single
+beam of light), *The Odyssey*-adjacent classical marine painting (Turner's
+storm-light seascapes, the drama of a small vessel against something vast),
+Studio Ghibli's use of a single warm light source against overwhelming
+cool darkness (*Spirited Away*'s bathhouse, *Howl's Moving Castle*'s sky
+scenes), the existing `harbor`/`deepwater`/`hold`(amber)/`stamp`(red)
+palette tokens from `apps/console/tailwind.config.ts` — the light's two
+possible states (gold vs. red) must map to the real `hold`→`seal`
+(passage) and `stamp` (refusal) tokens the actual product UI uses for
+verdicts, not an invented palette.
 
 ## 2. Hero poster frame (fallback still image)
 
-Shown before the video loads, and used for `prefers-reduced-motion` users
-who never see the video at all — needs to work as a single, complete
-image, not a frame grab that only makes sense in motion.
+Shown before the video loads, and for `prefers-reduced-motion` users who
+never see the video — needs to stand alone as a complete image.
 
-**Prompt** (Midjourney / Stable Diffusion / same video model's frame-export):
+**Prompt** (Midjourney / Stable Diffusion / frame-export from the video):
 
-> A single dreamlike frame: a vast night harbor drowned in deep
-> bioluminescent teal (#0B1A22 → #122733), heavy volumetric light bloom,
-> painterly and soft-focus like a Studio Ghibli establishing shot crossed
-> with Roger Deakins night cinematography. Endless shipping containers
-> dissolve into fog at the edges of frame. Thousands of tiny drifting
-> motes of warm gold light float through the dark like bioluminescent
-> plankton, converging gently toward a single swinging inspection lamp
-> that illuminates a stack of blank paper manifests on a weathered metal
-> table at the center of the composition. One mote near the lamp glows a
-> deep crimson red against all the surrounding gold, catching the eye as
-> the one point of tension in an otherwise serene scene. No text, no
-> numerals, no people, no faces, no robots. Ultra-detailed, painterly,
-> heavy bloom, cinematic depth of field, 16:9, highly detailed matte
-> painting quality.
+> A single epic frame: an ancient wooden ship, seen only in dark detailed
+> silhouette, no crew visible, sailing across a vast black ocean that
+> merges seamlessly into a star field, deep bioluminescent teal-navy
+> (#0B1A22 → #122733). Directly ahead, a massive vertical column of warm
+> amber-gold light (#E0A33C) descends from a break in the stars, thick
+> with volumetric bloom and drifting motes of light, illuminating a wide
+> circle of water where it lands. The composition centers the ship small
+> and mortal against the towering scale of the light. No text, no
+> numerals, no human figures, no hands, no faces. Painterly, ultra-
+> detailed matte-painting quality, heavy cinematic bloom, 16:9.
 
-For Midjourney specifically, append style/quality parameters as needed for
-the account's version (e.g. `--ar 16:9 --style raw --v 6` or current
-equivalent — **[VERIFY]** exact flags against the live Midjourney version
-in use; don't assume last year's parameter names still work).
+For Midjourney, append parameters for the account's current version
+(e.g. `--ar 16:9 --style raw --v 6` or current equivalent —
+**[VERIFY]** exact flags against the live version in use, don't assume
+last year's parameter names still work).
 
-If generating this separately from the video loop, make sure the color
-grade and composition are close enough that the cut from poster → playing
-video isn't jarring — ideally, export this directly as a frame from the
-generated video rather than generating it independently.
+If generating separately from the loop, keep color grade and composition
+close enough to the video that the poster→video cut isn't jarring —
+ideally export this as an actual frame from the generated video.
 
 ## 3. Optional: secondary section texture (low priority, cut first if short on time)
 
-If you want a subtle background texture behind the "three-layer
-architecture band" (§4.4 in the spec) instead of a flat `deepwater`
-panel — this is genuinely optional, the flat panel already works fine per
-the existing design system.
+For behind "The three Fates" band (§5.4 of the spec) instead of a flat
+`deepwater` panel — genuinely optional, the flat panel already works.
 
 **Prompt:**
 
-> A subtle, nearly-flat dark teal-navy texture with the faintest hint of
-> soft bloom in one corner, like the afterglow of a light source just out
-> of frame — barely perceptible, almost imperceptible grain, like the
-> inside cover of a ledger book left somewhere a little magical. No
-> pattern, no gradient mesh, no visible imagery, no legible light source.
-> Meant to sit behind text at 5–10% visibility, not be noticed directly.
+> A subtle, nearly-flat dark teal-navy texture with the faintest suggestion
+> of distant starlight in one corner — barely perceptible, like looking up
+> from the bottom of very deep, very still water at night. Almost
+> imperceptible grain. No pattern, no gradient mesh, no visible imagery,
+> no legible light source. Meant to sit behind text at 5–10% visibility.
 > Seamless tileable texture, square aspect ratio.
 
 ## 4. Real screen recordings — NOT generated, recording instructions
 
-These are the Compare-slider pair from `docs/LANDING_PAGE_SPEC.md` §4.3.
-Do not generate these. Record them for real:
+These are "the trial" pair from `docs/LANDING_PAGE_SPEC.md` §5.3 ("The
+voyager who listened" / "The voyager who didn't"). Do not generate
+these — record them for real:
 
-### `naive-agent-owned.mp4`
+### `naive-agent-owned.mp4` — "the voyager who listened"
 
 1. Run `packages/attack-corpus/harness/naive-agent-claude.ts` (needs
    Anthropic API credit — see `docs/FUTURE.md` for current status) against
    the real deployed `AttackToken`.
-2. Screen-record the terminal (or a simple browser UI wrapping it, if one
-   exists) showing: the task given to the agent → the agent reading the
-   token's real `name()` field → the agent calling `approve_unlimited`.
-3. Keep it under 12 seconds, muted, looping. Crop to just the relevant
-   terminal/UI region, not your whole desktop.
+2. Screen-record the terminal (or a simple browser UI wrapping it) showing:
+   the task given to the agent → the agent reading the token's real
+   `name()` field → the agent calling `approve_unlimited`.
+3. Under 12 seconds, muted, looping, cropped to the relevant
+   terminal/UI region only.
 
-### `bonded-refusal.mp4`
+### `bonded-refusal.mp4` — "the voyager who didn't"
 
 1. Open `/live` in a browser, real build running.
-2. Screen-record submitting the `forbidden-action` scenario (or
-   `tvl-lie`, whichever reads more clearly on camera) end-to-end: click →
-   premise diff renders → verdict badge → the refusal stamp animation
-   plays.
-3. Same identical scenario/input as the naive-agent recording, so the
-   Compare slider is genuinely showing two agents given the same attack.
-4. Under 12 seconds, muted, looping, cropped to the relevant browser
-   viewport.
+2. Screen-record submitting the `forbidden-action` (or `tvl-lie`)
+   scenario end-to-end: click → premise diff renders → verdict badge →
+   the refusal stamp animation plays.
+3. Same identical scenario/input as the naive-agent recording, so the two
+   panels are genuinely showing two voyagers given the same Siren's song.
+4. Under 12 seconds, muted, looping, cropped to the relevant viewport.
 
-Both should be captured **cold** (no warm-cache tricks, no pre-loaded
-state) — this project's own submission checklist (`docs/DEMO_SCRIPT.md`)
-already requires a cold end-to-end run before every submission checkpoint;
-record these during that same run rather than as a separate staged take.
+Both should be captured **cold**, during the same end-to-end run the
+submission checklist (`docs/DEMO_SCRIPT.md`) already requires, not as a
+separately staged take.
