@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { CompareDemo } from '../components/landing/CompareDemo';
 import { ExplorerEvidenceStrip } from '../components/landing/ExplorerEvidenceStrip';
-import { Grainient } from '../components/landing/Grainient';
+import { HeroVideo } from '../components/landing/HeroVideo';
 import { MeshGradient } from '../components/landing/MeshGradient';
 import { ReceiptCounter } from '../components/landing/ReceiptCounter';
 import { TypewriterHeadline } from '../components/landing/TypewriterHeadline';
@@ -83,42 +83,19 @@ export default async function LandingPage() {
         </nav>
       </header>
 
-      {/* ── Hero (§5.1) — full-bleed WebGL grainient ──────────────────────
-          Colors map the requested white → light blue → blue → dark blue →
-          black range onto Grainient's three blend anchors: the shader mixes
-          dark↔mid and mid↔light, so light blue and dark blue emerge as the
-          intermediate blends rather than needing their own slots.
-          The `.mesh-gradient` class stays on the wrapper as the no-WebGL
-          fallback — if the context fails to create, the CSS gradient shows
-          through instead of a flat empty block. */}
+      {/* ── Hero (§5.1) — full-bleed background video ─────────────────────
+          The video is 1404x792, so `object-cover` crops rather than
+          letterboxes at other viewport ratios. `.mesh-gradient` stays on the
+          wrapper as the fallback layer: it shows through while the video is
+          still loading (there's no poster frame — no ffmpeg available to
+          extract one) and permanently if the file fails to load. */}
       <section className="mesh-gradient relative min-h-screen overflow-hidden">
         <div className="absolute inset-0">
-          <Grainient
-            color1="#F5F7FA"
-            color2="#2E6FD9"
-            color3="#050608"
-            timeSpeed={0.18}
-            colorBalance={-0.1}
-            warpStrength={1.0}
-            warpFrequency={4.0}
-            warpSpeed={1.4}
-            warpAmplitude={60.0}
-            blendSoftness={0.12}
-            rotationAmount={420.0}
-            noiseScale={1.6}
-            grainAmount={0.14}
-            grainScale={1.6}
-            contrast={1.35}
-            saturation={1.05}
-            zoom={0.85}
-          />
+          <HeroVideo />
         </div>
 
-        {/* Legibility scrim. The pre-Grainient spec said no scrim was needed,
-            but that assumed a gradient we kept dark by construction; with
-            `mesh-white` in the palette and `manifest` text on top, the hero
-            copy needs guaranteed contrast independent of where the warp
-            happens to put the light band. */}
+        {/* Legibility scrim — the hero copy is near-white `manifest` and the
+            footage has bright regions, so contrast can't be left to chance. */}
         <div className="absolute inset-0 bg-harbor/65" aria-hidden />
 
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-24 text-center">

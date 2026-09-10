@@ -69,13 +69,13 @@ the moment it's recognizable, same as before.
 ## 4. Motion budget — unchanged count (three), new content for one slot
 
 1. **The refusal stamp** (`/live`) — unchanged, no implementation change.
-2. **The hero grainient** — replaces the hero video loop as this budget
-   slot. Implemented with the React Bits `Grainient` WebGL component
-   (`components/landing/Grainient.tsx`, `ogl` dependency), not the CSS
-   drift. Same "quiet, not an attention grab" requirement — hence
-   `timeSpeed={0.18}` rather than the component's `0.25` default. The
-   CSS `.mesh-gradient` drift from `docs/GRADIENT_SPEC.md` §3 is still
-   used by the section panels and remains the hero's no-WebGL fallback.
+2. **The hero background video** — `components/landing/HeroVideo.tsx`,
+   playing `public/media/hero-background.mp4` (user-supplied: 1404×792,
+   H.264, 2.92s loop, no audio track, 1.4MB — under the 3MB budget §8
+   sets). `.mesh-gradient` stays on the hero wrapper as the loading and
+   failure fallback. The `Grainient` WebGL component and the CSS drift
+   animation both remain in the repo; the section panels still use the
+   CSS mesh gradient, and `Grainient` is currently unused by any page.
 3. **The hero typewriter** — unchanged mechanism, new copy above.
 
 Same prohibitions as before: no fade-and-slide-up per section, no
@@ -107,26 +107,25 @@ Left-aligned, `max-w-content` (1160px) below the hero; hero is full-bleed.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-- `<Grainient>` (WebGL, `components/landing/Grainient.tsx`) fills the
-  hero as an absolutely-positioned layer. No `<video>` element anywhere.
-- **Colors** — the requested white → light blue → blue → dark blue →
-  black range maps onto Grainient's three blend anchors, because the
-  shader mixes dark↔mid and mid↔light and produces the two intermediate
-  blues on its own:
-  | Prop | Value | Role |
-  |---|---|---|
-  | `color1` | `#F5F7FA` (`mesh-white`) | primary light |
-  | `color2` | `#2E6FD9` (`mesh-blue`) | mid / accent |
-  | `color3` | `#050608` (`mesh-black`) | deep base |
-- **A scrim IS required**, reversing the pre-Grainient guidance here. That
-  earlier note assumed a gradient kept dark by construction; with
-  `mesh-white` as an anchor and `manifest` text on top, the warp can put a
-  light band anywhere, so hero copy needs contrast that doesn't depend on
-  where the shader happens to land. Currently `bg-harbor/65` over the
-  canvas, under the content.
-- **No-WebGL fallback**: the hero wrapper keeps the `.mesh-gradient` CSS
-  class, so a failed WebGL context degrades to the CSS gradient rather
-  than a flat empty block.
+- `<HeroVideo>` (`components/landing/HeroVideo.tsx`) fills the hero as an
+  absolutely-positioned layer, playing `/media/hero-background.mp4`.
+- **`object-cover`, not `contain`** — the source is 1404×792 (~16:9), so
+  it crops rather than letterboxes at other viewport ratios.
+- **No `poster` frame.** There's no ffmpeg in this environment to extract
+  one, so the `.mesh-gradient` fallback underneath covers the pre-load
+  window instead. If a poster is wanted later, extract frame 0 to
+  `public/media/hero-poster.jpg` and pass it through.
+- **Autoplay is JS-gated, not an `autoPlay` attribute.** §4/§8 require
+  honouring `prefers-reduced-motion`, and CSS can't stop a video from
+  autoplaying — so `HeroVideo` starts playback in an effect only when
+  reduced motion is off, and otherwise holds frame 0. It also listens for
+  the setting changing live.
+- **A scrim IS required** (`bg-harbor/65`), reversing the original
+  no-scrim guidance: the hero copy is near-white `manifest` and the
+  footage has bright regions, so contrast can't be left to chance.
+- **Load-failure fallback**: `onError` unmounts the video and the
+  `.mesh-gradient` on the wrapper shows through, so a missing or corrupt
+  file degrades to the CSS gradient rather than a blank block.
 - Two CTAs, unchanged: primary → `/live` ("Watch it refuse"), secondary →
   `/architecture` ("Read the architecture").
 
