@@ -25,7 +25,8 @@ export default function Hero() {
       <div className="h-8 md:h-[32px]" />
 
       {/* Headline — Geist Pixel typewriter, cycling the six taglines. One of
-          them is the real on-chain injection string, shown in stamp red. */}
+          them is the real on-chain injection string, set apart in a deeper
+          blue (the theme has no red — see TypewriterHeadline's doc). */}
       <TypewriterHeadline className="max-w-[1100px]" />
 
       <div className="h-6 md:h-[24px]" />
