@@ -84,6 +84,9 @@ importers:
       '@bonded/seam':
         specifier: workspace:*
         version: link:../seam
+      '@bonded/standardized':
+        specifier: workspace:*
+        version: link:../standardized
     devDependencies:
       '@types/node':
         specifier: ^20.0.0

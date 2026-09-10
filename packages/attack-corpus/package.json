@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "@bonded/enforcer": "workspace:*",
-    "@bonded/seam": "workspace:*"
+    "@bonded/seam": "workspace:*",
+    "@bonded/standardized": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
