@@ -1,14 +1,14 @@
 // Every link here resolves to something real — a working console route or the
 // public repo. No placeholder "#" hrefs, no pages that don't exist.
 const productLinks = [
-  { label: "LIVE ENFORCEMENT", href: "/live" },
-  { label: "DECISION LOG", href: "/log" },
-  { label: "POLICY", href: "/policy" },
-  { label: "ATTACK CORPUS", href: "/corpus" },
+  { label: "Live enforcement", href: "/live" },
+  { label: "Decision log", href: "/log" },
+  { label: "Policy", href: "/policy" },
+  { label: "Attack corpus", href: "/corpus" },
 ];
 const resourceLinks = [
-  { label: "ARCHITECTURE", href: "/architecture" },
-  { label: "SOURCE", href: "https://github.com/SamuelDharshi/bonded" },
+  { label: "Architecture", href: "/architecture" },
+  { label: "Source", href: "https://github.com/SamuelDharshi/bonded" },
 ];
 const chainLinks = [
   { label: "BONDEDVAULT", href: "https://testnet.arcscan.app/address/0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE" },
@@ -25,13 +25,13 @@ export default function Footer() {
         <div className="flex flex-col gap-6 md:w-[280px] md:shrink-0">
           <div className="flex items-center gap-[12px]">
             <div className="w-[32px] h-[32px] bg-[#FFD600] shrink-0" />
-            <span className="font-grotesk text-[16px] font-bold text-[#FFD600] tracking-[3px]">
-              BONDED
+            <span className="font-grotesk text-[16px] font-bold text-[#FFD600] tracking-[1px]">
+              Bonded
             </span>
           </div>
-          <p className="font-ibm-mono text-[11px] text-[#888888] tracking-[1px] leading-[1.6] max-w-[260px]">
-            THE SPENDING ACCOUNT FOR AGENTS THAT AREN&apos;T TRUSTED TO REPORT
-            THE WORLD — ONLY TO PROPOSE.
+          <p className="font-mono text-[11px] text-[#888888] tracking-[1px] leading-[1.6] max-w-[260px]">
+            The spending account for agents that aren&apos;t trusted to report
+            the world — only to propose.
           </p>
           <div className="flex gap-[12px]">
             {[{ label: "X" }, { label: "GH" }, { label: "LI" }].map((s) => (
@@ -50,12 +50,12 @@ export default function Footer() {
         {/* Link columns */}
         <div className="grid grid-cols-3 md:flex md:flex-1 gap-8 md:gap-[80px]">
           {[
-            { heading: "CONSOLE", links: productLinks },
-            { heading: "PROJECT", links: resourceLinks },
-            { heading: "ON-CHAIN", links: chainLinks },
+            { heading: "Console", links: productLinks },
+            { heading: "Project", links: resourceLinks },
+            { heading: "On-chain", links: chainLinks },
           ].map((col) => (
             <div key={col.heading} className="flex flex-col gap-4 md:gap-[20px]">
-              <span className="font-grotesk text-[11px] font-bold text-[#F5F5F0] tracking-[2px]">
+              <span className="font-grotesk text-[11px] font-bold text-[#F5F5F0] tracking-[0.5px]">
                 {col.heading}
               </span>
               {col.links.map((link) => (
@@ -65,7 +65,7 @@ export default function Footer() {
                   {...(link.href.startsWith("http")
                     ? { target: "_blank", rel: "noreferrer" }
                     : {})}
-                  className="font-ibm-mono text-[12px] text-[#888888] tracking-[1px] hover:text-[#CCCCCC] transition-colors"
+                  className="font-mono text-[12px] text-[#888888] tracking-[1px] hover:text-[#CCCCCC] transition-colors"
                 >
                   {link.label}
                 </a>
@@ -77,20 +77,20 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#1D1D1D] gap-3 sm:gap-0">
-        <span className="font-ibm-mono text-[11px] text-[#666666] tracking-[1px]">
-          © 2026 BONDED. BUILT AT ETHONLINE 2026. MIT LICENSED.
+        <span className="font-mono text-[11px] text-[#666666] tracking-[1px]">
+          © 2026 Bonded. Built at ETHOnline 2026. MIT licensed.
         </span>
         <div className="flex items-center gap-6 md:gap-[32px]">
           <a
             href="https://github.com/SamuelDharshi/bonded"
             target="_blank"
             rel="noreferrer"
-            className="font-ibm-mono text-[11px] text-[#666666] tracking-[1px] hover:text-[#AAAAAA] transition-colors"
+            className="font-mono text-[11px] text-[#666666] tracking-[1px] hover:text-[#AAAAAA] transition-colors"
           >
-            GITHUB
+            GitHub
           </a>
-          <span className="font-ibm-mono text-[11px] font-bold text-[#FFD600] tracking-[1px]">
-            ARC TESTNET // 5042002
+          <span className="font-mono text-[11px] font-bold text-[#FFD600] tracking-[1px]">
+            Arc testnet // 5042002
           </span>
         </div>
       </div>

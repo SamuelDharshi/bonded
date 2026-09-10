@@ -171,6 +171,6 @@ table {
   font-family: var(--font-sans), 'Space Grotesk', sans-serif;
 }
 
-.font-ibm-mono {
-  font-family: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
+.font-mono-site {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
 }

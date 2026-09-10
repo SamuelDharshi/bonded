@@ -9,17 +9,17 @@
  *    reachable and covered by the enforcer test suite.
  */
 const stats = [
-  { value: "102", label: "TESTS PASSING", border: true },
-  { value: "3", label: "CONTRACTS LIVE ON ARC", border: true },
-  { value: "0", label: "LLM CALLS IN THE ENFORCER", border: true },
-  { value: "6", label: "FAIL-CLOSED REASON CODES", border: false },
+  { value: "102", label: "Tests passing", border: true },
+  { value: "3", label: "Contracts live on Arc", border: true },
+  { value: "0", label: "LLM calls in the enforcer", border: true },
+  { value: "6", label: "Fail-closed reason codes", border: false },
 ];
 
 export default function Stats() {
   return (
     <section className="flex flex-col w-full bg-[#FFD600] py-12 px-6 md:py-[80px] md:px-[120px]">
-      <span className="font-ibm-mono text-[12px] font-bold text-[#0A0A0A] tracking-[3px]">
-        [03] // BY THE NUMBERS // ALL INDEPENDENTLY VERIFIABLE
+      <span className="font-mono text-[12px] font-bold text-[#0A0A0A] tracking-[1px]">
+        [03] // By the numbers — all independently verifiable
       </span>
       <div className="h-8 md:h-[32px]" />
       <div className="grid grid-cols-2 md:flex w-full gap-[2px] md:gap-0">
@@ -36,7 +36,7 @@ export default function Stats() {
             <span className="font-grotesk text-[40px] md:text-[64px] font-bold text-[#0A0A0A] tracking-[-2px] leading-none">
               {stat.value}
             </span>
-            <span className="font-ibm-mono text-[10px] md:text-[12px] font-bold text-[#1A1A1A] tracking-[2px]">
+            <span className="font-mono text-[10px] md:text-[12px] font-bold text-[#1A1A1A] tracking-[0.5px]">
               {stat.label}
             </span>
           </div>

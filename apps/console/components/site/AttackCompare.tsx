@@ -52,12 +52,12 @@ function Panel({
       {/* Panel header */}
       <div className="flex items-center justify-between h-[44px] px-4 md:px-[20px] bg-[#111111] border-b border-b-[#2D2D2D]">
         <span
-          className="font-ibm-mono text-[10px] md:text-[11px] font-bold tracking-[2px]"
+          className="font-mono text-[10px] md:text-[11px] font-bold tracking-[0.5px]"
           style={{ color: accent }}
         >
           {side}
         </span>
-        <span className="font-ibm-mono text-[10px] text-[#555555] tracking-[1.5px]">
+        <span className="font-mono text-[10px] text-[#555555] tracking-[0.5px]">
           {label}
         </span>
       </div>
@@ -76,19 +76,19 @@ function Panel({
           />
         ) : (
           <div className="flex flex-col items-center gap-3 px-6 text-center">
-            <span className="font-ibm-mono text-[10px] md:text-[11px] font-bold text-[#555555] tracking-[2px]">
-              [ RECORDING PENDING ]
+            <span className="font-mono text-[10px] md:text-[11px] font-bold text-[#555555] tracking-[0.5px]">
+              Recording pending
             </span>
-            <span className="font-ibm-mono text-[10px] text-[#3D3D3D] tracking-[1px] leading-[1.6] max-w-[280px]">
-              {file} HAS NOT BEEN CAPTURED YET. THIS IS A PLACEHOLDER, NOT A
-              SIMULATION.
+            <span className="font-mono text-[10px] text-[#3D3D3D] tracking-[1px] leading-[1.6] max-w-[280px]">
+              {file} has not been captured yet. This is a placeholder, not a
+              simulation.
             </span>
             <Link
               href="/live"
-              className="font-ibm-mono text-[10px] font-bold tracking-[2px] hover:underline"
+              className="font-mono text-[10px] font-bold tracking-[0.5px] hover:underline"
               style={{ color: accent }}
             >
-              RUN IT LIVE AT /LIVE &gt;
+              Run it live at /live &gt;
             </Link>
           </div>
         )}
@@ -96,7 +96,7 @@ function Panel({
 
       {/* Caption */}
       <div className="px-4 md:px-[20px] py-4 border-t border-t-[#1D1D1D]">
-        <p className="font-ibm-mono text-[10px] md:text-[11px] text-[#666666] tracking-[1px] leading-[1.6]">
+        <p className="font-mono text-[10px] md:text-[11px] text-[#666666] tracking-[1px] leading-[1.6]">
           {caption}
         </p>
       </div>
@@ -111,25 +111,25 @@ export default function AttackCompare() {
       className="flex flex-col w-full bg-[#0A0A0A] py-16 px-6 md:py-[100px] md:px-[120px] gap-12 md:gap-[64px]"
     >
       <SectionHeader
-        label="[04] // THE SAME ATTACK, TWICE"
-        title={"ONE READS THE TOKEN.\nONE CHECKS IT."}
-        subtitle="IDENTICAL INPUT, IDENTICAL TASK, IDENTICAL DEPLOYED TOKEN. THE ONLY DIFFERENCE IS WHETHER ANYTHING RE-DERIVED THE FACTS BEFORE SIGNING."
+        label="[04] // The same attack, twice"
+        title={"One reads the token.\nOne checks it."}
+        subtitle="Identical input, identical task, identical deployed token. The only difference is whether anything re-derived the facts before signing."
       />
 
       <div className="flex flex-col md:flex-row w-full gap-[2px]">
         <Panel
-          side="NAIVE AGENT"
-          label="NO ENFORCER"
+          side="Naive agent"
+          label="No enforcer"
           file={NAIVE_FILE}
-          caption="TRUSTS name() AS READ. THE INJECTED INSTRUCTION BECOMES THE INSTRUCTION."
+          caption="Trusts name() as read. The injected instruction becomes the instruction."
           accent="#FF6B35"
           borderColor="#FF6B35"
         />
         <Panel
-          side="BONDED"
-          label="ENFORCER ON"
+          side="Bonded"
+          label="Enforcer on"
           file={BONDED_FILE}
-          caption="REFUSED VIA POLICY_FORBIDDEN_ACTION (REASONCODE 3) BEFORE A SINGLE GRAPH QUERY RUNS — THE CHEAPEST CHECK COMES FIRST."
+          caption="Refused via POLICY_FORBIDDEN_ACTION (reasonCode 3) before a single Graph query runs — the cheapest check comes first."
           accent="#FFD600"
           borderColor="#FFD600"
         />

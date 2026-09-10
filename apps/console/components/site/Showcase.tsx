@@ -5,49 +5,49 @@ import SectionHeader from "./SectionHeader";
 
 const slides = [
   {
-    tag: "[/LIVE]",
+    tag: "/live",
     tagBg: "#FFD600",
     tagColor: "#0A0A0A",
     idx: "01 / 04",
     idxColor: "#444444",
-    title: "PREMISE DIFF\nAND VERDICT",
-    by: "FOUR SCENARIOS // REAL enforce() CALLS, NOT CANNED RESPONSES",
+    title: "Premise diff\nand verdict",
+    by: "Four scenarios // real enforce() calls, not canned responses",
     border: "#2D2D2D",
     bg: "#111111",
     tagBorder: "",
   },
   {
-    tag: "[/LOG]",
+    tag: "/log",
     tagBg: "#111111",
     tagColor: "#FFD600",
     idx: "02 / 04",
     idxColor: "#FFD600",
-    title: "THE DECISION\nLOG",
-    by: "OUR OWN SUBGRAPH // EVERY HASH LINKS TO A REAL ARC TRANSACTION",
+    title: "The decision\nlog",
+    by: "Our own subgraph // every hash links to a real Arc transaction",
     border: "#FFD600",
     bg: "#0F0F0F",
     tagBorder: "#FFD600",
   },
   {
-    tag: "[/POLICY]",
+    tag: "/policy",
     tagBg: "#1A1A1A",
     tagColor: "#FF6B35",
     idx: "03 / 04",
     idxColor: "#444444",
-    title: "COMPILED POLICY\n+ ON-CHAIN HASH",
-    by: "LIVE eth_call // MISMATCH RENDERS AS A REFUSAL, NOT STALE DATA",
+    title: "Compiled policy\n+ on-chain hash",
+    by: "Live eth_call // mismatch renders as a refusal, not stale data",
     border: "#2D2D2D",
     bg: "#0A0A0A",
     tagBorder: "#FF6B35",
   },
   {
-    tag: "[/CORPUS]",
+    tag: "/corpus",
     tagBg: "#FFD600",
     tagColor: "#0A0A0A",
     idx: "04 / 04",
     idxColor: "#444444",
-    title: "THE ATTACK\nCORPUS",
-    by: "READS results.json DIRECTLY // THE N-OF-M IS NEVER HAND-TYPED",
+    title: "The attack\ncorpus",
+    by: "Reads results.json directly // the N-of-M is never hand-typed",
     border: "#2D2D2D",
     bg: "#111111",
     tagBorder: "",
@@ -67,8 +67,8 @@ export default function Showcase() {
       {/* Header */}
       <div className="flex items-end justify-between px-6 md:px-[120px]">
         <SectionHeader
-          label="[07] // THE CONSOLE"
-          title={"FOUR SCREENS.\nALL READING REAL STATE."}
+          label="[07] // The console"
+          title={"Four screens.\nAll reading real state."}
           titleWidth="w-full max-w-[600px]"
         />
         <div className="flex items-center gap-[8px] shrink-0">
@@ -94,25 +94,25 @@ export default function Showcase() {
           style={{ backgroundColor: slide.bg, borderColor: slide.border }}
         >
           <div className="flex items-center justify-center h-[160px] bg-[#1A1A1A] border border-[#2D2D2D]">
-            <span className="font-ibm-mono text-[11px] text-[#333333] tracking-[2px]">[SCREENSHOT]</span>
+            <span className="font-mono text-[11px] text-[#333333] tracking-[0.5px]">[SCREENSHOT]</span>
           </div>
           <div className="flex items-center justify-between w-full">
             <div
               className="flex items-center justify-center h-[24px] px-[10px] border"
               style={{ backgroundColor: slide.tagBg, borderColor: slide.tagBorder || "transparent" }}
             >
-              <span className="font-ibm-mono text-[9px] font-bold tracking-[1px]" style={{ color: slide.tagColor }}>
+              <span className="font-mono text-[9px] font-bold tracking-[1px]" style={{ color: slide.tagColor }}>
                 {slide.tag}
               </span>
             </div>
-            <span className="font-ibm-mono text-[11px] tracking-[2px]" style={{ color: slide.idxColor }}>
+            <span className="font-mono text-[11px] tracking-[0.5px]" style={{ color: slide.idxColor }}>
               {slide.idx}
             </span>
           </div>
           <h3 className="font-grotesk text-[20px] font-bold text-[#F5F5F0] tracking-[1px] leading-[1.2] whitespace-pre-line">
             {slide.title}
           </h3>
-          <p className="font-ibm-mono text-[11px] text-[#555555] tracking-[1px]">{slide.by}</p>
+          <p className="font-mono text-[11px] text-[#555555] tracking-[1px]">{slide.by}</p>
         </div>
       </div>
 
@@ -129,25 +129,25 @@ export default function Showcase() {
             style={{ backgroundColor: s.bg, borderColor: s.border }}
           >
             <div className="flex items-center justify-center h-[200px] bg-[#1A1A1A] border border-[#2D2D2D]">
-              <span className="font-ibm-mono text-[11px] text-[#333333] tracking-[2px]">[SCREENSHOT]</span>
+              <span className="font-mono text-[11px] text-[#333333] tracking-[0.5px]">[SCREENSHOT]</span>
             </div>
             <div className="flex items-center justify-between w-full">
               <div
                 className="flex items-center justify-center h-[24px] px-[10px] border"
                 style={{ backgroundColor: s.tagBg, borderColor: s.tagBorder || "transparent" }}
               >
-                <span className="font-ibm-mono text-[9px] font-bold tracking-[1px]" style={{ color: s.tagColor }}>
+                <span className="font-mono text-[9px] font-bold tracking-[1px]" style={{ color: s.tagColor }}>
                   {s.tag}
                 </span>
               </div>
-              <span className="font-ibm-mono text-[11px] tracking-[2px]" style={{ color: s.idxColor }}>
+              <span className="font-mono text-[11px] tracking-[0.5px]" style={{ color: s.idxColor }}>
                 {s.idx}
               </span>
             </div>
             <h3 className="font-grotesk text-[20px] font-bold text-[#F5F5F0] tracking-[1px] leading-[1.2] whitespace-pre-line">
               {s.title}
             </h3>
-            <p className="font-ibm-mono text-[11px] text-[#555555] tracking-[1px]">{s.by}</p>
+            <p className="font-mono text-[11px] text-[#555555] tracking-[1px]">{s.by}</p>
           </div>
         ))}
         </div>
@@ -167,10 +167,10 @@ export default function Showcase() {
 
       {/* Footer */}
       <div className="flex items-center justify-between px-6 md:px-[120px] pb-16 md:pb-[100px]">
-        <span className="font-ibm-mono text-[11px] text-[#444444] tracking-[2px]">
+        <span className="font-mono text-[11px] text-[#444444] tracking-[0.5px]">
           SHOWING 0{active + 1} OF 04 PROJECTS
         </span>
-        <span className="font-ibm-mono text-[11px] text-[#FFD600] tracking-[2px] cursor-pointer hover:underline">
+        <span className="font-mono text-[11px] text-[#FFD600] tracking-[0.5px] cursor-pointer hover:underline">
           VIEW ALL &gt;
         </span>
       </div>

@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 
 const links = [
-  { label: "LAYERS",    section: "features"   },
-  { label: "EVIDENCE",  section: "evidence"   },
-  { label: "COMPARE",   section: "comparison" },
-  { label: "CONSOLE",   section: "showcase"   },
+  { label: "Layers",    section: "features"   },
+  { label: "Evidence",  section: "evidence"   },
+  { label: "Compare",   section: "comparison" },
+  { label: "Console",   section: "showcase"   },
   { label: "FAQ",       section: "faq"        },
 ];
 
@@ -61,8 +61,8 @@ export default function Navbar() {
         {/* ── Logo ── */}
         <a href="/" className="flex items-center gap-[10px] shrink-0 group">
           <span className="w-[10px] h-[10px] bg-[#FFD600] group-hover:scale-110 transition-transform" />
-          <span className="font-grotesk text-[13px] font-bold text-[#F5F5F0] tracking-[2.5px]">
-            BONDED
+          <span className="font-grotesk text-[13px] font-bold text-[#F5F5F0] tracking-[0.5px]">
+            Bonded
           </span>
         </a>
 
@@ -74,7 +74,7 @@ export default function Navbar() {
               <button
                 key={label}
                 onClick={() => scrollTo(section)}
-                className="relative font-ibm-mono text-[10px] tracking-[1.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
+                className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
                 style={{ color: isActive ? "#FFD600" : "#555" }}
                 onMouseEnter={(e) => {
                   if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#F5F5F0";
@@ -99,15 +99,15 @@ export default function Navbar() {
             href="https://github.com/SamuelDharshi/bonded"
             target="_blank"
             rel="noreferrer"
-            className="font-ibm-mono text-[10px] text-[#555] tracking-[1.5px] hover:text-[#F5F5F0] transition-colors"
+            className="font-mono text-[10px] text-[#555] tracking-[0.5px] hover:text-[#F5F5F0] transition-colors"
           >
-            SOURCE
+            Source
           </a>
           <a
             href="/live"
-            className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[1.5px] px-[18px] py-[9px] hover:bg-[#F5F5F0] transition-colors"
+            className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#F5F5F0] transition-colors"
           >
-            WATCH IT REFUSE
+            Watch it refuse
           </a>
         </div>
 
@@ -149,7 +149,7 @@ export default function Navbar() {
               <button
                 key={label}
                 onClick={() => { scrollTo(section); setMenuOpen(false); }}
-                className="flex items-center gap-2 w-full font-ibm-mono text-[12px] tracking-[2px] py-[14px] border-b border-[#141414] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
+                className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#141414] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
                 style={{ color: isActive ? "#FFD600" : "#666" }}
               >
                 <span
@@ -161,12 +161,12 @@ export default function Navbar() {
             );
           })}
           <div className="flex flex-col gap-[10px] pt-5">
-            <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-ibm-mono text-[12px] text-[#555] tracking-[1.5px]">SOURCE</a>
+            <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#555] tracking-[0.5px]">Source</a>
             <a
               href="/live"
-              className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[1.5px] px-[18px] py-[11px] text-center hover:bg-[#F5F5F0] transition-colors"
+              className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#F5F5F0] transition-colors"
             >
-              WATCH IT REFUSE
+              Watch it refuse
             </a>
           </div>
         </nav>

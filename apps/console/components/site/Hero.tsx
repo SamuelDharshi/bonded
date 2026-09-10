@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import GlitchText from "@/components/site/GlitchText";
+import { TypewriterHeadline } from "@/components/landing/TypewriterHeadline";
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -13,32 +13,27 @@ export default function Hero() {
       {/* Badge */}
       <div className="flex items-center justify-center gap-[8px] h-[32px] px-[12px] md:px-[16px] bg-[#1A1A1A] border-2 border-[#FFD600]">
         <div className="w-[8px] h-[8px] bg-[#FFD600] shrink-0" />
-        <span className="font-ibm-mono text-[9px] md:text-[11px] font-bold text-[#FFD600] tracking-[1px] md:tracking-[2px] whitespace-nowrap">
-          [LIVE] // ARC TESTNET // ETHONLINE 2026
+        <span className="font-mono text-[9px] md:text-[11px] font-bold text-[#FFD600] tracking-[1px] md:tracking-[0.5px] whitespace-nowrap">
+          Live on Arc testnet · ETHOnline 2026
         </span>
       </div>
 
       <div className="h-8 md:h-[32px]" />
 
-      {/* Headline */}
-      <h1 className="font-grotesk text-[clamp(32px,10vw,96px)] font-bold text-[#F5F5F0] tracking-[-1px] leading-none text-center w-full max-w-[1100px]">
-        <GlitchText text="AGENTS CAN'T SPEND" speed={45} delay={100} />
-        <br />
-        <GlitchText text="ON THEIR OWN" speed={45} delay={400} />
-      </h1>
-      <h1 className="font-grotesk text-[clamp(32px,10vw,96px)] font-bold text-[#FFD600] tracking-[-1px] leading-none text-center w-full max-w-[1100px]">
-        <GlitchText text="WORD." speed={45} delay={700} />
-      </h1>
+      {/* Headline — the original Geist Pixel typewriter, cycling the six
+          taglines (one of which is the real on-chain injection string, shown
+          in stamp red). */}
+      <TypewriterHeadline className="max-w-[1100px]" />
 
       <div className="h-8 md:h-[32px]" />
 
       {/* Subheading */}
-      <p className="font-ibm-mono text-[13px] md:text-[15px] text-[#888888] tracking-[1px] leading-[1.6] text-center w-full max-w-[800px]">
-        THE MODEL NEVER PRODUCES A TRANSACTION — ONLY A PROPOSAL AND THE FACTS
-        IT CLAIMS JUSTIFY IT.
+      <p className="font-mono text-[13px] md:text-[15px] text-[#888888] tracking-[1px] leading-[1.6] text-center w-full max-w-[800px]">
+        The model never produces a transaction — only a proposal and the facts
+        it claims justify it.
         <br />
-        AN ENFORCER THAT NEVER READS THE PROMPT RE-DERIVES EVERY ONE OF THEM
-        BEFORE THE MONEY MOVES.
+        An enforcer that never reads the prompt re-derives every one of them
+        before the money moves.
       </p>
 
       <div className="h-10 md:h-[48px]" />
@@ -49,24 +44,24 @@ export default function Hero() {
           href="/live"
           className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#FFD600] hover:bg-[#e6c200] transition-colors"
         >
-          <span className="font-grotesk text-[12px] font-bold text-[#0A0A0A] tracking-[2px]">
-            WATCH IT REFUSE
+          <span className="font-grotesk text-[12px] font-bold text-[#0A0A0A] tracking-[0.5px]">
+            Watch it refuse
           </span>
         </Link>
         <Link
           href="/architecture"
           className="flex items-center justify-center w-full sm:w-[200px] h-[56px] bg-[#0A0A0A] border-2 border-[#3D3D3D] hover:border-[#888888] transition-colors"
         >
-          <span className="font-ibm-mono text-[12px] text-[#888888] tracking-[2px]">
-            ARCHITECTURE &gt;
+          <span className="font-mono text-[12px] text-[#888888] tracking-[0.5px]">
+            Read the architecture
           </span>
         </Link>
       </div>
 
       <div className="h-6 md:h-[24px]" />
 
-      <p className="font-ibm-mono text-[11px] text-[#555555] tracking-[2px] text-center">
-        NO WALLET // NO FAUCET // NO SIGNATURE TO SEE THE REFUSAL
+      <p className="font-mono text-[11px] text-[#555555] tracking-[0.5px] text-center">
+        No wallet, no faucet, no signature required.
       </p>
 
       <div className="h-12 md:h-[64px]" />

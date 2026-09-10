@@ -8,12 +8,12 @@ import SectionHeader from "./SectionHeader";
  * *plausible lie about facts* without a human in the loop every time.
  */
 const rows = [
-  { feature: "NEVER READS ATTACKER-CONTROLLED TEXT", pc: "[✓]", figma: "[✗]", sketch: "[✓]", framer: "[✗]" },
-  { feature: "CHECKS STATED REASONS, NOT JUST OUTPUT", pc: "[✓]", figma: "[✗]", sketch: "[✗]", framer: "[✓]" },
-  { feature: "CATCHES A PLAUSIBLE LIE ABOUT FACTS", pc: "[✓]", figma: "[✗]", sketch: "[✗]", framer: "[—]" },
-  { feature: "FAILS CLOSED BY DEFAULT", pc: "[✓]", figma: "[✗]", sketch: "[✓]", framer: "[✓]" },
-  { feature: "ENFORCED ON-CHAIN, NOT IN THE APP", pc: "[✓]", figma: "[✗]", sketch: "[—]", framer: "[✗]" },
-  { feature: "RUNS WITHOUT A HUMAN EVERY TIME", pc: "[✓]", figma: "[✓]", sketch: "[✓]", framer: "[✗]" },
+  { feature: "Never reads attacker-controlled text", pc: "[✓]", figma: "[✗]", sketch: "[✓]", framer: "[✗]" },
+  { feature: "Checks stated reasons, not just output", pc: "[✓]", figma: "[✗]", sketch: "[✗]", framer: "[✓]" },
+  { feature: "Catches a plausible lie about facts", pc: "[✓]", figma: "[✗]", sketch: "[✗]", framer: "[—]" },
+  { feature: "Fails closed by default", pc: "[✓]", figma: "[✗]", sketch: "[✓]", framer: "[✓]" },
+  { feature: "Enforced on-chain, not in the app", pc: "[✓]", figma: "[✗]", sketch: "[—]", framer: "[✗]" },
+  { feature: "Runs without a human every time", pc: "[✓]", figma: "[✓]", sketch: "[✓]", framer: "[✗]" },
 ];
 
 function cellStyle(val: string) {
@@ -32,9 +32,9 @@ export default function Comparison() {
   return (
     <section id="comparison" className="flex flex-col w-full bg-[#050505] py-16 px-6 md:py-[100px] md:px-[120px] gap-12 md:gap-[64px]">
       <SectionHeader
-        label="[06] // VS. THE ALTERNATIVES"
-        title={"GUARDRAILS CHECK OUTPUT.\nBONDED CHECKS REASONS."}
-        subtitle="A GUARDRAIL ASKS WHETHER THE ACTION LOOKS ALLOWED. RE-DERIVATION ASKS WHETHER THE STORY BEHIND IT IS TRUE."
+        label="[06] // vs. the alternatives"
+        title={"Guardrails check output.\nBonded checks reasons."}
+        subtitle="A guardrail asks whether the action looks allowed. Re-derivation asks whether the story behind it is true."
       />
 
       {/* Desktop table */}
@@ -42,14 +42,14 @@ export default function Comparison() {
         {/* Header */}
         <div className="flex w-full h-[56px] bg-[#111111] border-b-2 border-b-[#FFD600]">
           <div className="flex items-center w-[400px] shrink-0 px-[32px] border-r border-r-[#2D2D2D]">
-            <span className="font-grotesk text-[11px] font-bold text-[#888888] tracking-[2px]">FEATURE</span>
+            <span className="font-grotesk text-[11px] font-bold text-[#888888] tracking-[0.5px]">Property</span>
           </div>
           <div className="flex items-center flex-1 px-[32px] bg-[#1A1A1A] border-r border-r-[#2D2D2D]">
-            <span className="font-grotesk text-[11px] font-bold text-[#FFD600] tracking-[2px]">BONDED</span>
+            <span className="font-grotesk text-[11px] font-bold text-[#FFD600] tracking-[0.5px]">BONDED</span>
           </div>
-          {["PROMPT GUARDRAIL", "ALLOWLIST", "HUMAN REVIEW"].map((tool, i) => (
+          {["Prompt guardrail", "Allowlist", "Human review"].map((tool, i) => (
             <div key={tool} className={`flex items-center flex-1 px-[32px] ${i < 2 ? "border-r border-r-[#2D2D2D]" : ""}`}>
-              <span className="font-grotesk text-[11px] font-bold text-[#555555] tracking-[2px]">{tool}</span>
+              <span className="font-grotesk text-[11px] font-bold text-[#555555] tracking-[0.5px]">{tool}</span>
             </div>
           ))}
         </div>
@@ -58,14 +58,14 @@ export default function Comparison() {
         {rows.map((row, i) => (
           <div key={row.feature} className={`flex w-full h-[56px] ${i < rows.length - 1 ? "border-b border-b-[#1D1D1D]" : ""}`}>
             <div className="flex items-center w-[400px] shrink-0 px-[32px] border-r border-r-[#2D2D2D]">
-              <span className="font-ibm-mono text-[12px] text-[#CCCCCC] tracking-[1px]">{row.feature}</span>
+              <span className="font-mono text-[12px] text-[#CCCCCC] tracking-[1px]">{row.feature}</span>
             </div>
             <div className="flex items-center flex-1 px-[32px] bg-[#0D0D0D] border-r border-r-[#2D2D2D]">
-              <span className="font-ibm-mono tracking-[1px] text-[#FFD600] font-bold text-[14px]">{row.pc}</span>
+              <span className="font-mono tracking-[1px] text-[#FFD600] font-bold text-[14px]">{row.pc}</span>
             </div>
             {[row.figma, row.sketch, row.framer].map((val, j) => (
               <div key={j} className={`flex items-center flex-1 px-[32px] ${j < 2 ? "border-r border-r-[#2D2D2D]" : ""}`}>
-                <span className={`font-ibm-mono tracking-[1px] ${cellStyle(val)} ${cellColor(val)}`}>{val}</span>
+                <span className={`font-mono tracking-[1px] ${cellStyle(val)} ${cellColor(val)}`}>{val}</span>
               </div>
             ))}
           </div>
@@ -77,31 +77,31 @@ export default function Comparison() {
         {/* Header row */}
         <div className="grid grid-cols-5 bg-[#111111] border border-[#FFD600] border-b-2">
           <div className="col-span-2 px-3 py-3">
-            <span className="font-grotesk text-[9px] font-bold text-[#888888] tracking-[1px]">FEATURE</span>
+            <span className="font-grotesk text-[9px] font-bold text-[#888888] tracking-[1px]">Property</span>
           </div>
           <div className="px-2 py-3 bg-[#1A1A1A]">
-            <span className="font-grotesk text-[9px] font-bold text-[#FFD600] tracking-[1px]">BOND</span>
+            <span className="font-grotesk text-[9px] font-bold text-[#FFD600] tracking-[1px]">Bonded</span>
           </div>
           <div className="px-2 py-3">
-            <span className="font-grotesk text-[9px] font-bold text-[#555555] tracking-[1px]">GRD</span>
+            <span className="font-grotesk text-[9px] font-bold text-[#555555] tracking-[1px]">Guard</span>
           </div>
           <div className="px-2 py-3">
-            <span className="font-grotesk text-[9px] font-bold text-[#555555] tracking-[1px]">ALLOW</span>
+            <span className="font-grotesk text-[9px] font-bold text-[#555555] tracking-[1px]">Allow</span>
           </div>
         </div>
         {rows.map((row, i) => (
           <div key={row.feature} className={`grid grid-cols-5 border border-[#1D1D1D] ${i % 2 === 0 ? "bg-[#0A0A0A]" : "bg-[#0D0D0D]"}`}>
             <div className="col-span-2 flex items-center px-3 py-4">
-              <span className="font-ibm-mono text-[9px] text-[#CCCCCC] tracking-[1px] leading-[1.4]">{row.feature}</span>
+              <span className="font-mono text-[9px] text-[#CCCCCC] tracking-[1px] leading-[1.4]">{row.feature}</span>
             </div>
             <div className="flex items-center px-2 py-4 bg-[#0D0D0D]">
-              <span className="font-ibm-mono text-[12px] text-[#FFD600] font-bold">{row.pc}</span>
+              <span className="font-mono text-[12px] text-[#FFD600] font-bold">{row.pc}</span>
             </div>
             <div className="flex items-center px-2 py-4">
-              <span className={`font-ibm-mono text-[11px] ${cellColor(row.figma)}`}>{row.figma}</span>
+              <span className={`font-mono text-[11px] ${cellColor(row.figma)}`}>{row.figma}</span>
             </div>
             <div className="flex items-center px-2 py-4">
-              <span className={`font-ibm-mono text-[11px] ${cellColor(row.sketch)}`}>{row.sketch}</span>
+              <span className={`font-mono text-[11px] ${cellColor(row.sketch)}`}>{row.sketch}</span>
             </div>
           </div>
         ))}

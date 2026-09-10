@@ -11,30 +11,30 @@ import SectionHeader from "./SectionHeader";
  */
 const faqs = [
   {
-    question: "ISN'T THIS JUST A GUARDRAIL?",
+    question: "Isn't this just a guardrail?",
     answer:
-      "NO. A GUARDRAIL CHECKS THE AGENT'S OUTPUT AGAINST A RULE. BONDED CHECKS WHETHER THE AGENT'S STATED REASONS MATCH REALITY — INDEPENDENTLY, VIA A DIFFERENT DATA PATH THAN THE ONE THE AGENT USED. IT CATCHES LYING, NOT JUST RULE-BREAKING.",
+      "No. A guardrail checks the agent's output against a rule. Bonded checks whether the agent's stated reasons match reality — independently, via a different data path than the one the agent used. It catches lying, not just rule-breaking.",
     defaultOpen: true,
   },
   {
-    question: "WHAT STOPS THE ENFORCER ITSELF BEING COMPROMISED?",
+    question: "What stops the enforcer itself being compromised?",
     answer:
-      "NOTHING ABSOLUTE, AND WE SAY SO IN THE THREAT MODEL. BONDED MOVES TRUST FROM A LARGE GENERATIVE MODEL TO A SMALL, AUDITABLE, NON-GENERATIVE COMPONENT — IT DOES NOT ELIMINATE TRUST. WHAT IT ADDS: THE POLICY THRESHOLD LIVES IN A TEE, AND ANYTHING IRREVERSIBLE NEEDS A SECOND HUMAN CONFIRMATION REGARDLESS OF WHAT THE ENFORCER SIGNS.",
+      "Nothing absolute, and we say so in the threat model. Bonded moves trust from a large generative model to a small, auditable, non-generative component — it does not eliminate trust. What it adds: the policy threshold lives in a TEE, and anything irreversible needs a second human confirmation regardless of what the enforcer signs.",
   },
   {
-    question: "DOES IT CATCH A TRUE-BUT-MISLEADING PREMISE?",
+    question: "Does it catch a true-but-misleading premise?",
     answer:
-      "NO. IF AN ATTACKER MANIPULATES REAL TVL, RE-DERIVATION CONFIRMS THE MANIPULATED NUMBER — BECAUSE IT IS, AT THAT BLOCK, TRUE. BONDED CATCHES LYING, NOT REALITY DISTORTION. THAT LIMIT IS DELIBERATE AND DOCUMENTED.",
+      "No. If an attacker manipulates real TVL, re-derivation confirms the manipulated number — because it is, at that block, true. Bonded catches lying, not reality distortion. That limit is deliberate and documented.",
   },
   {
-    question: "WHY ARC?",
+    question: "Why Arc?",
     answer:
-      "USDC-NATIVE GAS. THE PITCH DEPENDS ON THE AGENT NEVER NEEDING TO REASON ABOUT OR ACQUIRE A SEPARATE GAS ASSET — WHICH IS WHAT MAKES \"THE ACCOUNT JUST WORKS\" LITERAL RATHER THAN ASPIRATIONAL.",
+      "USDC-native gas. The pitch depends on the agent never needing to reason about or acquire a separate gas asset — which is what makes \"the account just works\" literal rather than aspirational.",
   },
   {
-    question: "WHAT ISN'T BUILT YET?",
+    question: "What isn't built yet?",
     answer:
-      "THE NAIVE-AGENT CORPUS HASN'T BEEN RUN — RESULTS.JSON REPORTS NOT_YET_RUN RATHER THAN A FABRICATED NUMBER. CRE DEPLOYMENT IS WAITLISTED, SO THE CONFIDENTIAL WORKFLOW IS PROVEN BY SIMULATION ONLY. THE KILL-SWITCH CONSOLE IS DESIGNED, NOT BUILT. ALL OF IT IS LISTED IN DOCS/FUTURE.MD.",
+      "The naive-agent corpus hasn't been run — results.json reports NOT_YET_RUN rather than a fabricated number. CRE deployment is waitlisted, so the confidential workflow is proven by simulation only. The kill-switch console is designed, not built. All of it is listed in docs/FUTURE.md.",
   },
 ];
 
@@ -46,8 +46,8 @@ export default function FAQ() {
       <div className="w-full max-w-[480px]">
         <SectionHeader
           label="[08] // FAQ"
-          title={"THE HARD\nQUESTIONS."}
-          subtitle="INCLUDING THE ONES WHERE THE ANSWER IS “NO”."
+          title={"The hard\nquestions."}
+          subtitle="Including the ones where the answer is “no”."
           titleWidth="w-full"
           subtitleWidth="w-full"
         />
@@ -73,7 +73,7 @@ export default function FAQ() {
                   style={{ backgroundColor: isOpen ? "#FFD600" : "#1A1A1A", border: isOpen ? "none" : "1px solid #3D3D3D" }}
                 >
                   <span
-                    className="font-ibm-mono text-[14px] font-bold"
+                    className="font-mono text-[14px] font-bold"
                     style={{ color: isOpen ? "#0A0A0A" : "#888888" }}
                   >
                     {isOpen ? "—" : "+"}
@@ -82,7 +82,7 @@ export default function FAQ() {
               </button>
               {isOpen && faq.answer && (
                 <div className="pb-8">
-                  <p className="font-ibm-mono text-[12px] md:text-[13px] text-[#888888] tracking-[1px] leading-[1.6]">
+                  <p className="font-mono text-[12px] md:text-[13px] text-[#888888] tracking-[1px] leading-[1.6]">
                     {faq.answer}
                   </p>
                 </div>
@@ -95,11 +95,11 @@ export default function FAQ() {
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-[16px] pt-10 md:pt-[48px]">
-        <span className="font-ibm-mono text-[13px] text-[#555555] tracking-[1px]">
-          STILL HAVE QUESTIONS?
+        <span className="font-mono text-[13px] text-[#555555] tracking-[1px]">
+          Everything above is in the repo, in more detail.
         </span>
-        <span className="font-ibm-mono text-[13px] font-bold text-[#FFD600] tracking-[1px] cursor-pointer hover:underline">
-          TALK TO A HUMAN &gt;
+        <span className="font-mono text-[13px] font-bold text-[#FFD600] tracking-[1px] cursor-pointer hover:underline">
+          Read the threat model &gt;
         </span>
       </div>
     </section>
