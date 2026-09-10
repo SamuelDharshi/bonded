@@ -50,12 +50,14 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Reading veil, weighted to the top. The link columns sit in the upper
-            half and are 11-12px mono, so that half stays near-white; the lower
-            half is left mostly clear, which is where the globe actually reads.
-            Without the weighting this is either an unreadable footer or an
-            invisible image. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF] from-15% via-[rgba(255,255,255,0.82)] to-[rgba(255,255,255,0.28)]" />
+        {/* Reading veil. The footer is now exactly as tall as its content, so
+            the globe sits behind the columns rather than in empty space below
+            them — which means the veil has to do real work. It stays white
+            across the top edge so the section above hands over cleanly, then
+            settles to a constant ~0.62 through the body: enough for 11-12px
+            mono to hold, light enough that the globe is still an image and not
+            a rumour. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF] from-2% via-[rgba(255,255,255,0.66)] via-30% to-[rgba(255,255,255,0.6)]" />
       </div>
 
       {/* Top */}
@@ -133,11 +135,6 @@ export default function Footer() {
           </span>
         </div>
       </div>
-
-      {/* Tail space. The globe is anchored to the bottom of the footer, so
-          this gives it somewhere to be seen below the bottom bar without
-          becoming a separate band again. */}
-      <div className="h-[100px] md:h-[160px]" />
 
     </footer>
   );
