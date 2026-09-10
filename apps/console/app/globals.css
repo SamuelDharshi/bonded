@@ -125,6 +125,31 @@ table {
    dark stop. background-size: 180% oversizes the image so blob edges never
    touch the container boundary, and leaves room for mesh-drift to pan.
 ────────────────────────────────────────────────────────────────────────── */
+/* ── Hero backdrop: dark footage on a light page ─────────────────────────────
+   public/media/hero-background.mp4 is a near-black world map drawn in bright
+   white and blue glyphs. The landing page is white + light blue, so the
+   footage is converted rather than dropped in as-is:
+
+     invert(1)           near-black ground -> white; bright glyphs -> dark
+     hue-rotate(180deg)  undoes the hue flip invert() does to the blue glyphs,
+                         which would otherwise come back orange
+     saturate/contrast   recovers the blue that inversion washes out
+
+   mix-blend-mode: multiply then composites the result onto the wrapper's own
+   white, so the video's ground dissolves into the page background instead of
+   sitting on it as a visible rectangle — only the glyphs darken the page.
+   The wrapper must therefore keep an explicit white background; multiply over
+   a transparent parent has nothing to blend against.
+
+   Opacity is on the wrapper, not here: applying it to the same element as
+   mix-blend-mode creates a stacking context and the blend stops reaching the
+   page behind it.
+─────────────────────────────────────────────────────────────────────────── */
+.hero-backdrop-video {
+  filter: invert(1) hue-rotate(180deg) saturate(1.35) contrast(1.05);
+  mix-blend-mode: multiply;
+}
+
 .mesh-gradient {
   position: relative;
   background-color: var(--mesh-dark);

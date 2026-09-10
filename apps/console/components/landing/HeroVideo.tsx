@@ -12,9 +12,16 @@ import { useEffect, useRef, useState } from 'react';
  *
  * Under reduced motion the video is rendered but held on its first frame
  * (paused, never played), so the composition is unchanged and only the motion
- * is removed. If the file fails to load entirely, `onError` hides the element
- * and the `.mesh-gradient` fallback on the parent shows through instead of a
- * blank block.
+ * is removed. If the file fails to load entirely, `onError` unmounts the
+ * element; on the landing page the backdrop wrapper's own white ground shows
+ * through, so a missing file degrades to a plain white hero rather than a
+ * black block. There is no poster frame — no ffmpeg here to cut one — so that
+ * same white also covers the pre-load window.
+ *
+ * The element is deliberately unstyled beyond object-cover. The landing page's
+ * light-theme conversion (invert + multiply) lives in `.hero-backdrop-video`
+ * in globals.css and is passed in via `className`, so this component stays
+ * reusable against a dark backdrop too.
  */
 export function HeroVideo({
   src = '/media/hero-background.mp4',
