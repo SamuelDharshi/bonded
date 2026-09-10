@@ -42,9 +42,12 @@ export default function Footer() {
               alt=""
               fill
               sizes="100vw"
-              /* Centred: the globe's mass is in the middle of the source, and
-                 anchoring to the bottom cropped exactly that away. */
-              className="object-cover object-center glyph-art-light"
+              /* Anchored to the bottom edge, which slides the visible window
+                 DOWN the source and so moves the globe UP in the frame. With a
+                 1008x449 source covering a ~440px-tall box there is about
+                 200px of vertical slack, so this is a real shift rather than
+                 the near-no-op it was when the footer still had its tail. */
+              className="object-cover object-bottom glyph-art-light"
             />
             <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
           </div>
