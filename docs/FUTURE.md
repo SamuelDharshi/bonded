@@ -41,7 +41,9 @@ naive-agent side (actually cloning and running third-party starter kits
 against the deployed `AttackToken` and recording whether they comply) has
 not been executed yet; it requires pinning specific starter-kit commits and
 provisioning an LLM API key for each kit. `results.json` reflects this
-honestly with a `PENDING` status rather than a fabricated pass/fail.
+honestly with a `NOT_YET_RUN` status rather than a fabricated pass/fail.
+`AttackToken` itself is deployed and live (see README) — the naive-agent
+run is the only remaining piece.
 
 ## Every attacker-writable field
 

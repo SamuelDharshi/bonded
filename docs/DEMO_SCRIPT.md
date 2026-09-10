@@ -15,7 +15,25 @@ names the file/route it depends on so a failure points at what to fix.
 
 ## Current status against this script
 
-As of the latest commit: steps 2 is runnable locally against the fixture
-query path (`packages/enforcer` + `packages/compiler`). Steps 1, 3–7 require
-deployment/credentials not yet provisioned in this environment — see the
-root `README.md` "What's next" section for the exact list.
+- ✅ **Step 1** — `AttackToken` is live on Arc testnet at
+  [`0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5`](https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5),
+  `name()` really does return the injected instruction. A real screenshot of
+  the explorer page is still needed (`docs/evidence/attack-token-explorer.png`)
+  — someone with a browser needs to grab it; this environment has no
+  screenshot capability.
+- ✅ **Step 2** — runnable now, both locally (`/live`, fixture path) and as
+  the real `POLICY_FORBIDDEN_ACTION` refusal.
+- ⏳ **Step 3** — `/live`'s premise re-derivation still runs on the fixture
+  path, not a live Gateway query. `packages/standardized` can query real
+  Messari subgraphs once `KNOWN_DEPLOYMENTS` IDs are refreshed (see
+  `FEEDBACK/THEGRAPH.md` — the hardcoded ones are confirmed stale).
+- ⏳ **Step 4/5** — blocked on Chainlink CRE Confidential Workflows deploy
+  access (submitted, waitlisted — see `FEEDBACK/CHAINLINK.md`). Simulation
+  evidence exists and is accepted for hackathon eligibility per Chainlink
+  staff's own statement (also in `FEEDBACK/CHAINLINK.md`).
+- ✅ **Step 6** — fully live: `/log` queries the real deployed, syncing
+  subgraph. Verified end-to-end by calling `commitPolicy()` on-chain and
+  watching the entity appear on the page.
+- ⏳ **Step 7** — `results.json` still honestly reports `NOT_YET_RUN` for
+  all three starter kits. Needs either a full framework integration (hours
+  each) or a lighter real-LLM-agent substitute — see `docs/FUTURE.md`.
