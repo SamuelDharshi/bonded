@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from "react";
 
-const links = [
-  { label: "Layers",    section: "features"   },
-  { label: "Evidence",  section: "evidence"   },
-  { label: "Compare",   section: "comparison" },
-  { label: "Console",   section: "showcase"   },
-  { label: "FAQ",       section: "faq"        },
+/**
+ * Two in-page anchors for the sections that exist on this page, then straight
+ * into the console. The landing page is short by design (BONDED_PRD.md §6
+ * specifies five sections), so a long anchor list would mostly point at
+ * nothing — every entry here resolves to something real.
+ */
+const links: { label: string; section?: string; href?: string }[] = [
+  { label: "Compare", section: "compare" },
+  { label: "Layers",  section: "layers"  },
+  { label: "Live",    href: "/live"      },
+  { label: "Log",     href: "/log"       },
+  { label: "Policy",  href: "/policy"    },
+  { label: "Corpus",  href: "/corpus"    },
 ];
 
 function scrollTo(id: string) {
@@ -29,7 +36,7 @@ export default function Navbar() {
 
   /* ── active section via IntersectionObserver ── */
   useEffect(() => {
-    const ids = links.map((l) => l.section).filter(Boolean);
+    const ids = links.map((l) => l.section).filter((v): v is string => Boolean(v));
     const obs: IntersectionObserver[] = [];
 
     ids.forEach((id) => {
@@ -68,12 +75,26 @@ export default function Navbar() {
 
         {/* ── Desktop nav ── */}
         <nav className="hidden md:flex items-center gap-[36px]">
-          {links.map(({ label, section }) => {
-            const isActive = active === section;
+          {links.map(({ label, section, href }) => {
+            const isActive = !!section && active === section;
+            if (href) {
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  className="font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
+                  style={{ color: "#555" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#F5F5F0"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#555"; }}
+                >
+                  {label}
+                </a>
+              );
+            }
             return (
               <button
                 key={label}
-                onClick={() => scrollTo(section)}
+                onClick={() => section && scrollTo(section)}
                 className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
                 style={{ color: isActive ? "#FFD600" : "#555" }}
                 onMouseEnter={(e) => {
@@ -143,12 +164,26 @@ export default function Navbar() {
         }}
       >
         <nav className="flex flex-col px-6 py-5 gap-0">
-          {links.map(({ label, section }) => {
-            const isActive = active === section;
+          {links.map(({ label, section, href }) => {
+            const isActive = !!section && active === section;
+            if (href) {
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#141414] transition-colors"
+                  style={{ color: "#666" }}
+                >
+                  <span className="w-[4px] h-[4px] rounded-full shrink-0" style={{ background: "#2D2D2D" }} />
+                  {label}
+                </a>
+              );
+            }
             return (
               <button
                 key={label}
-                onClick={() => { scrollTo(section); setMenuOpen(false); }}
+                onClick={() => { if (section) scrollTo(section); setMenuOpen(false); }}
                 className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#141414] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
                 style={{ color: isActive ? "#FFD600" : "#666" }}
               >
