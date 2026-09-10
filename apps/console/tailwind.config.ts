@@ -16,10 +16,19 @@ const config: Config = {
         seal:      '#3FA37A',
         stamp:     '#C2452C',
         hold:      '#E0A33C',
+
+        /* ── Mesh gradient palette (decorative only — docs/GRADIENT_SPEC.md §1)
+           Never blended with seal/stamp/hold, which stay reserved for verdicts. */
+        'mesh-white':      '#F5F7FA',
+        'mesh-light-blue': '#8FCFEA',
+        'mesh-blue':       '#2E6FD9',
+        'mesh-dark':       '#0B1A22', /* = harbor, reused, not a new value */
+        'mesh-black':      '#050608',
       },
       fontFamily: {
-        sans: ['Instrument Sans', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans:  ['var(--font-sans)', 'Space Grotesk', 'sans-serif'],
+        mono:  ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
+        pixel: ['var(--font-pixel)', 'monospace'],
       },
       borderRadius: {
         doc:     '4px',

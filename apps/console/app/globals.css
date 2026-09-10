@@ -11,6 +11,13 @@
   --seal:      #3FA37A;
   --stamp:     #C2452C;
   --hold:      #E0A33C;
+
+  /* ── Mesh gradient palette (decorative only — docs/GRADIENT_SPEC.md §1) ── */
+  --mesh-white:      #F5F7FA;
+  --mesh-light-blue: #8FCFEA;
+  --mesh-blue:       #2E6FD9;
+  --mesh-dark:       #0B1A22; /* = harbor, reused */
+  --mesh-black:      #050608;
 }
 
 * {
@@ -20,7 +27,7 @@
 body {
   background-color: #0B1A22; /* harbor */
   color: #ECEEEA;             /* manifest — default text on dark canvas */
-  font-family: 'Instrument Sans', sans-serif;
+  font-family: var(--font-sans, 'Space Grotesk'), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -111,4 +118,42 @@ table {
 /* Max line length for readability */
 .prose {
   max-width: 72ch;
+}
+
+/* ── Noisy mesh gradient ─────────────────────────────────────────────────────
+   docs/GRADIENT_SPEC.md §2. Five layered soft-edged radial gradients over the
+   dark stop. background-size: 180% oversizes the image so blob edges never
+   touch the container boundary, and leaves room for mesh-drift to pan.
+────────────────────────────────────────────────────────────────────────── */
+.mesh-gradient {
+  position: relative;
+  background-color: var(--mesh-dark);
+  background-image:
+    radial-gradient(at 15% 20%, var(--mesh-light-blue) 0px, transparent 50%),
+    radial-gradient(at 85% 10%, var(--mesh-white) 0px, transparent 45%),
+    radial-gradient(at 70% 65%, var(--mesh-blue) 0px, transparent 55%),
+    radial-gradient(at 20% 80%, var(--mesh-black) 0px, transparent 50%),
+    radial-gradient(at 90% 90%, var(--mesh-blue) 0px, transparent 40%);
+  background-size: 180% 180%;
+}
+
+/* ── Motion slot #2: the hero gradient drift (docs/GRADIENT_SPEC.md §3) ──────
+   28s, deliberately slow — ambience, not an attention grab. Reserved for the
+   hero; section-level mesh panels stay static.
+────────────────────────────────────────────────────────────────────────── */
+@keyframes mesh-drift {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 60%; }
+  100% { background-position: 0% 0%; }
+}
+
+.mesh-gradient--animated {
+  animation: mesh-drift 28s ease-in-out infinite;
+}
+
+/* Reduced motion freezes the gradient on its initial background-position */
+@media (prefers-reduced-motion: reduce) {
+  .mesh-gradient--animated {
+    animation: none;
+  }
 }
