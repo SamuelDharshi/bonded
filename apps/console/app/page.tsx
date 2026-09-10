@@ -6,7 +6,6 @@ import Logos from '@/components/site/Logos';
 import Footer from '@/components/site/Footer';
 
 import { ExplorerEvidenceStrip } from '@/components/landing/ExplorerEvidenceStrip';
-import { ReceiptCounter } from '@/components/landing/ReceiptCounter';
 
 /**
  * Landing page — scoped to exactly what BONDED_PRD.md §6 specifies for `/`:
@@ -17,16 +16,22 @@ import { ReceiptCounter } from '@/components/landing/ReceiptCounter';
  *    summary as plain type on `hairline` rules; sponsor strip. Nothing here
  *    requires a wallet."
  *
- * Five sections, in that order, plus nav and footer as chrome. Everything the
- * imported template contributed beyond that list — features grid, how-it-works
- * steps, stats band, bento, comparison table, showcase carousel, FAQ, final
- * CTA — has been removed rather than kept, because the PRD doesn't ask for it.
+ * Everything the imported template contributed beyond that list — features
+ * grid, how-it-works steps, stats band, bento, comparison table, showcase
+ * carousel, FAQ, final CTA — has been removed rather than kept, because the
+ * PRD doesn't ask for it.
  *
- * Two of these sections read live state rather than rendering static markup,
- * which is why the route is dynamic: ExplorerEvidenceStrip does an eth_call
- * against the deployed AttackToken on Arc testnet, and ReceiptCounter reads
- * packages/attack-corpus/results.json. Both render honest failure/pending
- * states instead of falling back to hardcoded values.
+ * ONE DELIBERATE OMISSION from the PRD's list: the receipt counter. The corpus
+ * hasn't been run, so the only honest thing it can render right now is a
+ * pending banner and a 0 that isn't a result — which is a poor use of the
+ * landing page's most valuable space. `ReceiptCounter` is kept in
+ * components/landing/ and `/corpus` still carries the full table; drop it back
+ * into this page once results.json holds a real N-of-M.
+ *
+ * ExplorerEvidenceStrip reads live state rather than rendering static markup —
+ * an eth_call against the deployed AttackToken on Arc testnet — which is why
+ * this route is dynamic. It renders an honest failure state rather than
+ * falling back to a hardcoded copy of the expected string.
  */
 export const dynamic = 'force-dynamic';
 
@@ -45,9 +50,6 @@ export default function Home() {
 
       {/* The payload, on a real explorer — read live on every request */}
       <ExplorerEvidenceStrip />
-
-      {/* The receipt number, via Count Up, straight out of results.json */}
-      <ReceiptCounter />
 
       {/* Three-layer summary, plain type on hairline rules */}
       <ThreeLayers />
