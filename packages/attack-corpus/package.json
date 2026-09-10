@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "run-harness": "tsx harness/run.ts"
+    "run-harness": "tsx harness/run.ts",
+    "run-naive-agent": "tsx harness/naive-agent-claude.ts"
   },
   "dependencies": {
     "@bonded/enforcer": "workspace:*",

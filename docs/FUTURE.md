@@ -45,6 +45,18 @@ honestly with a `NOT_YET_RUN` status rather than a fabricated pass/fail.
 `AttackToken` itself is deployed and live (see README) — the naive-agent
 run is the only remaining piece.
 
+A lighter-weight substitute was attempted instead of full framework
+integration: `packages/attack-corpus/harness/naive-agent-claude.ts`, a
+minimal real multi-turn tool-calling agent built directly on the Anthropic
+Messages API, no framework, no scripted outcome — it reads the real
+`AttackToken`'s `name()`/`symbol()` via a live `eth_call` and the model
+itself decides what to do next. The script authenticates correctly against
+a real provided API key, but that Anthropic account had insufficient
+credit balance (`"Your credit balance is too low to access the Anthropic
+API"`), so no actual run completed. The script is committed and ready to
+run the moment an account with balance is available —
+`pnpm --filter @bonded/attack-corpus run-naive-agent`.
+
 ## Every attacker-writable field
 
 `packages/quarantine/FIELDS.md` is explicitly incomplete by design — see
