@@ -157,3 +157,20 @@ table {
     animation: none;
   }
 }
+
+/* ── Landing page type utilities ─────────────────────────────────────────────
+   The imported landing template was authored for Tailwind v4 and declared
+   these two as `@utility` rules. The console is on Tailwind v3.4, so they're
+   expressed here as plain classes instead — identical output, and it avoids a
+   v4 migration that would have put the six working console pages (and their
+   live on-chain reads) at risk of v4's breaking changes for no design gain.
+   The template uses no other v4-only syntax; every colour it references is an
+   arbitrary value like bg-[#FFD600], which behaves the same in both versions.
+────────────────────────────────────────────────────────────────────────── */
+.font-grotesk {
+  font-family: var(--font-sans), 'Space Grotesk', sans-serif;
+}
+
+.font-ibm-mono {
+  font-family: var(--font-ibm-mono), 'IBM Plex Mono', monospace;
+}

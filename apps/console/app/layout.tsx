@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import type { CSSProperties } from 'react';
-import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Space_Grotesk, JetBrains_Mono, IBM_Plex_Mono } from 'next/font/google';
 import { GeistPixelSquare } from 'geist/font/pixel';
 import './globals.css';
 
@@ -13,6 +13,16 @@ const spaceGrotesk = Space_Grotesk({
 const jetbrainsMono = JetBrains_Mono({
   subsets:  ['latin'],
   variable: '--font-mono',
+  display:  'swap',
+});
+
+// The landing page's industrial type pairing. IBM Plex Mono carries every
+// label/eyebrow/caption there, distinct from JetBrains Mono which stays
+// reserved for on-chain data (hashes, addresses, amounts) across the console.
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets:  ['latin'],
+  weight:   ['400', '500', '700'],
+  variable: '--font-ibm-mono',
   display:  'swap',
 });
 
@@ -37,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${GeistPixelSquare.variable}`}
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${ibmPlexMono.variable} ${GeistPixelSquare.variable}`}
       style={pixelFontVariables}
     >
       <body className="font-sans bg-harbor text-manifest min-h-screen">
