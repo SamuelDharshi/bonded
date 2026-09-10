@@ -2,13 +2,45 @@ import { hashPolicy } from '@bonded/compiler';
 import type { Policy } from '@bonded/seam';
 import { Shell } from '../../components/shared/Shell';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Real compiled policy artifact (packages/compiler/examples/policy.json),
- * hashed server-side with the same hashPolicy() the enforcer uses. No
- * BondedRegistry commitment exists on-chain yet (Arc testnet deployment is
- * pending), so this page states that plainly instead of faking a match —
- * see the empty/failure state pattern in BONDED_PRD.md §6.
+ * hashed server-side with the same hashPolicy() the enforcer uses, then
+ * checked against BondedRegistry.currentPolicyHash() on Arc testnet via a
+ * live eth_call -- real chain read, not a fixture, same discipline as
+ * /live and /log.
  */
+const REGISTRY_ADDRESS = '0xB825225163aEf4353d0110BA63d0d811A17B8205';
+const COMMITTED_OWNER = '0xac13a62FC7E50d08945ba2e79B5Eaa190d8D7D9a'; // the deployer address this example was committed under
+
+async function fetchOnchainPolicyHash(): Promise<`0x${string}` | null> {
+  const rpcUrl = process.env.ARC_RPC_URL;
+  if (!rpcUrl) return null;
+
+  // currentPolicyHash(address) selector, verified via `cast sig` against
+  // the real ABI -- not assumed.
+  const paddedAddress = COMMITTED_OWNER.slice(2).toLowerCase().padStart(64, '0');
+  const data = `0x92fd5c7d${paddedAddress}`;
+
+  try {
+    const res = await fetch(rpcUrl, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_call',
+        params: [{ to: REGISTRY_ADDRESS, data }, 'latest'],
+      }),
+    });
+    const json = await res.json();
+    return json.result ?? null;
+  } catch {
+    return null;
+  }
+}
 const POLICY: Policy = {
   version: 1,
   budget: { asset: 'USDC', period: '7d', max: '500000000' },
@@ -43,8 +75,10 @@ these regardless of what the premises say.
 
 Anything over 100 USDC pauses for a human confirmation before it settles.`;
 
-export default function PolicyPage() {
+export default async function PolicyPage() {
   const policyHash = hashPolicy(POLICY);
+  const onchainHash = await fetchOnchainPolicyHash();
+  const matches = onchainHash !== null && onchainHash.toLowerCase() === policyHash.toLowerCase();
 
   return (
     <Shell>
@@ -75,17 +109,38 @@ export default function PolicyPage() {
             <p className="text-small text-manifest/50">Computed hash (SHA-256 of canonical JSON)</p>
             <p className="text-small font-mono text-manifest mt-1">{policyHash}</p>
           </div>
-          <span className="text-small font-mono border border-hold text-hold px-3 py-1 rounded-control">
-            NOT COMMITTED ON-CHAIN
-          </span>
+          {matches ? (
+            <span className="text-small font-mono border border-seal text-seal px-3 py-1 rounded-control">
+              MATCHES ON-CHAIN
+            </span>
+          ) : (
+            <span className="text-small font-mono border border-hold text-hold px-3 py-1 rounded-control">
+              {onchainHash ? 'HASH MISMATCH' : 'RPC UNREACHABLE'}
+            </span>
+          )}
         </div>
 
-        <p className="text-small text-manifest/40 mt-3 max-w-xl">
-          BondedRegistry is not yet deployed to Arc testnet, so there is no on-chain commitment
-          to compare against. Once deployed, this page re-hashes the downloaded artifact
-          client-side against the on-chain commitment before rendering — a mismatch means the
-          console refuses to render rather than showing stale policy.
-        </p>
+        {matches ? (
+          <p className="text-small text-manifest/40 mt-3 max-w-xl">
+            Committed on-chain to <code className="font-mono">BondedRegistry</code> at{' '}
+            <a
+              href={`https://testnet.arcscan.app/address/${REGISTRY_ADDRESS}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-seal hover:underline"
+            >
+              {REGISTRY_ADDRESS}
+            </a>
+            . This page re-hashes the artifact above server-side and reads{' '}
+            <code className="font-mono">currentPolicyHash()</code> live from Arc testnet on every
+            load — a mismatch would render as a refusal, not a stale display.
+          </p>
+        ) : (
+          <p className="text-small text-manifest/40 mt-3 max-w-xl">
+            Could not confirm the on-chain commitment right now (RPC unreachable or hash
+            differs) — refusing to claim a match rather than showing a stale one.
+          </p>
+        )}
       </div>
     </Shell>
   );
