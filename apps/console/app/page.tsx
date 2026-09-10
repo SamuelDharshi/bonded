@@ -103,7 +103,14 @@ export default function LandingPage() {
             <span className="text-manifest">USDC</span>
             <br />
             <span className="text-manifest/50">Address: </span>
-            <span className="text-manifest">PENDING_DEPLOY</span>
+            <a
+              href="https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5"
+              target="_blank"
+              rel="noreferrer"
+              className="text-seal hover:underline"
+            >
+              0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5 ↗
+            </a>
           </div>
         </div>
       </section>
