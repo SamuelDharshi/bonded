@@ -36,62 +36,109 @@ real ones.
 ## 1. Hero background video loop
 
 **Purpose:** full-bleed, muted, looping ambience behind the hero headline.
-Must read as "customs and port authority" (the established brand register
-— see `BONDED_PRD.md` §5.1), not generic cyberpunk/AI-slop. Dark,
-quiet, slow.
+Still rooted in "customs and port authority" (`BONDED_PRD.md` §5.1) —
+that's the vocabulary — but rendered as a **dream**, not a security
+camera: volumetric bloom, glowing particulate light, a sense of something
+vast and quiet being watched over. The mechanism itself should be
+legible as imagery, not just mood: *a fact drifting in from the dark,
+passing through a field of light, and either dissolving into gold (cleared)
+or freezing mid-air and turning red (refused)* — this is the actual
+Bonded pitch (every claim independently re-checked before anything moves)
+rendered as a visual metaphor, not abstract prettiness for its own sake.
 
-**Format:** 10–15 second seamless loop, 1920×1080 minimum, no audio track
-needed (will be muted anyway, but include ambient tone if the tool
-requires audio — strip it in post if so). Deliver as `.mp4` (H.264) and
-a `.webm` fallback.
+**Format:** 10–15 second seamless loop, 1920×1080 minimum (4K source if
+the tool supports it — bloom detail holds up much better downscaled than
+upscaled), no audio needed. Deliver as `.mp4` (H.264) and `.webm`.
 
-**Prompt** (for Runway Gen-4 / Kling / Sora-class video models):
+**Primary prompt** (Runway Gen-4 / Kling 2.x / Sora-class, free-text):
 
-> A slow, atmospheric night scene at a shipping port customs terminal.
-> Deep teal-navy color grade (#0B1A22 to #122733 range), moody and
-> underlit. Camera drifts slowly — a very slow dolly or crane move, no
-> handheld shake. Stacked shipping containers in soft focus in the
-> background, subtle rain-wet reflections on concrete, distant harbor
-> lights blurred into soft bokeh. In the mid-ground, a single inspection
-> lamp swings almost imperceptibly, casting a slow-moving pool of warm
-> light across a stack of paper manifests / customs documents on a metal
-> table — the documents are the visual focus, lit like something being
-> inspected. No visible text or logos on any document (keep them blank or
-> illegibly blurred — real copy will be added as DOM text over this
-> footage, not baked into it). No people, no faces. Cinematic, restrained,
-> financial-infrastructure mood rather than industrial-grunge or cyberpunk
-> — think a serious customs authority's internal footage, not a music
-> video. Extremely subtle film grain, no lens flares, no glitch effects,
-> no neon. Seamlessly loopable (first and last frame should match in
-> framing and lighting so the loop point is invisible).
+> A vast, dreamlike night harbor rendered in deep bioluminescent teal and
+> navy (#0B1A22 → #122733), shot like a Roger Deakins night exterior fused
+> with a Studio Ghibli dream sequence. Heavy volumetric light bloom —
+> every light source blooms and breathes softly, halos of glow bleeding
+> into the mist. Endless stacked shipping containers recede into fog,
+> their edges dissolving into soft-focus darkness, lit only by the warm
+> amber glow of a single swinging inspection lamp and by thousands of
+> tiny drifting motes of light — like fireflies or bioluminescent
+> plankton — slowly floating between the containers, each mote a small
+> pending claim waiting to be checked. Camera drifts in a slow, weightless
+> crane move through this field of light, as if floating. At the center of
+> frame, one larger mote of light — glowing gold and warm — drifts toward
+> a stack of blank paper manifests on a weathered metal table, passes
+> through the lamp's beam, and as it's fully illuminated it either
+> dissolves into a soft shower of golden sparks (cleared, let it pass
+> through this loop's ending) — no text, no numerals, no legible
+> language anywhere, no people, no faces, no robots, no circuit-board or
+> matrix-code textures. Painterly depth of field, heavy but soft bloom,
+> gentle film grain, anamorphic lens flare only on the lamp itself (subtle,
+> horizontal, blue-teal). Ultra slow motion. This should feel like the
+> most beautiful, most expensive frame of a prestige A24 film about a
+> harbor at 3am, not a corporate stock video and not a cyberpunk game
+> cinematic. Seamlessly loopable — first and last frame match in framing,
+> light position, and mote density so the loop point is invisible.
 
-**Negative prompt / avoid:** neon cyberpunk colors, glitch/VHS effects,
-holographic UI overlays, robots, circuit-board textures, matrix-style
-falling code, any text or logos, fast cuts, handheld camera shake, bright
-daylight, people/faces, gradient-mesh abstract shapes (the project's own
-design rules explicitly ban hand-authored gradient-mesh abstractions —
-this applies to AI-generated ones too).
+**Alternate prompt — "the refusal" variant** (if you want a second loop
+to swap in behind a different section, e.g. the Compare-slider area):
 
-**Style references to give the model, if it accepts them:** shipping-port
-photography (long-exposure night shots of container terminals), film
-stills from serious financial-thriller cinematography (restrained color,
-not action-movie saturation), the existing `harbor`/`deepwater` palette
-tokens from `apps/console/tailwind.config.ts`.
+> Same dreamlike bioluminescent harbor, same volumetric bloom and drifting
+> light-motes as above, but the camera holds on a single larger mote as it
+> drifts toward the lamp's light and something is *wrong* — the warm gold
+> light flickers, hesitates, and the mote suddenly freezes mid-air,
+> its glow collapsing from gold to a deep, saturated crimson-red bloom
+> that pulses once, slowly, like a heartbeat, then holds steady red,
+> refusing to move further toward the table. Everything else in frame —
+> the fog, the containers, the other drifting motes — stays exactly as
+> serene and dreamlike as before; only this one point of light carries
+> the tension. No text, no numerals, no people, no faces. Same painterly,
+> heavy-bloom, ultra-slow-motion treatment. Seamlessly loopable.
+
+**Negative prompt / avoid (both variants):** neon cyberpunk saturation,
+glitch/VHS/datamosh effects, holographic HUD overlays, robots or
+humanoid figures, circuit-board textures, matrix-style falling code, any
+legible text or logos, fast cuts, handheld shake, bright daylight,
+lens-flare overload (one soft flare on the lamp only), gradient-mesh
+abstract shapes with hard edges (soft volumetric bloom is the goal, not a
+flat vector gradient), anything that reads as a screensaver or generic
+"tech particle" stock asset — the fireflies/motes need to feel organic
+and weighted, not like a UI particle-system demo.
+
+**Style references to give the model, if it accepts them:** Roger Deakins'
+night cinematography (*Blade Runner 2049* harbor/junkyard scenes, *1917*'s
+flare-lit night sequence — bloom and scale, not the war content), Studio
+Ghibli's *Spirited Away* bathhouse-at-night lighting (warm light against
+deep cool darkness), long-exposure bioluminescent-plankton photography,
+the existing `harbor`/`deepwater`/`seal`(gold-green)/`stamp`(red) palette
+tokens from `apps/console/tailwind.config.ts` — the mote's two possible
+colors (gold-green for cleared, red for refused) should map to the real
+`seal` and `stamp` tokens, not an invented palette.
 
 ## 2. Hero poster frame (fallback still image)
 
 Shown before the video loads, and used for `prefers-reduced-motion` users
-who never see the video at all — so it needs to work as a standalone
-image, not just look like a frame grab.
+who never see the video at all — needs to work as a single, complete
+image, not a frame grab that only makes sense in motion.
 
-**Prompt** (for a still-image model — Midjourney / Stable Diffusion / same
-video model's frame-export):
+**Prompt** (Midjourney / Stable Diffusion / same video model's frame-export):
 
-> A single still frame from a night shipping-port customs terminal, deep
-> teal-navy color grade, moody underlit lighting. A stack of blank paper
-> manifests on a metal table under a single inspection lamp, shipping
-> containers softly out of focus in the background. Cinematic, restrained,
-> financial-infrastructure mood. No text, no logos, no people. 16:9.
+> A single dreamlike frame: a vast night harbor drowned in deep
+> bioluminescent teal (#0B1A22 → #122733), heavy volumetric light bloom,
+> painterly and soft-focus like a Studio Ghibli establishing shot crossed
+> with Roger Deakins night cinematography. Endless shipping containers
+> dissolve into fog at the edges of frame. Thousands of tiny drifting
+> motes of warm gold light float through the dark like bioluminescent
+> plankton, converging gently toward a single swinging inspection lamp
+> that illuminates a stack of blank paper manifests on a weathered metal
+> table at the center of the composition. One mote near the lamp glows a
+> deep crimson red against all the surrounding gold, catching the eye as
+> the one point of tension in an otherwise serene scene. No text, no
+> numerals, no people, no faces, no robots. Ultra-detailed, painterly,
+> heavy bloom, cinematic depth of field, 16:9, highly detailed matte
+> painting quality.
+
+For Midjourney specifically, append style/quality parameters as needed for
+the account's version (e.g. `--ar 16:9 --style raw --v 6` or current
+equivalent — **[VERIFY]** exact flags against the live Midjourney version
+in use; don't assume last year's parameter names still work).
 
 If generating this separately from the video loop, make sure the color
 grade and composition are close enough that the cut from poster → playing
@@ -107,11 +154,13 @@ the existing design system.
 
 **Prompt:**
 
-> A subtle, nearly-flat dark teal-navy paper/linen texture, very low
-> contrast, almost imperceptible grain — like the inside cover of a
-> ledger book. No pattern, no gradient mesh, no visible imagery. Meant to
-> sit behind text at 5-10% visibility, not be noticed directly. Seamless
-> tileable texture, square aspect ratio.
+> A subtle, nearly-flat dark teal-navy texture with the faintest hint of
+> soft bloom in one corner, like the afterglow of a light source just out
+> of frame — barely perceptible, almost imperceptible grain, like the
+> inside cover of a ledger book left somewhere a little magical. No
+> pattern, no gradient mesh, no visible imagery, no legible light source.
+> Meant to sit behind text at 5–10% visibility, not be noticed directly.
+> Seamless tileable texture, square aspect ratio.
 
 ## 4. Real screen recordings — NOT generated, recording instructions
 
