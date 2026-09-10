@@ -20,9 +20,46 @@ const chainLinks = [
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col w-full bg-[#FFFFFF]">
+    <footer className="relative flex flex-col w-full overflow-hidden bg-[#FFFFFF]">
+      {/* Backdrop for the whole footer. Purely decorative, so it is hidden
+          from assistive tech and its image carries an empty alt.
+
+          media/end.png is a glyph globe — the same visual family as the hero
+          footage and near-black in the same way — so it gets the same
+          conversion (`.glyph-art-light` + the #2E7FBF colour blend) instead of
+          being dropped in as a dark slab at the bottom of a white page. The
+          two bookend the landing page: world map at the top, globe at the end.
+          See globals.css for what the filter chain does, and why the opacity
+          has to sit on a wrapper rather than on the image itself. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[#FFFFFF]"
+      >
+        <div className="absolute inset-0 opacity-[0.72]">
+          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
+            <Image
+              src="/media/end.png"
+              alt=""
+              fill
+              sizes="100vw"
+              /* Centred: the globe's mass is in the middle of the source, and
+                 anchoring to the bottom cropped exactly that away. */
+              className="object-cover object-center glyph-art-light"
+            />
+            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
+          </div>
+        </div>
+
+        {/* Reading veil, weighted to the top. The link columns sit in the upper
+            half and are 11-12px mono, so that half stays near-white; the lower
+            half is left mostly clear, which is where the globe actually reads.
+            Without the weighting this is either an unreadable footer or an
+            invisible image. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF] from-15% via-[rgba(255,255,255,0.82)] to-[rgba(255,255,255,0.28)]" />
+      </div>
+
       {/* Top */}
-      <div className="flex flex-col md:flex-row gap-12 md:gap-[80px] px-6 md:px-[120px] py-12 md:py-[64px]">
+      <div className="relative z-10 flex flex-col md:flex-row gap-12 md:gap-[80px] px-6 md:px-[120px] py-12 md:py-[64px]">
         {/* Brand */}
         <div className="flex flex-col gap-6 md:w-[280px] md:shrink-0">
           <div className="flex items-center gap-[12px]">
@@ -78,7 +115,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#CFE3F2] gap-3 sm:gap-0">
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#CFE3F2] gap-3 sm:gap-0">
         <span className="font-mono text-[11px] text-[#6E8CA5] tracking-[1px]">
           © 2026 Bonded. Built at ETHOnline 2026. MIT licensed.
         </span>
@@ -97,38 +134,11 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Closing band. Purely decorative, so it is hidden from assistive tech
-          and carries an empty alt rather than a description.
+      {/* Tail space. The globe is anchored to the bottom of the footer, so
+          this gives it somewhere to be seen below the bottom bar without
+          becoming a separate band again. */}
+      <div className="h-[100px] md:h-[160px]" />
 
-          media/end.png is a glyph globe — the same visual family as the hero
-          footage, and near-black in the same way, so it gets the same
-          conversion (`.glyph-art-light` + the #2E7FBF colour blend) instead of
-          being dropped in as a dark slab at the bottom of a white page. The
-          two now bookend the landing page: world map at the top, globe at the
-          end. See globals.css for what the filter chain is doing and why the
-          opacity has to sit on the wrapper rather than on the image.
-
-          The top edge fades out of white so the band emerges from the footer
-          instead of starting on a hard line. */}
-      <div
-        aria-hidden
-        className="relative w-full h-[150px] md:h-[260px] overflow-hidden bg-[#FFFFFF]"
-      >
-        <div className="absolute inset-0 opacity-[0.78]">
-          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
-            <Image
-              src="/media/end.png"
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover glyph-art-light"
-            />
-            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
-          </div>
-        </div>
-
-        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#FFFFFF] to-transparent" />
-      </div>
     </footer>
   );
 }
