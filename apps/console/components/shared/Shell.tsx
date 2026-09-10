@@ -1,5 +1,4 @@
 import Navbar from '../site/Navbar';
-import Footer from '../site/Footer';
 
 /**
  * Console chrome. Wraps /live, /log, /policy, /corpus and /architecture.
@@ -7,10 +6,17 @@ import Footer from '../site/Footer';
  * These pages used to carry their own 240px sidebar, then their own top bar —
  * either way, a second navigation with a different link set from the landing
  * page's. That made them read as a separate app you had been dropped into
- * rather than pages of this site. They now share the landing page's Navbar and
- * Footer, so the header is continuous across every route and the console is
- * reachable from the marketing page and back again without the chrome
- * changing under you.
+ * rather than pages of this site. They now share the landing page's Navbar, so
+ * the header is continuous across every route and the console is reachable
+ * from the marketing page and back again without the chrome changing under
+ * you.
+ *
+ * The Footer is deliberately NOT shared. The landing page's closing block —
+ * three columns of links, social buttons, the glyph-globe backdrop — is
+ * marketing furniture, and under a live proposal stream or a decision log it
+ * is a long tail of nothing to do with the task. Navigation is what needed to
+ * be continuous here; the sign-off did not. Every link the footer carried is
+ * in the navbar anyway.
  *
  * This is a server component: nothing here needs state any more. Navbar owns
  * the scroll and active-route behaviour and marks itself 'use client'.
@@ -36,8 +42,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
 
         <main className="min-w-0 flex-1">{children}</main>
-
-        <Footer />
       </div>
     </div>
   );
