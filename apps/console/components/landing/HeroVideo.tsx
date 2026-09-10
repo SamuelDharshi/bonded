@@ -19,7 +19,7 @@ import { useEffect, useRef, useState } from 'react';
  * same white also covers the pre-load window.
  *
  * The element is deliberately unstyled beyond object-cover. The landing page's
- * light-theme conversion (invert + multiply) lives in `.hero-backdrop-video`
+ * light-theme conversion (invert + multiply) lives in `.glyph-art-light`
  * in globals.css and is passed in via `className`, so this component stays
  * reusable against a dark backdrop too.
  */

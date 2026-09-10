@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 // Every link here resolves to something real — a working console route or the
 // public repo. No placeholder "#" hrefs, no pages that don't exist.
 const productLinks = [
@@ -93,6 +95,39 @@ export default function Footer() {
             Arc testnet // 5042002
           </span>
         </div>
+      </div>
+
+      {/* Closing band. Purely decorative, so it is hidden from assistive tech
+          and carries an empty alt rather than a description.
+
+          media/end.png is a glyph globe — the same visual family as the hero
+          footage, and near-black in the same way, so it gets the same
+          conversion (`.glyph-art-light` + the #2E7FBF colour blend) instead of
+          being dropped in as a dark slab at the bottom of a white page. The
+          two now bookend the landing page: world map at the top, globe at the
+          end. See globals.css for what the filter chain is doing and why the
+          opacity has to sit on the wrapper rather than on the image.
+
+          The top edge fades out of white so the band emerges from the footer
+          instead of starting on a hard line. */}
+      <div
+        aria-hidden
+        className="relative w-full h-[150px] md:h-[260px] overflow-hidden bg-[#FFFFFF]"
+      >
+        <div className="absolute inset-0 opacity-[0.78]">
+          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
+            <Image
+              src="/media/end.png"
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover glyph-art-light"
+            />
+            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#FFFFFF] to-transparent" />
       </div>
     </footer>
   );

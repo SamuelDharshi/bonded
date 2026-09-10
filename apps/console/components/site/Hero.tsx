@@ -13,7 +13,7 @@ import { TypewriterHeadline } from "@/components/landing/TypewriterHeadline";
  *
  * The supplied footage sits behind all of it as a backdrop. It is near-black
  * in its original form, so it is inverted into the white + light-blue theme
- * rather than dropped in as a dark band — see `.hero-backdrop-video` in
+ * rather than dropped in as a dark band — see `.glyph-art-light` in
  * globals.css for how, and why the wrapper owns the opacity.
  */
 export default function Hero() {
@@ -33,7 +33,7 @@ export default function Hero() {
               video multiplies onto the group's own white, and the tint then
               recolours the result without either reaching the page. */}
           <div className="absolute inset-0 isolate bg-[#FFFFFF]">
-            <HeroVideo className="hero-backdrop-video" />
+            <HeroVideo className="glyph-art-light" />
 
             {/* Inverting the footage leaves its glyphs neutral grey, and turns
                 the handful of amber marks in the original a faint orange —

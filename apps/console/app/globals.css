@@ -132,10 +132,12 @@ table {
    dark stop. background-size: 180% oversizes the image so blob edges never
    touch the container boundary, and leaves room for mesh-drift to pan.
 ────────────────────────────────────────────────────────────────────────── */
-/* ── Hero backdrop: dark footage on a light page ─────────────────────────────
-   public/media/hero-background.mp4 is a near-black world map drawn in bright
-   white and blue glyphs. The landing page is white + light blue, so the
-   footage is converted rather than dropped in as-is:
+/* ── Dark glyph art on a light page ──────────────────────────────────────────
+   Two assets share this treatment and bookend the landing page: the hero
+   footage (media/hero-background.mp4, a world map) and the closing band in
+   the footer (media/end.png, a globe). Both are near-black with bright white
+   and blue glyphs, and the page is white + light blue, so each is converted
+   rather than dropped in as-is:
 
      invert(1)           near-black ground -> white; bright glyphs -> dark
      hue-rotate(180deg)  undoes the hue flip invert() does to the blue glyphs,
@@ -143,7 +145,7 @@ table {
      saturate/contrast   recovers the blue that inversion washes out
 
    mix-blend-mode: multiply then composites the result onto the wrapper's own
-   white, so the video's ground dissolves into the page background instead of
+   white, so the asset's ground dissolves into the page background instead of
    sitting on it as a visible rectangle — only the glyphs darken the page.
    The wrapper must therefore keep an explicit white background; multiply over
    a transparent parent has nothing to blend against.
@@ -152,7 +154,7 @@ table {
    mix-blend-mode creates a stacking context and the blend stops reaching the
    page behind it.
 ─────────────────────────────────────────────────────────────────────────── */
-.hero-backdrop-video {
+.glyph-art-light {
   filter: invert(1) hue-rotate(180deg) saturate(1.35) contrast(1.05);
   mix-blend-mode: multiply;
 }
