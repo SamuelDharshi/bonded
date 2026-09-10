@@ -36,12 +36,15 @@ import { ExplorerEvidenceStrip } from '@/components/landing/ExplorerEvidenceStri
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
-  // The root layout paints the console's dark canvas on <body> (bg-harbor /
-  // text-manifest). The landing page runs a white + light-blue theme instead,
-  // so it sets background and text colour explicitly here rather than
-  // inheriting them — the console routes keep their own palette untouched.
+  // No top padding, deliberately: the navbar is transparent until you scroll,
+  // so the hero has to start at y=0 and run behind it. Hero's own top padding
+  // keeps the badge clear of the bar.
+  //
+  // Background and text colour are inherited now rather than set here — the
+  // whole site moved to the white + light-blue theme, so bg-harbor /
+  // text-manifest on <body> already resolve to it.
   return (
-    <main className="flex flex-col w-full min-h-screen bg-[#FFFFFF] text-[#10314A] pt-[60px]">
+    <main className="flex flex-col w-full min-h-screen">
       <Navbar />
 
       {/* Headline stating the mechanism + one line of subcopy */}

@@ -56,11 +56,16 @@ export default function Navbar() {
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      /* Transparent over the hero so the footage runs behind it, then a
+         translucent white pane on scroll. 0.72 alpha rather than a solid fill:
+         the blur only reads as glass if some of the page shows through it.
+         `saturate` keeps colour passing under the pane from going flat, which
+         is the usual giveaway of a cheap-looking blur. */
       style={{
-        background:       scrolled ? "rgba(10,10,10,0.88)" : "transparent",
-        backdropFilter:   scrolled ? "blur(14px)"          : "none",
-        WebkitBackdropFilter: scrolled ? "blur(14px)"      : "none",
-        borderBottom:     scrolled ? "1px solid #E7F1FA"   : "1px solid transparent",
+        background:           scrolled ? "rgba(255,255,255,0.72)" : "transparent",
+        backdropFilter:       scrolled ? "blur(16px) saturate(160%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(16px) saturate(160%)" : "none",
+        borderBottom:         scrolled ? "1px solid #CFE3F2" : "1px solid transparent",
       }}
     >
       <div className="flex items-center justify-between h-[60px] px-6 md:px-[48px] max-w-[1400px] mx-auto">
@@ -68,7 +73,7 @@ export default function Navbar() {
         {/* ── Logo ── */}
         <a href="/" className="flex items-center gap-[10px] shrink-0 group">
           <span className="w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform" />
-          <span className="font-grotesk text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
+          <span className="font-mono text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
             Bonded
           </span>
         </a>
@@ -120,13 +125,13 @@ export default function Navbar() {
             href="https://github.com/SamuelDharshi/bonded"
             target="_blank"
             rel="noreferrer"
-            className="font-mono text-[10px] text-[#555] tracking-[0.5px] hover:text-[#10314A] transition-colors"
+            className="font-mono text-[10px] text-[#6E8CA5] tracking-[0.5px] hover:text-[#10314A] transition-colors"
           >
             Source
           </a>
           <a
             href="/live"
-            className="font-grotesk text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+            className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
           >
             Watch it refuse
           </a>
@@ -157,10 +162,11 @@ export default function Navbar() {
       <div
         className="md:hidden overflow-hidden transition-all duration-300"
         style={{
-          maxHeight:    menuOpen ? "400px" : "0px",
-          background:   "rgba(10,10,10,0.97)",
-          backdropFilter: "blur(14px)",
-          borderBottom: menuOpen ? "1px solid #E7F1FA" : "none",
+          maxHeight:      menuOpen ? "400px" : "0px",
+          background:     "rgba(255,255,255,0.94)",
+          backdropFilter: "blur(16px) saturate(160%)",
+          WebkitBackdropFilter: "blur(16px) saturate(160%)",
+          borderBottom:   menuOpen ? "1px solid #CFE3F2" : "none",
         }}
       >
         <nav className="flex flex-col px-6 py-5 gap-0">
@@ -196,10 +202,10 @@ export default function Navbar() {
             );
           })}
           <div className="flex flex-col gap-[10px] pt-5">
-            <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#555] tracking-[0.5px]">Source</a>
+            <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#6E8CA5] tracking-[0.5px]">Source</a>
             <a
               href="/live"
-              className="font-grotesk text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
+              className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
               Watch it refuse
             </a>

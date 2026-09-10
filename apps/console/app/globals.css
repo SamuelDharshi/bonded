@@ -2,15 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mirrors the token table in tailwind.config.ts — see the comment there for
+   why the names stay fixed while the values move to the light theme, and why
+   seal/stamp/hold are exempt from the repaint. */
 :root {
-  --harbor:    #0B1A22;
-  --deepwater: #122733;
-  --hairline:  #1E3A47;
-  --manifest:  #ECEEEA;
-  --ink:       #0E1614;
-  --seal:      #3FA37A;
-  --stamp:     #C2452C;
-  --hold:      #E0A33C;
+  --harbor:    #FFFFFF;
+  --deepwater: #F2F8FD;
+  --hairline:  #CFE3F2;
+  --manifest:  #10314A;
+  --ink:       #10314A;
+  --seal:      #1E7A55;
+  --stamp:     #B03A22;
+  --hold:      #9A6B12;
 
   /* ── Mesh gradient palette (decorative only — docs/GRADIENT_SPEC.md §1) ── */
   --mesh-white:      #F5F7FA;
@@ -25,8 +28,8 @@
 }
 
 body {
-  background-color: #0B1A22; /* harbor */
-  color: #ECEEEA;             /* manifest — default text on dark canvas */
+  background-color: #FFFFFF; /* harbor */
+  color: #10314A;             /* manifest — default text on the light canvas */
   font-family: var(--font-sans, 'Space Grotesk'), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -65,10 +68,14 @@ body {
   transition: opacity 120ms ease;
 }
 
-/* ── Document surfaces (paper on harbor canvas) ─────────────────────────── */
+/* ── Document surfaces ───────────────────────────────────────────────────────
+   These were paper laid on a dark canvas, and read as raised because they were
+   lighter than everything around them. On a white canvas that inversion no
+   longer works, so the surface goes one step DARKER than the page instead —
+   same role, opposite direction. */
 .document {
-  background-color: #ECEEEA; /* manifest */
-  color: #0E1614;             /* ink */
+  background-color: #E7F1FA;
+  color: #10314A;             /* ink */
   border-radius: 4px;         /* doc radius */
 }
 
@@ -79,7 +86,7 @@ table {
 
 /* ── Hairline rules — 1px only, never decorative ─────────────────────────── */
 .hairline-rule {
-  border-color: #1E3A47;
+  border-color: #CFE3F2;
   border-width: 1px;
 }
 
@@ -197,5 +204,5 @@ table {
 }
 
 .font-mono-site {
-  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
 }
