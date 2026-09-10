@@ -48,9 +48,13 @@ export default function Hero() {
             cut-off line where the hero meets the Compare slider. */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-[#FFFFFF]" />
 
-        {/* Reading scrim: a soft white bloom under the headline block, so the
-            glyph field never sits directly behind running text. */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_38%,#FFFFFF_0%,rgba(255,255,255,0.72)_45%,transparent_100%)]" />
+        {/* Reading scrim. Sized to the content column (the subcopy is capped at
+            820px) and run the full height of the section, so every line of
+            running text sits on near-white while the map stays visible in the
+            margins either side. An ellipse tight around the headline is not
+            enough — it leaves the subcopy on the densest part of the glyph
+            field, which is where this footage is busiest. */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_66%_88%_at_50%_46%,#FFFFFF_0%,#FFFFFF_34%,rgba(255,255,255,0.88)_58%,rgba(255,255,255,0.45)_80%,transparent_100%)]" />
       </div>
 
       {/* Badge */}
