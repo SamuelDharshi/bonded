@@ -13,6 +13,7 @@
     "@bonded/compiler": "workspace:*",
     "@bonded/enforcer": "workspace:*",
     "@bonded/seam": "workspace:*",
+    "@bonded/standardized": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "framer-motion": "^11.0.0",

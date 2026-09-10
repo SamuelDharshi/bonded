@@ -98,7 +98,9 @@ export default function LivePage() {
         <p className="text-body text-manifest/60 mt-2 max-w-xl">
           Each scenario below calls the real <code className="font-mono text-small">enforce()</code> from{' '}
           <code className="font-mono text-small">@bonded/enforcer</code> — the same function its own unit tests call.
-          Re-derivation runs against the documented fixture path (no live Graph Gateway key configured yet).
+          Premises are re-derived from a Messari DEX-AMM subgraph through the Graph Gateway, against the live
+          Uniswap V3 WETH/USDC pool on Base, pinned to one block per run. Each result below reports the query
+          path and block it actually used.
         </p>
 
         <div className="grid grid-cols-2 gap-4 mt-8">

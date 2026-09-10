@@ -1,14 +1,19 @@
 /**
  * COMPOSABLE TRACK PROOF SCRIPT
  *
- * Runs the SAME query function against multiple Messari DEX-AMM
- * standardized subgraph deployment IDs. Zero protocol-specific code
- * changes between protocols.
+ * Runs the SAME query function against every Messari DEX-AMM standardized
+ * deployment in KNOWN_DEPLOYMENTS. Zero protocol-specific code changes
+ * between them: the query is written against the Messari schema, so adding
+ * a protocol means adding an ID and a pool, not a code path.
  *
  * Output: console table + writes proof.json
  *
- * This script IS the Composable-track argument.
- * Screenshot the output for the README.
+ * HONEST SCOPE: there is one live deployment in that map today, so this
+ * currently demonstrates the mechanism rather than proving it across three
+ * protocols at once. The three Ethereum deployments this script used to run
+ * against are dead — see the note on KNOWN_DEPLOYMENTS. Add any further
+ * DEX-AMM deployment and it runs unchanged; that property is the argument,
+ * and it is worth stating as what it is rather than overstating it.
  *
  * Run: pnpm --filter @bonded/standardized proof
  */
@@ -18,7 +23,12 @@ import { fileURLToPath } from 'node:url';
 import { executeQuery, parseUSDToScale18, type GatewayConfig } from '../src/gateway.js';
 import { buildQuery, parseResponse, KNOWN_DEPLOYMENTS } from '../src/schemas/messari-dex-amm.js';
 
-const GATEWAY_BASE_URL = process.env['GRAPH_GATEWAY_URL'] ?? 'https://gateway.thegraph.com/api';
+// GRAPH_GATEWAY_BASE_URL, not GRAPH_GATEWAY_URL. The latter is this project's
+// own subgraph query endpoint on Studio; because buildGatewayUrl passes any
+// URL containing '/query/' through verbatim, using it here sent every Messari
+// lookup to the Bonded subgraph and came back "Type `Query` has no field
+// `liquidityPool`" — which reads like a bad deployment ID, not a bad base URL.
+const GATEWAY_BASE_URL = process.env['GRAPH_GATEWAY_BASE_URL'] ?? 'https://gateway.thegraph.com/api';
 const API_KEY          = process.env['GRAPH_API_KEY'];
 
 if (!API_KEY) {
@@ -27,13 +37,11 @@ if (!API_KEY) {
 }
 
 /**
- * Well-known pool IDs for each protocol (Ethereum mainnet).
- * Verify these are current before running.
+ * A well-known pool on each deployment. Verified live 2026-09-11.
  */
 const POOL_IDS: Record<keyof typeof KNOWN_DEPLOYMENTS, string> = {
-  'uniswap-v3-ethereum':  '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640', // USDC/ETH 0.05%
-  'curve-ethereum':       '0xbebc44055f52ea3fe848b70e396fa9e9a4d58aee', // 3pool
-  'balancer-v2-ethereum': '0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8', // USDC/WETH
+  // Uniswap V3 WETH/USDC 0.3% on Base — ~$125M TVL, created 2023-08.
+  'uniswap-v3-base': '0x6c561b446416e1a00e8e93e221854d6ea4171372',
 };
 
 interface ProofResult {

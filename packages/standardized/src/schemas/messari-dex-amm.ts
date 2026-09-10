@@ -12,24 +12,30 @@
 export const MESSARI_DEX_AMM_SCHEMA = 'messari-dex-amm' as const;
 
 /**
- * Known Messari DEX-AMM standardized subgraph deployment IDs.
+ * Known Messari DEX-AMM standardized deployment IDs.
  *
- * CONFIRMED STALE as of 2026-09-08 — see FEEDBACK/THEGRAPH.md for the
- * exact Gateway queries and error responses. Two of the three IDs below
- * don't resolve at all; the third resolves to a real subgraph that is NOT
- * a Messari DEX-AMM deployment (no `liquidityPools` field). Do not treat
- * these as usable without re-verifying against Subgraph Studio / Graph
- * Explorer first — the query PATTERN in this file is real and tested, but
- * these specific IDs are not currently live.
+ * VERIFIED LIVE 2026-09-11 against the production Gateway: the entry below
+ * answers `liquidityPools { totalValueLockedUSD createdTimestamp }` with real
+ * data. These are IPFS deployment IDs, so they resolve under the Gateway's
+ * /deployments/id/ path — see isDeploymentId() in gateway.ts.
  *
- * These are the deployments used in the Composable track proof script.
- * The SAME query resolves against all of them — that's the proof, once
- * the IDs are current.
+ * There is one entry, and that is an honest reflection of what exists rather
+ * than a shortened list. The three that used to sit here (Uniswap v3, Curve
+ * and Balancer on Ethereum) are dead: two return "subgraph not found" and the
+ * third resolves to a subgraph with no `liquidityPools` field. Messari's
+ * hosted-service deployments largely went with the hosted service, and on
+ * Base specifically there is no Curve or Balancer DEX-AMM deployment to point
+ * at — Curve's is Arbitrum-only.
+ *
+ * The Composable claim is unchanged in kind but should be stated honestly:
+ * the query in this file is written against the Messari schema, not against
+ * Uniswap, so any DEX-AMM deployment can be added to this map and resolved by
+ * the same code. What cannot be claimed today is that it has been *proven*
+ * across three protocols simultaneously — one live deployment is what there
+ * is to stand on.
  */
 export const KNOWN_DEPLOYMENTS = {
-  'uniswap-v3-ethereum': 'ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH5XNovGR',
-  'curve-ethereum':      'OfqMDDMPZjgjMjgCkRMbZfMLxBMDFNfGaYzVqv5Uo7b',
-  'balancer-v2-ethereum':'H9oPAbXnobBRq1cB3HDmbZ1E8MWQyJYQjT1QDJMrdbNp',
+  'uniswap-v3-base': 'QmawEzRNeDyaTgjPKb1eRrbyzxczgSHUYzvTMaMnN8jyuh',
 } as const;
 
 export type MessariDexAmmField =

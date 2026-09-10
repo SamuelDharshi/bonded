@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-09-10T19:43:46.230Z",
+  "queryFunction": "buildQuery(\"liquidityPool.totalValueLockedUSD\")",
+  "note": "Same function, same zero code changes, multiple protocols",
+  "summary": {
+    "total": 1,
+    "succeeded": 1,
+    "failed": 0
+  },
+  "results": [
+    {
+      "protocol": "uniswap-v3-base",
+      "subgraphId": "QmawEzRNeDyaTgjPKb1eRrbyzxczgSHUYzvTMaMnN8jyuh",
+      "poolId": "0x6c561b446416e1a00e8e93e221854d6ea4171372",
+      "field": "liquidityPool.totalValueLockedUSD",
+      "rawValue": "125083149.7762591124787192497172299",
+      "scaledValue": "125083149776259112478719249",
+      "success": true
+    }
+  ]
+}

@@ -29,17 +29,42 @@ export interface GraphQLResponse<T> {
 }
 
 /**
+ * A deployment ID is an IPFS CIDv0: 'Qm' followed by 44 base58 characters.
+ * A subgraph ID is a different, shorter base58 string with no fixed prefix.
+ * The Gateway addresses the two under different paths and rejects each ID
+ * under the other's path, so the distinction has to be made before the URL
+ * is built rather than discovered from a 404.
+ */
+const DEPLOYMENT_ID_RE = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/;
+
+export function isDeploymentId(id: string): boolean {
+  return DEPLOYMENT_ID_RE.test(id);
+}
+
+/**
  * Build the full Gateway URL for a subgraph.
- * Production format: https://gateway.thegraph.com/api/{apiKey}/subgraphs/id/{subgraphId}
- * Studio dev-endpoint format: used verbatim, see GatewayConfig.gatewayBaseUrl.
  *
- * NOTE: Copy this URL verbatim from Subgraph Studio — do not type from memory.
+ * Three shapes, in the order they are tested:
+ *   1. Studio dev endpoint  — used verbatim, detected by '/query/'.
+ *   2. Deployment ID (Qm…)  — {base}/{apiKey}/deployments/id/{id}
+ *   3. Subgraph ID          — {base}/{apiKey}/subgraphs/id/{id}
+ *
+ * Case 2 is why this function exists in its current form. Graph Explorer
+ * shows a deployment ID prominently on a subgraph's page, so that is what
+ * gets copied — and sending one to /subgraphs/id/ returns
+ * "invalid subgraph ID", which reads exactly like a dead subgraph. Three
+ * deployments were written off as stale on that evidence before the paths
+ * were told apart. They were in fact dead, but the next ID would not have
+ * been, and it would have failed identically.
+ *
+ * NOTE: Copy the ID verbatim from Studio/Explorer — do not type from memory.
  */
 export function buildGatewayUrl(config: GatewayConfig): string {
   if (config.gatewayBaseUrl.includes('/query/')) {
     return config.gatewayBaseUrl;
   }
-  return `${config.gatewayBaseUrl}/${config.apiKey}/subgraphs/id/${config.subgraphId}`;
+  const path = isDeploymentId(config.subgraphId) ? 'deployments' : 'subgraphs';
+  return `${config.gatewayBaseUrl}/${config.apiKey}/${path}/id/${config.subgraphId}`;
 }
 
 /**
