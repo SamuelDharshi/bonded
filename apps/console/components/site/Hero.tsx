@@ -18,16 +18,17 @@ import { TypewriterHeadline } from "@/components/landing/TypewriterHeadline";
  */
 export default function Hero() {
   return (
-    <section className="relative flex flex-col items-center w-full bg-[#FFFFFF] pt-16 px-6 md:pt-[100px] md:px-[120px] overflow-hidden">
+    <section className="relative flex flex-col items-center justify-center w-full min-h-[560px] md:min-h-[720px] bg-[#FFFFFF] pt-16 pb-16 px-6 md:pt-[100px] md:pb-[100px] md:px-[120px] overflow-hidden">
       {/* Backdrop. Purely decorative, so it is hidden from assistive tech and
           sits behind everything; the wrapper carries the white ground that the
           video's multiply blend composites onto, and the opacity that keeps
-          the glyphs faint enough for #10314A type to stay legible over them. */}
+          the glyphs strong enough to read as an image without swamping the
+          type sitting on them. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[#FFFFFF] overflow-hidden"
       >
-        <div className="absolute inset-0 opacity-[0.34]">
+        <div className="absolute inset-0 opacity-[0.78]">
           {/* `isolate` keeps the two blends below scoped to this group: the
               video multiplies onto the group's own white, and the tint then
               recolours the result without either reaching the page. */}
@@ -48,13 +49,13 @@ export default function Hero() {
             cut-off line where the hero meets the Compare slider. */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-[#FFFFFF]" />
 
-        {/* Reading scrim. Sized to the content column (the subcopy is capped at
-            820px) and run the full height of the section, so every line of
-            running text sits on near-white while the map stays visible in the
-            margins either side. An ellipse tight around the headline is not
-            enough — it leaves the subcopy on the densest part of the glyph
-            field, which is where this footage is busiest. */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_66%_88%_at_50%_46%,#FFFFFF_0%,#FFFFFF_34%,rgba(255,255,255,0.88)_58%,rgba(255,255,255,0.45)_80%,transparent_100%)]" />
+        {/* Reading scrim. Deliberately partial: an opaque white plateau would
+            make the footage invisible exactly where the viewer is looking, so
+            this only lifts contrast under the text rather than erasing what is
+            behind it. Peak alpha 0.62 in the centre, gone by the edges — the
+            map stays legible as an image through the whole section. Contrast
+            for the small type is bought back by darkening it below instead. */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_62%_72%_at_50%_46%,rgba(255,255,255,0.62)_0%,rgba(255,255,255,0.5)_45%,rgba(255,255,255,0.22)_74%,transparent_100%)]" />
       </div>
 
       {/* Badge */}
@@ -74,11 +75,19 @@ export default function Hero() {
 
       <div className="h-6 md:h-[24px]" />
 
-      {/* One line of subcopy, per the PRD. */}
-      <p className="relative z-10 font-mono text-[13px] md:text-[15px] text-[#52738D] tracking-[0.5px] leading-[1.6] text-center w-full max-w-[820px]">
-        The model proposes and states its reasons; an enforcer that never reads
-        the prompt re-derives every one of them before the money moves.
-      </p>
+      {/* One line of subcopy, per the PRD.
+          The 13-15px mono is the only text on this page small enough to lose
+          against the glyph field, and it happens to land on the busiest band
+          of the footage. It gets a local plate rather than a bigger global
+          scrim — dimming the whole map to rescue two lines would undo the
+          point of having the video there at all. The plate is wider and taller
+          than the text so it reads as a soft bloom, not a box. */}
+      <div className="relative z-10 w-full max-w-[980px] px-4 py-6 bg-[radial-gradient(ellipse_50%_60%_at_50%_50%,#FFFFFF_0%,rgba(255,255,255,0.96)_40%,rgba(255,255,255,0.75)_65%,transparent_100%)]">
+        <p className="font-mono text-[13px] md:text-[15px] text-[#2C4E68] tracking-[0.5px] leading-[1.6] text-center mx-auto max-w-[820px]">
+          The model proposes and states its reasons; an enforcer that never reads
+          the prompt re-derives every one of them before the money moves.
+        </p>
+      </div>
 
       <div className="h-10 md:h-[48px]" />
 
@@ -104,7 +113,7 @@ export default function Hero() {
 
       <div className="h-6 md:h-[24px]" />
 
-      <p className="relative z-10 font-mono text-[11px] text-[#6E8CA5] tracking-[0.5px] text-center">
+      <p className="relative z-10 font-mono text-[11px] text-[#52738D] tracking-[0.5px] text-center">
         No wallet, no faucet, no signature required.
       </p>
     </section>
