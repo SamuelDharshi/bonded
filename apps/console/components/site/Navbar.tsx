@@ -1,20 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
- * Two in-page anchors for the sections that exist on this page, then straight
- * into the console. The landing page is short by design (BONDED_PRD.md §6
- * specifies five sections), so a long anchor list would mostly point at
- * nothing — every entry here resolves to something real.
+ * The site's single navigation bar, used by the landing page and by every
+ * console route through components/shared/Shell.
+ *
+ * It used to be landing-only, with the console carrying a separate sidebar of
+ * its own. That made /live, /log, /policy and /corpus feel like a different
+ * site rather than pages of this one — different chrome, different link set,
+ * no way back to the sections you came from. One component now serves both.
+ *
+ * The complication that makes this more than a copy-paste: two of the entries
+ * are in-page anchors that only exist on `/`. Scrolling to #compare from
+ * /policy would scroll to nothing, so off the landing page they become real
+ * links to `/#compare` and the browser handles the jump after navigation.
+ * `section` and `href` are therefore both present on those two, and which one
+ * is used depends on where you are.
  */
-const links: { label: string; section?: string; href?: string }[] = [
-  { label: "Compare", section: "compare" },
-  { label: "Layers",  section: "layers"  },
-  { label: "Live",    href: "/live"      },
-  { label: "Log",     href: "/log"       },
-  { label: "Policy",  href: "/policy"    },
-  { label: "Corpus",  href: "/corpus"    },
+type NavLink = {
+  label: string;
+  /** In-page anchor id — only resolvable on the landing page. */
+  section?: string;
+  /** Route, or the fallback target for an anchor when off the landing page. */
+  href?: string;
+};
+
+const links: NavLink[] = [
+  { label: "Compare", section: "compare", href: "/#compare" },
+  { label: "Layers", section: "layers", href: "/#layers" },
+  { label: "Live", href: "/live" },
+  { label: "Log", href: "/log" },
+  { label: "Policy", href: "/policy" },
+  { label: "Corpus", href: "/corpus" },
+  { label: "Architecture", href: "/architecture" },
 ];
 
 function scrollTo(id: string) {
@@ -23,19 +44,30 @@ function scrollTo(id: string) {
 }
 
 export default function Navbar() {
-  const [scrolled, setScrolled]           = useState(false);
-  const [active, setActive]               = useState("");
-  const [menuOpen, setMenuOpen]           = useState(false);
+  const pathname = usePathname();
+  const onLanding = pathname === "/";
+
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   /* ── scroll detection ── */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ── active section via IntersectionObserver ── */
+  /* ── active section via IntersectionObserver. Landing page only: off it
+        there are no sections to observe, and the route match below decides
+        what is highlighted instead. ── */
   useEffect(() => {
+    if (!onLanding) {
+      setActive("");
+      return;
+    }
+
     const ids = links.map((l) => l.section).filter((v): v is string => Boolean(v));
     const obs: IntersectionObserver[] = [];
 
@@ -51,7 +83,18 @@ export default function Navbar() {
     });
 
     return () => obs.forEach((o) => o.disconnect());
-  }, []);
+  }, [onLanding, pathname]);
+
+  /** True when this entry represents where the reader currently is. */
+  function isActive(link: NavLink): boolean {
+    if (onLanding) return !!link.section && active === link.section;
+    return !!link.href && !link.section && pathname === link.href;
+  }
+
+  /** An anchor behaves as a scroll button only where its target exists. */
+  function isScrollAnchor(link: NavLink): boolean {
+    return onLanding && !!link.section;
+  }
 
   return (
     <header
@@ -71,48 +114,47 @@ export default function Navbar() {
       <div className="flex items-center justify-between h-[60px] px-6 md:px-[48px] max-w-[1400px] mx-auto">
 
         {/* ── Logo ── */}
-        <a href="/" className="flex items-center gap-[10px] shrink-0 group">
+        <Link href="/" className="flex items-center gap-[10px] shrink-0 group">
           <span className="w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform" />
           <span className="font-mono text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
             Bonded
           </span>
-        </a>
+        </Link>
 
         {/* ── Desktop nav ── */}
-        <nav className="hidden md:flex items-center gap-[36px]">
-          {links.map(({ label, section, href }) => {
-            const isActive = !!section && active === section;
-            if (href) {
+        <nav className="hidden md:flex items-center gap-[28px]">
+          {links.map((link) => {
+            const activeNow = isActive(link);
+
+            if (!isScrollAnchor(link)) {
               return (
-                <a
-                  key={label}
-                  href={href}
-                  className="font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
-                  style={{ color: "#6E8CA5" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#10314A"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#6E8CA5"; }}
+                <Link
+                  key={link.label}
+                  href={link.href!}
+                  aria-current={activeNow ? "page" : undefined}
+                  className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
+                  style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
                 >
-                  {label}
-                </a>
+                  {link.label}
+                  <span
+                    className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#1E7BB8] transition-all duration-300"
+                    style={{ width: activeNow ? "100%" : "0%" }}
+                  />
+                </Link>
               );
             }
+
             return (
               <button
-                key={label}
-                onClick={() => section && scrollTo(section)}
+                key={link.label}
+                onClick={() => link.section && scrollTo(link.section)}
                 className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
-                style={{ color: isActive ? "#1E7BB8" : "#6E8CA5" }}
-                onMouseEnter={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#10314A";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = isActive ? "#1E7BB8" : "#6E8CA5";
-                }}
+                style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
               >
-                {label}
+                {link.label}
                 <span
                   className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#1E7BB8] transition-all duration-300"
-                  style={{ width: isActive ? "100%" : "0%" }}
+                  style={{ width: activeNow ? "100%" : "0%" }}
                 />
               </button>
             );
@@ -129,12 +171,12 @@ export default function Navbar() {
           >
             Source
           </a>
-          <a
+          <Link
             href="/live"
             className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
           >
             Watch it refuse
-          </a>
+          </Link>
         </div>
 
         {/* ── Mobile burger ── */}
@@ -142,6 +184,7 @@ export default function Navbar() {
           className="md:hidden flex flex-col gap-[5px] p-2 -mr-2"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
           <span
             className="block w-[20px] h-[1.5px] bg-[#10314A] transition-transform duration-200 origin-center"
@@ -162,7 +205,7 @@ export default function Navbar() {
       <div
         className="md:hidden overflow-hidden transition-all duration-300"
         style={{
-          maxHeight:      menuOpen ? "400px" : "0px",
+          maxHeight:      menuOpen ? "460px" : "0px",
           background:     "rgba(255,255,255,0.94)",
           backdropFilter: "blur(16px) saturate(160%)",
           WebkitBackdropFilter: "blur(16px) saturate(160%)",
@@ -170,45 +213,52 @@ export default function Navbar() {
         }}
       >
         <nav className="flex flex-col px-6 py-5 gap-0">
-          {links.map(({ label, section, href }) => {
-            const isActive = !!section && active === section;
-            if (href) {
+          {links.map((link) => {
+            const activeNow = isActive(link);
+
+            if (!isScrollAnchor(link)) {
               return (
-                <a
-                  key={label}
-                  href={href}
+                <Link
+                  key={link.label}
+                  href={link.href!}
                   onClick={() => setMenuOpen(false)}
+                  aria-current={activeNow ? "page" : undefined}
                   className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
-                  style={{ color: "#6E8CA5" }}
+                  style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
                 >
-                  <span className="w-[4px] h-[4px] rounded-full shrink-0" style={{ background: "#CFE3F2" }} />
-                  {label}
-                </a>
+                  <span
+                    className="w-[4px] h-[4px] rounded-full shrink-0"
+                    style={{ background: activeNow ? "#1E7BB8" : "#CFE3F2" }}
+                  />
+                  {link.label}
+                </Link>
               );
             }
+
             return (
               <button
-                key={label}
-                onClick={() => { if (section) scrollTo(section); setMenuOpen(false); }}
+                key={link.label}
+                onClick={() => { if (link.section) scrollTo(link.section); setMenuOpen(false); }}
                 className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
-                style={{ color: isActive ? "#1E7BB8" : "#6E8CA5" }}
+                style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
               >
                 <span
                   className="w-[4px] h-[4px] rounded-full shrink-0 transition-colors"
-                  style={{ background: isActive ? "#1E7BB8" : "#CFE3F2" }}
+                  style={{ background: activeNow ? "#1E7BB8" : "#CFE3F2" }}
                 />
-                {label}
+                {link.label}
               </button>
             );
           })}
           <div className="flex flex-col gap-[10px] pt-5">
             <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#6E8CA5] tracking-[0.5px]">Source</a>
-            <a
+            <Link
               href="/live"
+              onClick={() => setMenuOpen(false)}
               className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
               Watch it refuse
-            </a>
+            </Link>
           </div>
         </nav>
       </div>
