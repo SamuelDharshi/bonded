@@ -53,15 +53,69 @@ authoritative and let me write correct code — but they mean an agent (or a
 person) following `triggers.md` literally for an HTTP trigger, without
 cross-checking the installed package, ships code that doesn't compile.
 
+## Confidential Workflows Private Beta access — requested via both paths (2026-09-10)
+
+Initially requested via `cre account access` (CLI), org `org_lgyLfW5Ebah6miLW`.
+Also found and submitted Chainlink's actual Google Form for this (separate
+from `cre account access` — the CLI prompt and the form appear to be two
+paths to the same review queue; the form asks for the same org ID and adds
+a use-case description plus a Private Beta Terms acceptance). Confirmation
+received same day: **on the waitlist**, "under
+review," no ETA given beyond "we'll notify you by email." Explicitly told
+we don't need to wait for access to keep developing — local simulation is
+sufficient, which matches what Chainlink staff told the ETHGlobal NYC
+Discord repeatedly (see below).
+
+## Chainlink staff confirm: simulation is sufficient for hackathon eligibility (reproduced from ETHGlobal NYC #partner-chainlink, dates April–June 2026)
+
+Not our own finding, but directly relevant and worth recording since it
+confirms our own approach without us having to guess:
+
+> "You do not need to deploy the CRE project to mainnet — definitely not a
+> requirement for this hackathon. To be eligible for prizes, you should
+> simply run a local simulation of your workflow using the `cre workflow
+> simulate` command. If your workflow includes the Chain Write capability,
+> running the simulation with the `cre workflow simulate --broadcast` flag
+> will result in the state changing transaction on testnet, so you will
+> have a legit transaction hash, etc." — Solange Gueiros, Chainlink Labs
+
+Also confirmed: no API key needed for the hackathon (production only), and
+(from Andrej, Chainlink Labs) CLI v1.19.0+ supports `--listen` on
+`cre workflow simulate` for HTTP/Log triggers, starting a local listener at
+`http://localhost:2000/trigger` instead of requiring `--http-payload`
+upfront — useful for interactive testing, not yet tried against
+`stepup-threshold`. Our installed CLI (v1.32.0) is well above this minimum.
+
+## Unreproduced community report: MockKeystoneForwarder may not forward writes on Arc (2026-04-05, ETHGlobal NYC Discord)
+
+From a fellow builder, Francesco Vlacancich, not verified by us:
+
+> "personally i had to deploy and override my own implementation of a
+> MockForwarder on Arc cause the chainlink mock forwarder that the
+> simulation was calling was not actually forwarding my write requests"
+
+Relevant because it's exactly the Arc + simulation-forwarder intersection
+this project would hit if `cre workflow simulate --broadcast` is ever run
+against an on-chain write path. Flagging now, before we've reproduced it
+ourselves, so it doesn't cost a debugging session later if we do hit it.
+Also relevant to the Forwarder-address question generally: CRE's own
+`evm-client.md` reference confirms simulation always uses a *different*
+`MockKeystoneForwarder` address than the real network's production
+`KeystoneForwarder` — they are never the same contract, by design, and no
+Arc forwarder address is documented in the reference we have access to.
+Do not hardcode one; verify against Chainlink's live forwarder directory
+(`docs.chain.link/cre/guides/workflow/using-evm-client/forwarder-directory-ts.md`)
+at the point an Arc production deployment actually happens.
+
 ## Not yet exercised
 
-- Deployment (private beta, requires separate enrollment per
-  `confidential-workflows.md` — access requested via `cre account access`,
-  org `org_lgyLfW5Ebah6miLW`, pending Chainlink's team as of this writing).
+- Deployment itself — waitlisted, see above.
 - The real DMK-equivalent confirmation flow wiring this workflow's output
   into `BondedVault.confirmStepUp()` — out of scope until deployment access
-  and Arc contract addresses both exist.
+  and a verified Arc forwarder address both exist.
 - `packages/authority/src/chainlink/tee.ts`'s `ChainlinkCREAuthority` class
   (the HTTP-polling `pollForConfirmation` design) hasn't been reconciled
   against this newly-built real workflow yet — worth revisiting whether CRE
   has a more direct primitive once deploy access lands.
+- `--listen` mode and `--broadcast` against `stepup-threshold` specifically
+  — not yet tried, would strengthen the simulation evidence further.
