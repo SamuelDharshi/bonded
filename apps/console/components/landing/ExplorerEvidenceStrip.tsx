@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
+import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 
 
@@ -109,11 +110,56 @@ export async function ExplorerEvidenceStrip() {
   const hasScreenshot = screenshotExists();
 
   return (
-    <section className="max-w-content mx-auto px-8 py-16">
+    <section className="relative w-full overflow-hidden">
+      {/* Section backdrop. Purely decorative — aria-hidden, empty alt.
+
+          media/on-chain.jpeg is a field of white flowers on black, so it takes
+          the same conversion as the hero footage and the footer globe
+          the #2E7FBF colour blend, inverted out of near-black into the white
+          + light-blue theme rather than dropped in as a dark slab. It uses
+          `.photo-art-light` rather than the `.glyph-art-light` the hero and
+          footer use — see globals.css for why a photograph of large solid
+          shapes needs different tuning from sparse glyph art, and why the
+          opacity sits on a wrapper rather than on the image.
+
+          Note this is a still, not an animation — the file is a JPEG despite
+          being asked for as a gif, so nothing here moves. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[#FFFFFF]"
+      >
+        <div className="absolute inset-0 opacity-[0.55]">
+          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
+            <Image
+              src="/media/on-chain.jpeg"
+              alt=""
+              fill
+              sizes="100vw"
+              /* Anchored low: the one tall flower sits at the top of the
+                 source and landed squarely behind the heading. Cropping to
+                 the bed of flowers below it gives an even texture with no
+                 single shape competing with the type. */
+              className="object-cover object-bottom photo-art-light"
+            />
+            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
+          </div>
+        </div>
+
+        {/* Fades top and bottom so the section joins the white above and below
+            it without hard seams. */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#FFFFFF] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#FFFFFF] to-transparent" />
+      </div>
+
+      <div className="relative z-10 max-w-content mx-auto px-8 py-16">
       <p className="text-small text-[#1E7BB8] font-bold uppercase tracking-wider">On-chain evidence</p>
       <h2 className="text-h1 text-[#10314A] mt-2">The payload is the token&apos;s name.</h2>
 
-      <div className="bg-[#F2F8FD] border border-[#CFE3F2] mt-6">
+      {/* The card goes translucent so the backdrop reads through it, with a
+          blur behind so the live name()/symbol() values stay crisp. Written as
+          rgba() rather than a `/85` opacity suffix — Tailwind silently emits
+          nothing for an opacity step it does not recognise. */}
+      <div className="bg-[rgba(242,248,253,0.82)] backdrop-blur-md border border-[#CFE3F2] mt-6">
         <div className="p-6 md:p-8">
           {token.error ? (
             <div className="border border-[#B4D3E9] bg-[#E7F1FA] p-4">
@@ -164,6 +210,7 @@ export async function ExplorerEvidenceStrip() {
             yourself.
           </p>
         </div>
+      </div>
       </div>
     </section>
   );

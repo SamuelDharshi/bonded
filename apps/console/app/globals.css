@@ -159,6 +159,24 @@ table {
   mix-blend-mode: multiply;
 }
 
+/* ── Photographic art on a light page ────────────────────────────────────────
+   Same idea as .glyph-art-light, different tuning, because the assets differ
+   in kind. The glyph pieces are sparse bright marks on black: invert them and
+   you get sparse dark marks on white, which is exactly what is wanted.
+   media/on-chain.jpeg is a field of large solid white flowers, and inverting
+   that at full contrast produces large solid NEAR-BLACK shapes — a dark blob
+   sitting on the section heading rather than a light backdrop behind it.
+
+   So contrast is pulled down to lift the blacks off the floor and brightness
+   pushes the whole range up, landing the flowers as pale blue silhouettes
+   instead of dark ones. The colour blend on top then does the same job it
+   does for the glyph art.
+────────────────────────────────────────────────────────────────────────── */
+.photo-art-light {
+  filter: invert(1) hue-rotate(180deg) saturate(1.3) contrast(0.5) brightness(1.28);
+  mix-blend-mode: multiply;
+}
+
 .mesh-gradient {
   position: relative;
   background-color: var(--mesh-dark);
