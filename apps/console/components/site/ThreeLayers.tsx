@@ -43,9 +43,9 @@ export default function ThreeLayers() {
   return (
     <section
       id="layers"
-      className="flex flex-col w-full bg-[#0A0A0A] py-16 px-6 md:py-[100px] md:px-[120px]"
+      className="flex flex-col w-full bg-[#FFFFFF] py-16 px-6 md:py-[100px] md:px-[120px]"
     >
-      <span className="font-mono text-[10px] md:text-[12px] font-bold text-[#FFD600] tracking-[1px]">
+      <span className="font-mono text-[10px] md:text-[12px] font-bold text-[#1E7BB8] tracking-[1px]">
         Three layers, one frozen seam
       </span>
 
@@ -55,19 +55,19 @@ export default function ThreeLayers() {
         {layers.map(({ layer, sponsor, detail, cta, href, external }) => (
           <div
             key={layer}
-            className="flex flex-col md:flex-row gap-3 md:gap-[64px] w-full py-8 md:py-[40px] border-t border-t-[#1E3A47]"
+            className="flex flex-col md:flex-row gap-3 md:gap-[64px] w-full py-8 md:py-[40px] border-t border-t-[#CFE3F2]"
           >
             <div className="md:w-[220px] md:shrink-0">
-              <p className="font-mono text-[11px] text-[#555555] tracking-[0.5px]">
+              <p className="font-mono text-[11px] text-[#6E8CA5] tracking-[0.5px]">
                 {layer}
               </p>
-              <p className="font-grotesk text-[22px] md:text-[26px] font-bold text-[#F5F5F0] tracking-[-0.5px] mt-1">
+              <p className="font-grotesk text-[22px] md:text-[26px] font-bold text-[#10314A] tracking-[-0.5px] mt-1">
                 {sponsor}
               </p>
             </div>
 
             <div className="flex-1">
-              <p className="font-mono text-[12px] md:text-[13px] text-[#888888] tracking-[0.5px] leading-[1.7] max-w-[620px]">
+              <p className="font-mono text-[12px] md:text-[13px] text-[#52738D] tracking-[0.5px] leading-[1.7] max-w-[620px]">
                 {detail}
               </p>
               {external ? (
@@ -75,14 +75,14 @@ export default function ThreeLayers() {
                   href={href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block font-mono text-[12px] text-[#FFD600] tracking-[0.5px] mt-4 hover:underline"
+                  className="inline-block font-mono text-[12px] text-[#1E7BB8] tracking-[0.5px] mt-4 hover:underline"
                 >
                   {cta} ↗
                 </a>
               ) : (
                 <Link
                   href={href}
-                  className="inline-block font-mono text-[12px] text-[#FFD600] tracking-[0.5px] mt-4 hover:underline"
+                  className="inline-block font-mono text-[12px] text-[#1E7BB8] tracking-[0.5px] mt-4 hover:underline"
                 >
                   {cta} →
                 </Link>
@@ -90,7 +90,7 @@ export default function ThreeLayers() {
             </div>
           </div>
         ))}
-        <div className="border-t border-t-[#1E3A47]" />
+        <div className="border-t border-t-[#CFE3F2]" />
       </div>
     </section>
   );

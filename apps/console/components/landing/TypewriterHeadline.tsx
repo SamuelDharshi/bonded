@@ -13,7 +13,10 @@ interface Headline {
 /**
  * The six rotating headlines, copied verbatim from LANDING_PAGE_SPEC.md §3.
  * Item 5 is the real injected `name()` string from the deployed AttackToken
- * (0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5) and is styled in `stamp` red.
+ * (0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5). It is set apart with a deeper
+ * blue rather than the original `stamp` red, to stay inside the white +
+ * light-blue theme; that keeps it visually distinct but does drop the "this
+ * string is dangerous" colour cue the red carried.
  * Colour is a per-headline property, never inferred from string content.
  */
 const HEADLINES: readonly Headline[] = [
@@ -26,9 +29,14 @@ const HEADLINES: readonly Headline[] = [
 ];
 
 /** Static class strings so Tailwind's scanner keeps both colours. */
+// Landing page runs a white + light-blue theme, so the headline colours are
+// in-palette hexes rather than the console's dark-canvas tokens. The injected
+// string keeps a distinct (deeper, more saturated) blue so it still reads as
+// the odd one out — see the note in the component doc above about what that
+// trades away versus the original `stamp` red.
 const COLOR_CLASS: Record<HeadlineColor, string> = {
-  manifest: 'text-manifest',
-  stamp:    'text-stamp',
+  manifest: 'text-[#10314A]',
+  stamp:    'text-[#0B4F7D]',
 };
 
 const TYPE_MIN_MS = 35;

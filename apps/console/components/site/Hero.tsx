@@ -13,11 +13,11 @@ import { TypewriterHeadline } from "@/components/landing/TypewriterHeadline";
  */
 export default function Hero() {
   return (
-    <section className="relative flex flex-col items-center w-full bg-[#0A0A0A] pt-16 px-6 md:pt-[100px] md:px-[120px] overflow-hidden">
+    <section className="relative flex flex-col items-center w-full bg-[#FFFFFF] pt-16 px-6 md:pt-[100px] md:px-[120px] overflow-hidden">
       {/* Badge */}
-      <div className="flex items-center justify-center gap-[8px] h-[32px] px-[12px] md:px-[16px] bg-[#1A1A1A] border-2 border-[#FFD600]">
-        <div className="w-[8px] h-[8px] bg-[#FFD600] shrink-0" />
-        <span className="font-mono text-[9px] md:text-[11px] font-bold text-[#FFD600] tracking-[0.5px] whitespace-nowrap">
+      <div className="flex items-center justify-center gap-[8px] h-[32px] px-[12px] md:px-[16px] bg-[#E7F1FA] border-2 border-[#1E7BB8]">
+        <div className="w-[8px] h-[8px] bg-[#1E7BB8] shrink-0" />
+        <span className="font-mono text-[9px] md:text-[11px] font-bold text-[#1E7BB8] tracking-[0.5px] whitespace-nowrap">
           Live on Arc testnet · ETHOnline 2026
         </span>
       </div>
@@ -31,7 +31,7 @@ export default function Hero() {
       <div className="h-6 md:h-[24px]" />
 
       {/* One line of subcopy, per the PRD. */}
-      <p className="font-mono text-[13px] md:text-[15px] text-[#888888] tracking-[0.5px] leading-[1.6] text-center w-full max-w-[820px]">
+      <p className="font-mono text-[13px] md:text-[15px] text-[#52738D] tracking-[0.5px] leading-[1.6] text-center w-full max-w-[820px]">
         The model proposes and states its reasons; an enforcer that never reads
         the prompt re-derives every one of them before the money moves.
       </p>
@@ -42,17 +42,17 @@ export default function Hero() {
       <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-[16px] w-full sm:w-auto">
         <Link
           href="/live"
-          className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#FFD600] hover:bg-[#e6c200] transition-colors"
+          className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#1E7BB8] hover:bg-[#17618F] transition-colors"
         >
-          <span className="font-grotesk text-[12px] font-bold text-[#0A0A0A] tracking-[0.5px]">
+          <span className="font-grotesk text-[12px] font-bold text-[#FFFFFF] tracking-[0.5px]">
             Watch it refuse
           </span>
         </Link>
         <Link
           href="/architecture"
-          className="flex items-center justify-center w-full sm:w-[200px] h-[56px] bg-[#0A0A0A] border-2 border-[#3D3D3D] hover:border-[#888888] transition-colors"
+          className="flex items-center justify-center w-full sm:w-[200px] h-[56px] bg-[#FFFFFF] border-2 border-[#B4D3E9] hover:border-[#52738D] transition-colors"
         >
-          <span className="font-mono text-[12px] text-[#888888] tracking-[0.5px]">
+          <span className="font-mono text-[12px] text-[#52738D] tracking-[0.5px]">
             Read the architecture
           </span>
         </Link>
@@ -60,7 +60,7 @@ export default function Hero() {
 
       <div className="h-6 md:h-[24px]" />
 
-      <p className="font-mono text-[11px] text-[#555555] tracking-[0.5px] text-center">
+      <p className="font-mono text-[11px] text-[#6E8CA5] tracking-[0.5px] text-center">
         No wallet, no faucet, no signature required.
       </p>
     </section>

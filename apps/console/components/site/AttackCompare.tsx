@@ -46,24 +46,24 @@ function Panel({
 
   return (
     <div
-      className="flex flex-col w-full md:flex-1 bg-[#0F0F0F] border"
+      className="flex flex-col w-full md:flex-1 bg-[#F2F8FD] border"
       style={{ borderColor }}
     >
       {/* Panel header */}
-      <div className="flex items-center justify-between h-[44px] px-4 md:px-[20px] bg-[#111111] border-b border-b-[#2D2D2D]">
+      <div className="flex items-center justify-between h-[44px] px-4 md:px-[20px] bg-[#F2F8FD] border-b border-b-[#CFE3F2]">
         <span
           className="font-mono text-[10px] md:text-[11px] font-bold tracking-[0.5px]"
           style={{ color: accent }}
         >
           {side}
         </span>
-        <span className="font-mono text-[10px] text-[#555555] tracking-[0.5px]">
+        <span className="font-mono text-[10px] text-[#6E8CA5] tracking-[0.5px]">
           {label}
         </span>
       </div>
 
       {/* Media slot */}
-      <div className="relative flex items-center justify-center aspect-video bg-[#0A0A0A]">
+      <div className="relative flex items-center justify-center aspect-video bg-[#FFFFFF]">
         {present ? (
           <video
             className="h-full w-full object-cover"
@@ -76,10 +76,10 @@ function Panel({
           />
         ) : (
           <div className="flex flex-col items-center gap-3 px-6 text-center">
-            <span className="font-mono text-[10px] md:text-[11px] font-bold text-[#555555] tracking-[0.5px]">
+            <span className="font-mono text-[10px] md:text-[11px] font-bold text-[#6E8CA5] tracking-[0.5px]">
               Recording pending
             </span>
-            <span className="font-mono text-[10px] text-[#3D3D3D] tracking-[1px] leading-[1.6] max-w-[280px]">
+            <span className="font-mono text-[10px] text-[#B4D3E9] tracking-[1px] leading-[1.6] max-w-[280px]">
               {file} has not been captured yet. This is a placeholder, not a
               simulation.
             </span>
@@ -95,8 +95,8 @@ function Panel({
       </div>
 
       {/* Caption */}
-      <div className="px-4 md:px-[20px] py-4 border-t border-t-[#1D1D1D]">
-        <p className="font-mono text-[10px] md:text-[11px] text-[#666666] tracking-[1px] leading-[1.6]">
+      <div className="px-4 md:px-[20px] py-4 border-t border-t-[#CFE3F2]">
+        <p className="font-mono text-[10px] md:text-[11px] text-[#6E8CA5] tracking-[1px] leading-[1.6]">
           {caption}
         </p>
       </div>
@@ -108,7 +108,7 @@ export default function AttackCompare() {
   return (
     <section
       id="compare"
-      className="flex flex-col w-full bg-[#0A0A0A] py-16 px-6 md:py-[100px] md:px-[120px] gap-12 md:gap-[64px]"
+      className="flex flex-col w-full bg-[#FFFFFF] py-16 px-6 md:py-[100px] md:px-[120px] gap-12 md:gap-[64px]"
     >
       <SectionHeader
         label="[04] // The same attack, twice"
@@ -122,16 +122,16 @@ export default function AttackCompare() {
           label="No enforcer"
           file={NAIVE_FILE}
           caption="Trusts name() as read. The injected instruction becomes the instruction."
-          accent="#FF6B35"
-          borderColor="#FF6B35"
+          accent="#56A8DC"
+          borderColor="#56A8DC"
         />
         <Panel
           side="Bonded"
           label="Enforcer on"
           file={BONDED_FILE}
           caption="Refused via POLICY_FORBIDDEN_ACTION (reasonCode 3) before a single Graph query runs — the cheapest check comes first."
-          accent="#FFD600"
-          borderColor="#FFD600"
+          accent="#1E7BB8"
+          borderColor="#1E7BB8"
         />
       </div>
     </section>

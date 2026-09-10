@@ -18,18 +18,18 @@ const chainLinks = [
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col w-full bg-[#050505]">
+    <footer className="flex flex-col w-full bg-[#FFFFFF]">
       {/* Top */}
       <div className="flex flex-col md:flex-row gap-12 md:gap-[80px] px-6 md:px-[120px] py-12 md:py-[64px]">
         {/* Brand */}
         <div className="flex flex-col gap-6 md:w-[280px] md:shrink-0">
           <div className="flex items-center gap-[12px]">
-            <div className="w-[32px] h-[32px] bg-[#FFD600] shrink-0" />
-            <span className="font-grotesk text-[16px] font-bold text-[#FFD600] tracking-[1px]">
+            <div className="w-[32px] h-[32px] bg-[#1E7BB8] shrink-0" />
+            <span className="font-grotesk text-[16px] font-bold text-[#1E7BB8] tracking-[1px]">
               Bonded
             </span>
           </div>
-          <p className="font-mono text-[11px] text-[#888888] tracking-[1px] leading-[1.6] max-w-[260px]">
+          <p className="font-mono text-[11px] text-[#52738D] tracking-[1px] leading-[1.6] max-w-[260px]">
             The spending account for agents that aren&apos;t trusted to report
             the world — only to propose.
           </p>
@@ -37,9 +37,9 @@ export default function Footer() {
             {[{ label: "X" }, { label: "GH" }, { label: "LI" }].map((s) => (
               <button
                 key={s.label}
-                className="flex items-center justify-center w-[36px] h-[36px] bg-[#111111] border border-[#2D2D2D] hover:border-[#888888] transition-colors"
+                className="flex items-center justify-center w-[36px] h-[36px] bg-[#F2F8FD] border border-[#CFE3F2] hover:border-[#52738D] transition-colors"
               >
-                <span                   className="font-grotesk text-[10px] font-bold text-[#AAAAAA]">
+                <span                   className="font-grotesk text-[10px] font-bold text-[#52738D]">
                   {s.label}
                 </span>
               </button>
@@ -55,7 +55,7 @@ export default function Footer() {
             { heading: "On-chain", links: chainLinks },
           ].map((col) => (
             <div key={col.heading} className="flex flex-col gap-4 md:gap-[20px]">
-              <span className="font-grotesk text-[11px] font-bold text-[#F5F5F0] tracking-[0.5px]">
+              <span className="font-grotesk text-[11px] font-bold text-[#10314A] tracking-[0.5px]">
                 {col.heading}
               </span>
               {col.links.map((link) => (
@@ -65,7 +65,7 @@ export default function Footer() {
                   {...(link.href.startsWith("http")
                     ? { target: "_blank", rel: "noreferrer" }
                     : {})}
-                  className="font-mono text-[12px] text-[#888888] tracking-[1px] hover:text-[#CCCCCC] transition-colors"
+                  className="font-mono text-[12px] text-[#52738D] tracking-[1px] hover:text-[#2C4E68] transition-colors"
                 >
                   {link.label}
                 </a>
@@ -76,8 +76,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#1D1D1D] gap-3 sm:gap-0">
-        <span className="font-mono text-[11px] text-[#666666] tracking-[1px]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#CFE3F2] gap-3 sm:gap-0">
+        <span className="font-mono text-[11px] text-[#6E8CA5] tracking-[1px]">
           © 2026 Bonded. Built at ETHOnline 2026. MIT licensed.
         </span>
         <div className="flex items-center gap-6 md:gap-[32px]">
@@ -85,11 +85,11 @@ export default function Footer() {
             href="https://github.com/SamuelDharshi/bonded"
             target="_blank"
             rel="noreferrer"
-            className="font-mono text-[11px] text-[#666666] tracking-[1px] hover:text-[#AAAAAA] transition-colors"
+            className="font-mono text-[11px] text-[#6E8CA5] tracking-[1px] hover:text-[#52738D] transition-colors"
           >
             GitHub
           </a>
-          <span className="font-mono text-[11px] font-bold text-[#FFD600] tracking-[1px]">
+          <span className="font-mono text-[11px] font-bold text-[#1E7BB8] tracking-[1px]">
             Arc testnet // 5042002
           </span>
         </div>

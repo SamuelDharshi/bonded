@@ -36,8 +36,12 @@ import { ExplorerEvidenceStrip } from '@/components/landing/ExplorerEvidenceStri
 export const dynamic = 'force-dynamic';
 
 export default function Home() {
+  // The root layout paints the console's dark canvas on <body> (bg-harbor /
+  // text-manifest). The landing page runs a white + light-blue theme instead,
+  // so it sets background and text colour explicitly here rather than
+  // inheriting them — the console routes keep their own palette untouched.
   return (
-    <main className="flex flex-col w-full bg-[#0A0A0A] pt-[60px]">
+    <main className="flex flex-col w-full min-h-screen bg-[#FFFFFF] text-[#10314A] pt-[60px]">
       <Navbar />
 
       {/* Headline stating the mechanism + one line of subcopy */}

@@ -3,7 +3,6 @@ import path from 'node:path';
 
 import { ExternalLink } from 'lucide-react';
 
-import { MeshGradient } from './MeshGradient';
 
 /**
  * Explorer evidence strip — docs/LANDING_PAGE_SPEC.md §5.2.
@@ -111,40 +110,40 @@ export async function ExplorerEvidenceStrip() {
 
   return (
     <section className="max-w-content mx-auto px-8 py-16">
-      <p className="text-small text-manifest/50 uppercase tracking-wider">On-chain evidence</p>
-      <h2 className="text-h1 text-manifest mt-2">The payload is the token&apos;s name.</h2>
+      <p className="text-small text-[#1E7BB8] font-bold uppercase tracking-wider">On-chain evidence</p>
+      <h2 className="text-h1 text-[#10314A] mt-2">The payload is the token&apos;s name.</h2>
 
-      <MeshGradient className="rounded-doc border border-hairline mt-6">
+      <div className="bg-[#F2F8FD] border border-[#CFE3F2] mt-6">
         <div className="p-6 md:p-8">
           {token.error ? (
-            <div className="border border-hold/40 bg-hold/10 rounded-control p-4">
-              <p className="text-small text-hold">Live on-chain read failed: {token.error}</p>
-              <p className="text-small text-manifest/60 mt-2">
+            <div className="border border-[#B4D3E9] bg-[#E7F1FA] p-4">
+              <p className="text-small text-[#0B4F7D] font-bold">Live on-chain read failed: {token.error}</p>
+              <p className="text-small text-[#52738D] mt-2">
                 This panel only ever shows a value it just read from Arc testnet. It has no
                 hardcoded copy to fall back on — check the explorer link below instead.
               </p>
             </div>
           ) : (
             <>
-              <p className="text-small text-manifest/50">
+              <p className="text-small text-[#6E8CA5]">
                 <span className="font-mono">name()</span> — read live from Arc testnet
               </p>
-              <p className="text-body font-mono text-stamp mt-2 break-all">{token.name}</p>
+              <p className="text-body font-mono text-[#0B4F7D] font-bold mt-2 break-all">{token.name}</p>
 
-              <p className="text-small text-manifest/50 mt-6">
+              <p className="text-small text-[#6E8CA5] mt-6">
                 <span className="font-mono">symbol()</span>
               </p>
-              <p className="text-body font-mono text-manifest mt-2">{token.symbol}</p>
+              <p className="text-body font-mono text-[#10314A] mt-2">{token.symbol}</p>
             </>
           )}
 
-          <div className="border-t border-hairline mt-6 pt-4">
-            <p className="text-small text-manifest/50">Contract</p>
+          <div className="border-t border-[#CFE3F2] mt-6 pt-4">
+            <p className="text-small text-[#6E8CA5]">Contract</p>
             <a
               href={EXPLORER_URL}
               target="_blank"
               rel="noreferrer"
-              className="text-small font-mono text-seal mt-2 inline-flex items-center gap-1.5 break-all hover:underline"
+              className="text-small font-mono text-[#1E7BB8] mt-2 inline-flex items-center gap-1.5 break-all hover:underline"
             >
               {ATTACK_TOKEN_ADDRESS}
               <ExternalLink size={13} strokeWidth={1.5} aria-hidden />
@@ -156,16 +155,16 @@ export async function ExplorerEvidenceStrip() {
             <img
               src={SCREENSHOT_SRC}
               alt={`testnet.arcscan.app showing the token at ${ATTACK_TOKEN_ADDRESS} with its injected name() string, as read by any third party`}
-              className="rounded-doc border border-hairline mt-6 w-full"
+              className="border border-[#CFE3F2] mt-6 w-full"
             />
           )}
 
-          <p className="text-small text-manifest/60 mt-6">
+          <p className="text-small text-[#52738D] mt-6">
             Same data, no wallet, no trust in us: open it on testnet.arcscan.app and read the field
             yourself.
           </p>
         </div>
-      </MeshGradient>
+      </div>
     </section>
   );
 }

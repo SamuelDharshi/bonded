@@ -60,15 +60,15 @@ export default function Navbar() {
         background:       scrolled ? "rgba(10,10,10,0.88)" : "transparent",
         backdropFilter:   scrolled ? "blur(14px)"          : "none",
         WebkitBackdropFilter: scrolled ? "blur(14px)"      : "none",
-        borderBottom:     scrolled ? "1px solid #1E1E1E"   : "1px solid transparent",
+        borderBottom:     scrolled ? "1px solid #E7F1FA"   : "1px solid transparent",
       }}
     >
       <div className="flex items-center justify-between h-[60px] px-6 md:px-[48px] max-w-[1400px] mx-auto">
 
         {/* ── Logo ── */}
         <a href="/" className="flex items-center gap-[10px] shrink-0 group">
-          <span className="w-[10px] h-[10px] bg-[#FFD600] group-hover:scale-110 transition-transform" />
-          <span className="font-grotesk text-[13px] font-bold text-[#F5F5F0] tracking-[0.5px]">
+          <span className="w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform" />
+          <span className="font-grotesk text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
             Bonded
           </span>
         </a>
@@ -83,9 +83,9 @@ export default function Navbar() {
                   key={label}
                   href={href}
                   className="font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
-                  style={{ color: "#555" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#F5F5F0"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#555"; }}
+                  style={{ color: "#6E8CA5" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#10314A"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#6E8CA5"; }}
                 >
                   {label}
                 </a>
@@ -96,17 +96,17 @@ export default function Navbar() {
                 key={label}
                 onClick={() => section && scrollTo(section)}
                 className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
-                style={{ color: isActive ? "#FFD600" : "#555" }}
+                style={{ color: isActive ? "#1E7BB8" : "#6E8CA5" }}
                 onMouseEnter={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#F5F5F0";
+                  if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#10314A";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = isActive ? "#FFD600" : "#555";
+                  (e.currentTarget as HTMLButtonElement).style.color = isActive ? "#1E7BB8" : "#6E8CA5";
                 }}
               >
                 {label}
                 <span
-                  className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#FFD600] transition-all duration-300"
+                  className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#1E7BB8] transition-all duration-300"
                   style={{ width: isActive ? "100%" : "0%" }}
                 />
               </button>
@@ -120,13 +120,13 @@ export default function Navbar() {
             href="https://github.com/SamuelDharshi/bonded"
             target="_blank"
             rel="noreferrer"
-            className="font-mono text-[10px] text-[#555] tracking-[0.5px] hover:text-[#F5F5F0] transition-colors"
+            className="font-mono text-[10px] text-[#555] tracking-[0.5px] hover:text-[#10314A] transition-colors"
           >
             Source
           </a>
           <a
             href="/live"
-            className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#F5F5F0] transition-colors"
+            className="font-grotesk text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
           >
             Watch it refuse
           </a>
@@ -139,15 +139,15 @@ export default function Navbar() {
           aria-label="Toggle menu"
         >
           <span
-            className="block w-[20px] h-[1.5px] bg-[#F5F5F0] transition-transform duration-200 origin-center"
+            className="block w-[20px] h-[1.5px] bg-[#10314A] transition-transform duration-200 origin-center"
             style={{ transform: menuOpen ? "translateY(6.5px) rotate(45deg)" : "none" }}
           />
           <span
-            className="block w-[20px] h-[1.5px] bg-[#F5F5F0] transition-opacity duration-200"
+            className="block w-[20px] h-[1.5px] bg-[#10314A] transition-opacity duration-200"
             style={{ opacity: menuOpen ? 0 : 1 }}
           />
           <span
-            className="block w-[20px] h-[1.5px] bg-[#F5F5F0] transition-transform duration-200 origin-center"
+            className="block w-[20px] h-[1.5px] bg-[#10314A] transition-transform duration-200 origin-center"
             style={{ transform: menuOpen ? "translateY(-6.5px) rotate(-45deg)" : "none" }}
           />
         </button>
@@ -160,7 +160,7 @@ export default function Navbar() {
           maxHeight:    menuOpen ? "400px" : "0px",
           background:   "rgba(10,10,10,0.97)",
           backdropFilter: "blur(14px)",
-          borderBottom: menuOpen ? "1px solid #1E1E1E" : "none",
+          borderBottom: menuOpen ? "1px solid #E7F1FA" : "none",
         }}
       >
         <nav className="flex flex-col px-6 py-5 gap-0">
@@ -172,10 +172,10 @@ export default function Navbar() {
                   key={label}
                   href={href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#141414] transition-colors"
-                  style={{ color: "#666" }}
+                  className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
+                  style={{ color: "#6E8CA5" }}
                 >
-                  <span className="w-[4px] h-[4px] rounded-full shrink-0" style={{ background: "#2D2D2D" }} />
+                  <span className="w-[4px] h-[4px] rounded-full shrink-0" style={{ background: "#CFE3F2" }} />
                   {label}
                 </a>
               );
@@ -184,12 +184,12 @@ export default function Navbar() {
               <button
                 key={label}
                 onClick={() => { if (section) scrollTo(section); setMenuOpen(false); }}
-                className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#141414] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
-                style={{ color: isActive ? "#FFD600" : "#666" }}
+                className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
+                style={{ color: isActive ? "#1E7BB8" : "#6E8CA5" }}
               >
                 <span
                   className="w-[4px] h-[4px] rounded-full shrink-0 transition-colors"
-                  style={{ background: isActive ? "#FFD600" : "#2D2D2D" }}
+                  style={{ background: isActive ? "#1E7BB8" : "#CFE3F2" }}
                 />
                 {label}
               </button>
@@ -199,7 +199,7 @@ export default function Navbar() {
             <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#555] tracking-[0.5px]">Source</a>
             <a
               href="/live"
-              className="font-grotesk text-[11px] font-bold text-[#0A0A0A] bg-[#FFD600] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#F5F5F0] transition-colors"
+              className="font-grotesk text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
               Watch it refuse
             </a>
