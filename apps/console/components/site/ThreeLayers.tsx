@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -43,15 +44,57 @@ export default function ThreeLayers() {
   return (
     <section
       id="layers"
-      className="flex flex-col w-full bg-[#FFFFFF] py-16 px-6 md:py-[100px] md:px-[120px]"
+      className="relative flex flex-col w-full overflow-hidden bg-[#FFFFFF] py-16 px-6 md:py-[100px] md:px-[120px]"
     >
-      <span className="font-mono text-[10px] md:text-[12px] font-bold text-[#1E7BB8] tracking-[1px]">
+      {/* Backdrop. Purely decorative — aria-hidden, empty alt.
+
+          media/three-layers.jpg is two wireframe hands reaching for each
+          other: fine bright lines on near-black, which is the same kind of
+          asset as the hero footage and the footer globe, so it takes
+          `.glyph-art-light` rather than the softer `.photo-art-light` the
+          flower field needs. Inverting sparse lines gives sparse dark lines;
+          inverting large solid shapes gives blobs, which is the distinction
+          those two classes exist to make. See globals.css.
+
+          Anchored right: the source is portrait (960x1200) in a wide section,
+          so most of it is cropped either way. Keeping the right edge puts the
+          open space between the two hands behind the left-hand column, where
+          the layer names and sponsors sit. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[#FFFFFF]"
+      >
+        <div className="absolute inset-0 opacity-[0.6]">
+          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
+            <Image
+              src="/media/three-layers.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover object-right glyph-art-light"
+            />
+            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
+          </div>
+        </div>
+
+        {/* Reading veil. This section is three rows of 12-13px mono on hairline
+            rules — the lightest type on the page and the least able to survive
+            a busy backdrop. Heavier on the left, where the detail paragraphs
+            run, thinning to the right where the drawing is worth seeing. */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#FFFFFF_0%,rgba(255,255,255,0.92)_45%,rgba(255,255,255,0.68)_75%,rgba(255,255,255,0.5)_100%)]" />
+
+        {/* Soften both edges into the sections above and below. */}
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#FFFFFF] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#FFFFFF] to-transparent" />
+      </div>
+
+      <span className="relative z-10 font-mono text-[10px] md:text-[12px] font-bold text-[#1E7BB8] tracking-[1px]">
         Three layers, one frozen seam
       </span>
 
       <div className="h-8 md:h-[40px]" />
 
-      <div className="flex flex-col w-full">
+      <div className="relative z-10 flex flex-col w-full">
         {layers.map(({ layer, sponsor, detail, cta, href, external }) => (
           <div
             key={layer}
