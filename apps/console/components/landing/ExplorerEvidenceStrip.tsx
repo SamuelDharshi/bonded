@@ -1,6 +1,3 @@
-import { existsSync } from 'node:fs';
-import path from 'node:path';
-
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 
@@ -26,9 +23,6 @@ const EXPLORER_URL = `https://testnet.arcscan.app/address/${ATTACK_TOKEN_ADDRESS
 /** Standard ERC-20 selectors, verified working against this exact contract. */
 const NAME_SELECTOR = '0x06fdde03';
 const SYMBOL_SELECTOR = '0x95d89b41';
-
-/** Real screenshot of the same token on testnet.arcscan.app (§7 manifest). */
-const SCREENSHOT_SRC = '/media/attack-token-explorer.png';
 
 interface TokenRead {
   name: string | null;
@@ -96,18 +90,8 @@ async function readAttackToken(): Promise<TokenRead> {
   }
 }
 
-/**
- * The screenshots in §7's manifest are captured but not necessarily committed.
- * Check at request time so the image appears the moment the file lands, and a
- * broken <img> never ships in the meantime.
- */
-function screenshotExists(): boolean {
-  return existsSync(path.join(process.cwd(), 'public', 'media', 'attack-token-explorer.png'));
-}
-
 export async function ExplorerEvidenceStrip() {
   const token = await readAttackToken();
-  const hasScreenshot = screenshotExists();
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -195,15 +179,6 @@ export async function ExplorerEvidenceStrip() {
               <ExternalLink size={13} strokeWidth={1.5} aria-hidden />
             </a>
           </div>
-
-          {hasScreenshot && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={SCREENSHOT_SRC}
-              alt={`testnet.arcscan.app showing the token at ${ATTACK_TOKEN_ADDRESS} with its injected name() string, as read by any third party`}
-              className="border border-[#CFE3F2] mt-6 w-full"
-            />
-          )}
 
           <p className="text-small text-[#52738D] mt-6">
             Same data, no wallet, no trust in us: open it on testnet.arcscan.app and read the field
