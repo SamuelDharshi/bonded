@@ -378,6 +378,8 @@ Bonded/
 │   ├── proposer/                Model-side proposal generation.  15 tests
 │   ├── quarantine/              Untrusted-string classifier.  9 tests
 │   ├── authority/               IAuthority — the TEE signing interface
+│   ├── settlement/              Drives a verdict onto Arc: enforce -> sign
+│   │                              -> BondedVault.settle()
 │   └── attack-corpus/           Naive-agent-vs-Bonded harness
 │
 ├── apps/console/                Next.js 15 App Router · React 19 · TS strict
@@ -541,7 +543,16 @@ pnpm --filter @bonded/standardized proof
 curl -s -X POST http://localhost:3000/api/enforce \
   -H 'content-type: application/json' \
   -d '{"scenario":"tvl-lie"}' | jq '.verdict, .premises'
+# 4. A verdict really settles on Arc, end to end:
+#    enforce() -> sign -> BondedVault.settle() -> subgraph -> /log
+pnpm --filter @bonded/settlement settle tvl-lie    # refusal, moves no money
+pnpm --filter @bonded/settlement fund-vault 5
+pnpm --filter @bonded/settlement settle legit      # releases 1 USDC
 ```
+
+The settle script never forces an outcome. If the enforcer refuses it settles
+the refusal; if the verdict is `HELD_FOR_STEPUP` it stops and says why, because
+releasing those funds needs a confirmation only a real enclave can produce.
 
 ---
 
@@ -629,9 +640,19 @@ Verified in this environment, not asserted.
   [`AttackToken`](https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5).
   Wired to real Arc testnet USDC, verified via `symbol()`/`decimals()` on-chain
   — returns `"USDC"` / `6`, not assumed.
+- **Verdicts really settle on Arc, both outcomes.** `BondedVault.settle()` has
+  been called with real signed verdicts produced by the real enforcer against
+  live Graph data:
+  - [CLEARED — 1 USDC released](https://testnet.arcscan.app/tx/0x05b7a368e5f200d15b673feebcddbcd5928ab19890420dc639bf19ba42c8a631)
+  - [REFUSED — recorded on-chain, no USDC moved](https://testnet.arcscan.app/tx/0x1b1775b8c39765f13ec0961ecf4ceafcba9c1dd971144c9b82446c1c86f83c3c)
+
+  The vault verified the signature itself, checked the on-chain policy hash,
+  enforced its own anti-replay and budget guards, and transferred the USDC.
+  Reproduce with `pnpm --filter @bonded/settlement settle legit`.
 - **Bonded's own subgraph deployed and syncing** (`v0.0.2`). Verified in order:
   called `commitPolicy()` on-chain → watched it get indexed → watched it render
-  on `/log`.
+  on `/log`. Both settled verdicts above are indexed as `VerdictRecord`
+  entities and render there too.
 - **116 tests pass.** 100 TypeScript across 5 packages (enforcer 39, compiler
   23, proposer 15, standardized 14, quarantine 9) + 16 Foundry including three
   fuzz suites.
@@ -643,11 +664,23 @@ Verified in this environment, not asserted.
 
 ### Not done, and honest about it
 
-- ⏳ **CRE is not deployed.** Simulated only; deploy access is pending
-  private-beta approval from Chainlink. `BondedVault.enrolledSigner` is
-  currently the deployer's own address as a documented placeholder, and is
-  `immutable` — so this needs a redeploy once a real enclave-custodied key
-  exists. The console states this on every page.
+- ⏳ **CRE is not deployed, and the authority layer is not in the enforcement
+  path.** The biggest remaining gap, stated precisely:
+  - `enforce()` step 5 compares `valueUSDC` against `policy.irreversible_above`
+    **locally, in plaintext**. The argument for the CRE layer is that the
+    threshold stays confidential inside an enclave so it cannot be
+    binary-searched. The running system does not yet have that property.
+  - The verdict signing key is a **local key read from the environment**
+    (`packages/settlement/src/chain.ts`). It should live inside the TEE.
+    Whoever holds that file can produce a signature the vault accepts.
+  - `packages/authority/src/chainlink/tee.ts` is a complete `IAuthority`
+    implementation against a CRE node, but it is **never constructed** —
+    nothing depends on `@bonded/authority` yet.
+  - `BondedVault.enrolledSigner` is `immutable` and currently the deployer's
+    address, so adopting a real enclave key needs a redeploy.
+
+  The workflow itself is real and simulates correctly; deploy access is pending
+  private-beta approval from Chainlink. The console states this on every page.
 - ⏳ **The naive-agent side of the attack corpus has not been run.**
   `results.json` reports `NOT_YET_RUN` for all three starter kits rather than
   inventing a number. Needs pinned commits and an LLM key per kit.

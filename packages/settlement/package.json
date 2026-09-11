@@ -1,0 +1,24 @@
+{
+  "name": "@bonded/settlement",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "commit-policy": "tsx src/commit-policy.ts",
+    "settle": "tsx src/settle.ts",
+    "fund-vault": "tsx src/fund-vault.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bonded/compiler": "workspace:*",
+    "@bonded/enforcer": "workspace:*",
+    "@bonded/seam": "workspace:*",
+    "@bonded/standardized": "workspace:*",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
+  }
+}
