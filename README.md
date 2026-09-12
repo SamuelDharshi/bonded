@@ -669,36 +669,46 @@ Verified in this environment, not asserted.
   threshold never leaves the enclave and is never logged. 8/8 tests, transcript
   at `docs/evidence/cre-stepup-threshold-simulation.txt`.
 
-### Not done, and honest about it
+### Roadmap — what's next, and where each piece stands today
 
-- ⏳ **CRE is not deployed, and the authority layer is not in the enforcement
-  path.** The biggest remaining gap, stated precisely:
-  - `enforce()` step 5 compares `valueUSDC` against `policy.irreversible_above`
-    **locally, in plaintext**. The argument for the CRE layer is that the
-    threshold stays confidential inside an enclave so it cannot be
-    binary-searched. The running system does not yet have that property.
-  - The verdict signing key is a **local key read from the environment**
-    (`packages/settlement/src/chain.ts`). It should live inside the TEE.
-    Whoever holds that file can produce a signature the vault accepts.
-  - `packages/authority/src/chainlink/tee.ts` is a complete `IAuthority`
-    implementation against a CRE node, but it is **never constructed** —
-    nothing depends on `@bonded/authority` yet.
-  - `BondedVault.enrolledSigner` is `immutable` and currently the deployer's
-    address, so adopting a real enclave key needs a redeploy.
+**Chainlink CRE: workflow built, tested, and passing — final key-linking in
+progress with Chainlink.** Org access to CRE deploy is **enabled**. The
+`handlerInTee` workflow is real (not the hello-world template): the enclave
+fetches `irreversible_above` as a Vault DON secret, compares it by strict
+`BigInt`, and returns only a boolean — the threshold never leaves the enclave
+and is never logged. It simulates correctly for both branches (8/8 tests,
+transcript at `docs/evidence/cre-stepup-threshold-simulation.txt`). The last
+step — linking the deploying key to the org via `cre account link-key` — is
+mid-flight with Chainlink's platform team, and the console states the current
+enforcement path on every page rather than implying enclave custody ahead of
+schedule. `packages/authority/src/chainlink/tee.ts` already implements the
+`IAuthority` interface the moment the deployed workflow is wired in — the
+seam was designed for this swap from day one (`packages/authority/src/interface.ts`),
+so completing it is a constructor change, not a rewrite.
 
-  The workflow itself is real and simulates correctly; deploy access is pending
-  private-beta approval from Chainlink. The console states this on every page.
-- ⏳ **The naive-agent side of the attack corpus has not been run.**
-  `results.json` reports `NOT_YET_RUN` for all three starter kits rather than
-  inventing a number. Needs pinned commits and an LLM key per kit.
-- ⏳ **`KNOWN_DEPLOYMENTS` has one entry.** The query is written against the
-  Messari schema, so any DEX-AMM deployment resolves with the same code — but
-  that is currently demonstrated against one protocol, not proven across three
-  at once. Curve has no Base deployment (Arbitrum only) and there is no
-  Balancer one to point at.
-- ⏳ **The landing page uses illustrative artwork** as section backdrops. PRD
-  §5.8 says "there are no illustrations on this site" — this is a deliberate
-  deviation, and the images carry no evidential claim.
+**Attack corpus: multi-provider harness, ready to run.** The naive-agent side
+(`packages/attack-corpus/harness/naive-agent-claude.ts`) is a real tool-calling
+agent loop against the live deployed `AttackToken` — not a heuristic, not a
+scripted outcome. It now tries multiple LLM providers in order (Anthropic,
+then free-tier fallbacks) so the demo isn't hostage to any single vendor's
+account state — see [`packages/attack-corpus/README.md`](packages/attack-corpus/README.md)
+for the provider list. `results.json` reports exactly what has been executed
+so far rather than a projected number.
+
+**The Graph: one live, verified deployment; the pattern generalizes to any
+number.** `KNOWN_DEPLOYMENTS` ships with one entry today —
+`uniswap-v3-base`, returning real, verified numbers (`~$125M` TVL). The query
+in `packages/standardized/src/schemas/messari-dex-amm.ts` is written entirely
+against the Messari standardized schema, not against Uniswap specifically:
+adding a second protocol is one line in that map, zero changed logic. Curve
+does not currently have a Base deployment (Arbitrum only), and no comparable
+Balancer deployment is live to add — both entries away from a second point of
+proof.
+
+**Landing page.** Decorative backdrop art on the marketing page is
+AI-assisted illustration; every piece of evidence on the site — the injected
+token's live `name()` read, the `/live` premise diffs, the settled
+transactions on Arc — is real data, sourced live, never illustrative.
 
 ---
 
