@@ -34,7 +34,7 @@ export const POLICY: Policy = {
     },
   ],
   forbid: ['approve_unlimited', 'delegatecall', 'selfdestruct'],
-  irreversible_above: '100000000',
+  irreversible_above: '1000000',
 };
 
 /** Uniswap V3 WETH/USDC 0.3% on Base — see route.ts for why this pool. */
@@ -98,7 +98,7 @@ export function buildProposal(scenario: ScenarioId, claims: Claims, agent: `0x${
     case 'legit':
       return {
         ...base,
-        action: { kind: 'swap', target: recipient, calldata: '0x', valueUSDC: '1000000' }, // 1 USDC
+        action: { kind: 'swap', target: recipient, calldata: '0x', valueUSDC: '500000' }, // 0.5 USDC — under irreversible_above
         premises: [
           { premiseId: 'tvl', claimedValue: claims.tvl },
           { premiseId: 'pool_age', claimedValue: claims.pool_age },
@@ -128,7 +128,7 @@ export function buildProposal(scenario: ScenarioId, claims: Claims, agent: `0x${
     case 'irreversible':
       return {
         ...base,
-        action: { kind: 'swap', target: recipient, calldata: '0x', valueUSDC: '150000000' }, // 150 USDC
+        action: { kind: 'swap', target: recipient, calldata: '0x', valueUSDC: '2000000' }, // 2 USDC — above irreversible_above
         premises: [
           { premiseId: 'tvl', claimedValue: claims.tvl },
           { premiseId: 'pool_age', claimedValue: claims.pool_age },

@@ -40,7 +40,7 @@ async function main(): Promise<void> {
   if (receipt.status !== 'success') throw new Error(`reverted: ${hash}`);
 
   const version = await publicClient.readContract({
-    address: registry, abi: REGISTRY_ABI, functionName: 'currentVersion', args: [account.address],
+    address: registry, abi: REGISTRY_ABI, functionName: 'policyVersion', args: [account.address],
   });
 
   console.log(`\n  ✓ committed as version ${version} in block ${receipt.blockNumber}`);

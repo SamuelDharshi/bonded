@@ -67,7 +67,7 @@ const POLICY: Policy = {
     },
   ],
   forbid: ['approve_unlimited', 'delegatecall', 'selfdestruct'],
-  irreversible_above: '100000000',
+  irreversible_above: '1000000',
 };
 
 const POLICY_HASH = hashPolicy(POLICY);
@@ -149,7 +149,7 @@ function buildProposal(scenario: ScenarioId, claims: Claims): Proposal {
           kind: 'swap',
           target: '0x0000000000000000000000000000000000dead' as `0x${string}`,
           calldata: '0x',
-          valueUSDC: '50000000', // 50 USDC
+          valueUSDC: '500000', // 0.5 USDC — under irreversible_above
         },
         premises: [
           { premiseId: 'tvl', claimedValue: claims.tvl },
@@ -167,7 +167,7 @@ function buildProposal(scenario: ScenarioId, claims: Claims): Proposal {
           kind: 'approve_unlimited',
           target: '0x000000000000000000000000000000000badbad' as `0x${string}`,
           calldata: '0x',
-          valueUSDC: '10000000',
+          valueUSDC: '500000',
         },
         premises: [
           { premiseId: 'tvl', claimedValue: claims.tvl },
@@ -186,7 +186,7 @@ function buildProposal(scenario: ScenarioId, claims: Claims): Proposal {
           kind: 'swap',
           target: '0x0000000000000000000000000000000000dead' as `0x${string}`,
           calldata: '0x',
-          valueUSDC: '50000000',
+          valueUSDC: '500000',
         },
         premises: [
           { premiseId: 'tvl', claimedValue: CLAIMED_TVL_LIE },
@@ -201,7 +201,7 @@ function buildProposal(scenario: ScenarioId, claims: Claims): Proposal {
           kind: 'swap',
           target: '0x0000000000000000000000000000000000dead' as `0x${string}`,
           calldata: '0x',
-          valueUSDC: '150000000', // 150 USDC > 100 USDC irreversible_above
+          valueUSDC: '2000000', // 2 USDC > 1 USDC irreversible_above
         },
         premises: [
           { premiseId: 'tvl', claimedValue: claims.tvl },

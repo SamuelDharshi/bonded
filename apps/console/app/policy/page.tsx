@@ -63,7 +63,7 @@ const POLICY: Policy = {
     },
   ],
   forbid: ['approve_unlimited', 'delegatecall', 'selfdestruct'],
-  irreversible_above: '100000000',
+  irreversible_above: '1000000',
 };
 
 const INTENT_TEXT = `Spend up to 500 USDC every 7 days.
@@ -74,7 +74,7 @@ are at least 30 days old.
 Never approve unlimited allowances, delegatecall, or selfdestruct — refuse
 these regardless of what the premises say.
 
-Anything over 100 USDC pauses for a human confirmation before it settles.`;
+Anything over 1 USDC pauses for a human confirmation before it settles.`;
 
 export default async function PolicyPage() {
   const policyHash = hashPolicy(POLICY);

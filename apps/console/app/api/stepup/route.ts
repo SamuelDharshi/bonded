@@ -65,11 +65,12 @@ const POLICY: Policy = {
     { id: 'pool_age', schema: 'messari-dex-amm', field: 'liquidityPool.createdTimestamp', op: 'older_than', value: '2592000' },
   ],
   forbid: ['approve_unlimited', 'delegatecall', 'selfdestruct'],
-  irreversible_above: '100000000',
+  irreversible_above: '1000000',
 };
 
-/** 150 USDC — above the vault's immutable 100 USDC IRREVERSIBLE_ABOVE. */
-const DEMO_VALUE_USDC = 150_000_000n;
+/** 2 USDC — above the policy's 1 USDC irreversible_above, and small
+    enough that the vault can actually cover the release. */
+const DEMO_VALUE_USDC = 2_000_000n;
 
 const VAULT_ABI = [
   { type: 'function', name: 'settle', stateMutability: 'nonpayable', inputs: [
@@ -278,7 +279,7 @@ function holdPhase(): Response {
     }
 
     send({ n: 1, name: 'Enforce', ok: true,
-      detail: `HELD_FOR_STEPUP — ${fmtUSDC(DEMO_VALUE_USDC)} USDC exceeds the ${fmtUSDC(100_000_000n)} USDC threshold. Every premise passed; the amount is what holds it.`,
+      detail: `HELD_FOR_STEPUP — ${fmtUSDC(DEMO_VALUE_USDC)} USDC exceeds the ${fmtUSDC(BigInt(POLICY.irreversible_above))} USDC threshold. Every premise passed; the amount is what holds it.`,
       artifact: `proposal   ${verdict.proposalHash}\nreason     ${verdict.reasonCode} IRREVERSIBLE_UNCONFIRMED\nblock      ${verdict.blockChecked}\ntvl        claimed ${tvl}\n           derived ${tvl}` });
 
     // ── 2. Funding preflight, stated before anything is spent ────────────

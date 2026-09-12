@@ -56,7 +56,7 @@ const INTENT: PolicyIntent = {
     },
   ],
   forbiddenActions: ['approve_unlimited', 'delegatecall', 'selfdestruct'],
-  irreversibleAboveUSDC: '100',
+  irreversibleAboveUSDC: '1',
 };
 
 /**

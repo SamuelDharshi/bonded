@@ -107,10 +107,13 @@ export const REGISTRY_ABI = [
     outputs: [],
   },
   {
+    // policyVersion, not currentVersion. The latter name was wrong and went
+    // unnoticed because commit-policy short-circuits when the hash already
+    // matches, so the read was never reached until the policy actually changed.
     type: 'function',
-    name: 'currentVersion',
+    name: 'policyVersion',
     stateMutability: 'view',
-    inputs: [{ name: 'agent', type: 'address' }],
+    inputs: [{ name: 'owner', type: 'address' }],
     outputs: [{ type: 'uint256' }],
   },
 ] as const;
