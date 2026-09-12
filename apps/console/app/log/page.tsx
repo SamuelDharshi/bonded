@@ -80,6 +80,37 @@ async function loadLog(): Promise<LogData> {
 // live by loading our own deploy transaction there (200, real page).
 const EXPLORER_TX = (hash: string) => `https://testnet.arcscan.app/tx/${hash}`;
 
+/* The same verdict vocabulary /live uses. Kept identical on purpose: a
+   reader who has just watched a refusal stream past on /live should meet the
+   same words and the same colours when they come here to find its receipt,
+   not a second encoding of the same enum. */
+const OUTCOME_NAMES = ['CLEARED', 'REFUSED', 'HELD_FOR_STEPUP'] as const;
+
+const OUTCOME_STYLES: Record<number, string> = {
+  0: 'text-seal border-seal',
+  1: 'text-stamp border-stamp',
+  2: 'text-hold border-hold',
+};
+
+const REASON_NAMES: Record<number, string> = {
+  0: 'OK',
+  1: 'PREMISE_MISMATCH',
+  2: 'PREMISE_UNRESOLVABLE',
+  3: 'POLICY_FORBIDDEN_ACTION',
+  4: 'BUDGET_EXCEEDED',
+  5: 'STALE_POLICY',
+  6: 'IRREVERSIBLE_UNCONFIRMED',
+  7: 'ATTESTATION_MISSING',
+};
+
+/** USDC is 6-decimal. BigInt, never parseFloat — PRD §12.6. */
+function formatUSDC(raw: string): string {
+  const v = BigInt(raw);
+  const whole = v / 1_000_000n;
+  const frac = (v % 1_000_000n).toString().padStart(6, '0').slice(0, 2);
+  return `${whole.toLocaleString('en-US')}.${frac}`;
+}
+
 export default async function LogPage() {
   const data = await loadLog();
 
@@ -137,11 +168,15 @@ export default async function LogPage() {
 
         {data.verdictRecords.length === 0 ? (
           <div className="mt-8 border border-hairline rounded-control p-4 bg-deepwater">
+            {/* Reachable again only if the subgraph is re-deployed or resyncs
+                from scratch. It is no longer true that settlement has never
+                run — two verdicts are settled on Arc — so this state now means
+                "indexing hasn't caught up", not "this was never built". */}
             <p className="text-small text-manifest/50">
-              No verdicts settled yet — BondedVault.settle() hasn&apos;t been called on-chain.
-              The enforcer&apos;s real logic already works end-to-end against the fixture path
-              (see <code className="font-mono">/live</code>); wiring a live proposal through to
-              an on-chain settlement is the next real step here.
+              No verdicts indexed yet. Settled verdicts appear here once the subgraph has
+              indexed the <code className="font-mono">VerdictSettled</code> event —
+              run <code className="font-mono">pnpm --filter @bonded/settlement settle</code> to
+              submit one, or wait for the subgraph to catch up if one was just sent.
             </p>
           </div>
         ) : (
@@ -150,10 +185,39 @@ export default async function LogPage() {
             <div className="space-y-3">
               {data.verdictRecords.map((v) => (
                 <div key={v.id} className="document rounded-doc p-4">
-                  <p className="text-small font-mono text-ink">{v.agent}</p>
-                  <p className="text-small font-mono text-ink/60 mt-1">
-                    outcome={v.outcome} reasonCode={v.reasonCode} value={v.valueUSDC}
-                  </p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-small font-mono text-ink truncate">{v.agent}</p>
+                      <p className="text-small font-mono text-ink/60 mt-1">
+                        {REASON_NAMES[v.reasonCode] ?? `reasonCode ${v.reasonCode}`}
+                        {' · '}
+                        {/* A REFUSED verdict moves nothing, so printing "0.00 USDC"
+                            next to it invites reading it as a zero-value transfer
+                            rather than as money that never left the vault. */}
+                        {v.outcome === 0
+                          ? `${formatUSDC(v.valueUSDC)} USDC released`
+                          : 'no USDC moved'}
+                        {' · block '}
+                        {v.blockNumber}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 text-small font-mono border px-3 py-1 rounded-control ${
+                        OUTCOME_STYLES[v.outcome] ?? 'text-manifest border-hairline'
+                      }`}
+                    >
+                      {OUTCOME_NAMES[v.outcome] ?? `outcome ${v.outcome}`}
+                    </span>
+                  </div>
+
+                  <a
+                    href={EXPLORER_TX(v.transactionHash)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-small font-mono text-seal mt-3 inline-block hover:underline break-all"
+                  >
+                    {v.transactionHash.slice(0, 18)}... ↗
+                  </a>
                 </div>
               ))}
             </div>
