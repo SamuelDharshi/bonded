@@ -354,6 +354,13 @@ Live deployment in use:
 against pool `0x6c561b446416e1a00e8e93e221854d6ea4171372` — WETH/USDC 0.3%,
 ~$125M TVL, created 2023-11-18.
 
+**Settlement — Arc, main track.** BondedVault holds USDC and releases it only
+against a signed Verdict, using Arc's USDC-native gas — the agent never
+acquires a second asset just to pay for its own execution. Deployed and
+settling on **Arc testnet only**; this submission does not claim the
+separate $3,500 Arc sub-track that requires mainnet deployment by its
+deadline, since that hasn't happened here.
+
 **Authority — Chainlink CRE.** The original design spec'd Ledger's Key Ring +
 DMK for this role. This build uses Chainlink CRE — see `docs/FUTURE.md` for
 why, and `packages/authority/src/interface.ts` for the `IAuthority` interface
