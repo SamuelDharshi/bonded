@@ -75,6 +75,15 @@ enclave-custodied key means redeploying the vault and re-pointing
 `BONDED_VAULT_ADDRESS`, the subgraph manifest, and the console's addresses.
 Cheap on testnet, but it is a redeploy, not a setter.
 
+That path is not theoretical — it has already been walked once, to lower
+`IRREVERSIBLE_ABOVE`. `contracts/script/DeployVault.s.sol` deploys a vault
+against the existing registry, `packages/settlement`'s `recover` script
+drains the outgoing vault through `settle()` first (there is no withdraw
+function, so recovery is the ordinary enforced path pointed at the signer),
+and the subgraph keeps the superseded address as a second data source so
+`/log` does not lose its history. Swapping in an enclave key reuses exactly
+that sequence with a different `ENFORCER_SIGNER_ADDRESS`.
+
 ### 5. `confirmStepUp` expects a plain signature, not a DON report
 
 The contract recovers ECDSA over `keccak256("STEPUP:" || proposalHash)` and

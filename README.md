@@ -321,7 +321,7 @@ Policy {
       op: "older_than", value: "2592000" }                     // 30 days
   ]
   forbid: ["approve_unlimited", "delegatecall", "selfdestruct"]
-  irreversible_above: "100000000"                              // 100 USDC
+  irreversible_above: "1000000"                                // 1 USDC
 }
 ```
 
