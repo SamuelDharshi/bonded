@@ -1,4 +1,6 @@
 {
-  "authorizedKeys": [],
+  "authorizedKeys": [
+    "0xac13a62FC7E50d08945ba2e79B5Eaa190d8D7D9a"
+  ],
   "secretId": "IRREVERSIBLE_THRESHOLD_USDC"
 }
