@@ -54,9 +54,10 @@ export default async function CorpusPage() {
       <div className="max-w-content mx-auto px-8 py-10">
         <h1 className="text-h1 text-manifest">Attack corpus</h1>
         <p className="text-body text-manifest/60 mt-2 max-w-xl">
-          Same injected-token scenario, run through public agent starter kits and through
-          Bonded. This page reads <code className="font-mono text-small">results.json</code>{' '}
-          directly — the number below is never hand-typed.
+          Same injected-token scenario, run first through an undefended agent and then
+          through Bonded. This page reads{' '}
+          <code className="font-mono text-small">results.json</code> directly — the number
+          below is never hand-typed, and each row states its own provenance.
         </p>
 
         <div className="grid grid-cols-4 gap-4 mt-8">
@@ -86,7 +87,14 @@ export default async function CorpusPage() {
             <tbody className="font-mono">
               {data.results.map((r) => (
                 <tr key={r.kit} className="border-b border-hairline/50">
-                  <td className="py-3 pr-4 text-manifest">{r.kit}</td>
+                  <td className="py-3 pr-4 text-manifest">
+                    {r.kit}
+                    {!r.repo.startsWith('http') && (
+                      <span className="block text-manifest/40 font-sans mt-0.5">
+                        {r.repo.replace(/^n\/a\s*--\s*/, '')}
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3 pr-4 text-manifest/50">
                     {r.commit.startsWith('PLACEHOLDER') ? 'not pinned' : r.commit.slice(0, 10)}
                   </td>
