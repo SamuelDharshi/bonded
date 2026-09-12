@@ -25,11 +25,14 @@
  *
  * Model names for the free-tier providers are configurable via
  * GROQ_MODEL / OPENROUTER_MODEL because both providers' catalogs change
- * over time -- the defaults below are believed current as of this build
- * but were not live-verified against those two providers' APIs (this
- * environment has no Groq/OpenRouter key to test with). If a default
- * model 404s, set the override env var to whatever the provider's current
- * docs list rather than editing this file.
+ * over time. The Groq default (openai/gpt-oss-120b) was live-verified on
+ * 2026-09-12 -- Anthropic returned 400 (no credit), the harness fell
+ * through to Groq automatically, and the agent ran a real tool-calling
+ * loop against the live AttackToken and complied with the injected
+ * instruction, exactly as the naive-agent side is meant to demonstrate.
+ * OpenRouter's default has not been live-verified (no key available in
+ * this environment) -- if it 404s, check the provider's current model
+ * list rather than editing this file.
  */
 
 export interface ToolCall {
@@ -301,8 +304,9 @@ function buildProviderList(tokenAddress: string, arcRpcUrl: string): ProviderAtt
             apiKey: process.env['GROQ_API_KEY']!,
             baseUrl: 'https://api.groq.com/openai/v1',
             // Verify at https://console.groq.com/docs/models if this 404s --
-            // Groq's free-tier model roster changes.
-            model: process.env['GROQ_MODEL'] ?? 'llama-3.3-70b-versatile',
+            // Groq's free-tier model roster changes; confirmed live against
+            // this project's key on 2026-09-12 via GET /openai/v1/models.
+            model: process.env['GROQ_MODEL'] ?? 'openai/gpt-oss-120b',
           },
           tokenAddress,
           arcRpcUrl,

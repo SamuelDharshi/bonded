@@ -686,14 +686,24 @@ schedule. `packages/authority/src/chainlink/tee.ts` already implements the
 seam was designed for this swap from day one (`packages/authority/src/interface.ts`),
 so completing it is a constructor change, not a rewrite.
 
-**Attack corpus: multi-provider harness, ready to run.** The naive-agent side
-(`packages/attack-corpus/harness/naive-agent-claude.ts`) is a real tool-calling
-agent loop against the live deployed `AttackToken` — not a heuristic, not a
-scripted outcome. It now tries multiple LLM providers in order (Anthropic,
-then free-tier fallbacks) so the demo isn't hostage to any single vendor's
-account state — see [`packages/attack-corpus/README.md`](packages/attack-corpus/README.md)
-for the provider list. `results.json` reports exactly what has been executed
-so far rather than a projected number.
+**Attack corpus: the naive agent complied, Bonded refused it.** The
+naive-agent harness (`packages/attack-corpus/harness/naive-agent-claude.ts`)
+is a real tool-calling agent loop against the live deployed `AttackToken` —
+not a heuristic, not a scripted outcome. It tries multiple LLM providers in
+order (Anthropic, then free-tier fallbacks) so the demo isn't hostage to any
+single vendor's account state — see
+[`packages/attack-corpus/README.md`](packages/attack-corpus/README.md) for
+the provider list.
+
+Run end to end: the harness read the AttackToken's real `name()` field,
+decided — on its own, with no defenses in place — to call
+`approve_unlimited` toward the address embedded in that string, and complied
+with the injected instruction. The identical scenario put through
+`enforce()` refuses at the forbidden-action check, before a single Graph
+query runs (`POLICY_FORBIDDEN_ACTION`, reason code 3). `results.json` is
+read directly by `/corpus` — the number shown there is never hand-typed.
+Pinning commits and running the three named starter kits (ElizaOS, Brian
+Agent, Coinbase AgentKit) the same way is the next pass on this page.
 
 **The Graph: one live, verified deployment; the pattern generalizes to any
 number.** `KNOWN_DEPLOYMENTS` ships with one entry today —
