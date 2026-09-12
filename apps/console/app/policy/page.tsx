@@ -1,6 +1,7 @@
 import { hashPolicy } from '@bonded/compiler';
 import type { Policy } from '@bonded/seam';
 import { Shell } from '../../components/shared/Shell';
+import { PolicyRecompile } from '../../components/console/PolicyRecompile';
 
 export const dynamic = 'force-dynamic';
 
@@ -141,6 +142,8 @@ export default async function PolicyPage() {
             differs) — refusing to claim a match rather than showing a stale one.
           </p>
         )}
+
+        <PolicyRecompile />
       </div>
     </Shell>
   );
