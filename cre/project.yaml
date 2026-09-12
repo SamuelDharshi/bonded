@@ -8,6 +8,11 @@ staging-settings:
   rpcs:
     - chain-name: ethereum-testnet-sepolia
       url: https://ethereum-sepolia-rpc.publicnode.com
+    # CRE's account/key-registry lookups (cre account link-key etc.) query
+    # Ethereum mainnet regardless of which chain the workflow itself targets.
+    # Read-only lookup RPC — no funds needed, no writes go through this.
+    - chain-name: ethereum-mainnet
+      url: https://ethereum-rpc.publicnode.com
 
 # ==========================================================================
 production-settings:
