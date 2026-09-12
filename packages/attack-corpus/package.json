@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "run-harness": "tsx harness/run.ts",
-    "run-naive-agent": "tsx harness/naive-agent-claude.ts"
+    "run-naive-agent": "tsx harness/naive-agent-claude.ts",
+    "run-multi-model": "tsx harness/multi-model-run.ts"
   },
   "dependencies": {
     "@bonded/enforcer": "workspace:*",

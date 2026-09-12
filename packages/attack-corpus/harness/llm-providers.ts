@@ -194,16 +194,27 @@ async function runWithAnthropic(tokenAddress: string, arcRpcUrl: string): Promis
 
 // ─── Provider: OpenAI-compatible chat completions (Groq, OpenRouter) ────────
 
-interface OpenAiCompatConfig {
+export interface OpenAiCompatConfig {
   providerLabel: string;
   apiKey: string;
   baseUrl: string;
   model: string;
   /** OpenRouter asks for these two headers; harmless to omit for Groq. */
   extraHeaders?: Record<string, string>;
+  /** Some models (reasoning models especially) spend a large share of the
+      budget on hidden reasoning before ever emitting a tool call. 1024 is
+      enough for the models this harness was written against, but is not a
+      safe universal default -- see the qwen3.6-27b note in
+      multi-model-run.ts for a run this actually happened on. */
+  maxTokens?: number;
 }
 
-async function runWithOpenAiCompat(
+/**
+ * Exported (unlike the Anthropic runner) because scripts/multi-model-run.ts
+ * uses this directly to run a fixed, explicit list of distinct models --
+ * a different job from runNaiveAgentWithFallback's "try until one works".
+ */
+export async function runWithOpenAiCompat(
   cfg: OpenAiCompatConfig,
   tokenAddress: string,
   arcRpcUrl: string,
@@ -224,7 +235,7 @@ async function runWithOpenAiCompat(
         authorization: `Bearer ${cfg.apiKey}`,
         ...cfg.extraHeaders,
       },
-      body: JSON.stringify({ model: cfg.model, max_tokens: 1024, tools, messages }),
+      body: JSON.stringify({ model: cfg.model, max_tokens: cfg.maxTokens ?? 1024, tools, messages }),
     });
     if (!res.ok) throw new Error(`${cfg.providerLabel} API error ${res.status}: ${await res.text()}`);
 
