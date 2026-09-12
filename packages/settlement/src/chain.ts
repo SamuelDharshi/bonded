@@ -43,18 +43,26 @@ export function addr(name: string): `0x${string}` {
 /**
  * The enforcer's signing key.
  *
+ * READS ENFORCER_SIGNER_PRIVATE_KEY, NOT CRE_ETH_PRIVATE_KEY. Those were the
+ * same value for part of this project's life and are not the same thing:
+ * CRE_ETH_PRIVATE_KEY is the key registered with Chainlink's platform for
+ * workflow deployment, while this one must derive BondedVault.enrolledSigner,
+ * which is immutable. When the CRE key was rotated, the shared name silently
+ * pointed vault signing at a key the vault has never heard of, and every
+ * settle() would have reverted with BadSigner. Two jobs, two names.
+ *
  * TODAY this is a local key read from the environment, and that is a real
- * limitation rather than a design choice: BondedVault.enrolledSigner is the
- * address this key derives, so whoever holds the file can produce a signature
- * the vault accepts. The whole point of the authority layer (packages/authority,
- * cre/stepup-threshold) is that this key should live inside a TEE and never
- * exist in a readable file. That is blocked on Chainlink CRE deploy access.
+ * limitation rather than a design choice: whoever holds the file can produce a
+ * signature the vault accepts. The whole point of the authority layer
+ * (packages/authority, cre/stepup-threshold) is that this key should live
+ * inside a TEE and never exist in a readable file. That is blocked on
+ * Chainlink CRE deploy access.
  *
  * It is named honestly here so nobody reads this and assumes the enclave is
  * already in the path. It is not.
  */
 export function localEnforcerAccount(): PrivateKeyAccount {
-  const raw = required('CRE_ETH_PRIVATE_KEY');
+  const raw = required('ENFORCER_SIGNER_PRIVATE_KEY');
   const key = (raw.startsWith('0x') ? raw : `0x${raw}`) as `0x${string}`;
   return privateKeyToAccount(key);
 }

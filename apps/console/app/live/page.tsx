@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Shell } from '../../components/shared/Shell';
+import { StepUpGate } from '../../components/console/StepUpGate';
 import { ChevronRight, Pause, Play } from 'lucide-react';
 
 /**
@@ -335,6 +336,8 @@ export default function LivePage() {
             );
           })}
         </div>
+
+        <StepUpGate />
       </div>
     </Shell>
   );
