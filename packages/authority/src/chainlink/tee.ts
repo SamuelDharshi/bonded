@@ -23,6 +23,28 @@ import type { Verdict, Signature, Hash32 } from '@bonded/seam';
  * - Document the exact CRE CLI commands in FEEDBACK/CHAINLINK.md.
  */
 export class ChainlinkCREAuthority implements IAuthority {
+  // ── VERIFICATION STATUS — read before wiring this in ────────────────────
+  //
+  // VERIFIED (cre/stepup-threshold, simulated, both branches):
+  //   The deployed workflow takes { proposalHash, proposalValueUSDC } over an
+  //   HTTP trigger authorised by ECDSA EVM keys, reads the threshold as a
+  //   Vault DON secret inside an AWS Nitro enclave, and returns
+  //   { proposalHash, requiresStepUp } plus a signed DON report carrying
+  //   (bytes32 proposalHash, bool requiresStepUp, uint64 evaluatedAt).
+  //   requiresStepUp() below maps onto exactly that.
+  //
+  // NOT VERIFIED — the endpoints in signVerdict/confirmStepUp/isAvailable
+  //   below were written ahead of deploy access and target paths
+  //   (/api/v1/workflows/:id/sign, /stepup/arm, /stepup/status) that are NOT
+  //   part of CRE's deployed HTTP-trigger surface. localhost:6688 is a
+  //   Chainlink *node* operator port, not CRE's workflow invocation URL.
+  //   Treat them as a sketch, not an integration.
+  //
+  // ARCHITECTURAL GAP, not just a wiring gap: signVerdict() cannot be
+  //   satisfied by this workflow at all. The workflow computes a boolean; it
+  //   never holds or uses the enforcer's verdict-signing key. Moving verdict
+  //   signing into the enclave is a change to the workflow itself, not a
+  //   configuration of this class. See docs/CRE_ADAPTATION.md.
   private readonly workflowId: string;
   private readonly donId: string;
   private readonly coreApiUrl: string;
@@ -35,6 +57,66 @@ export class ChainlinkCREAuthority implements IAuthority {
     this.workflowId  = config.workflowId;
     this.donId       = config.donId;
     this.coreApiUrl  = config.coreApiUrl ?? 'http://localhost:6688';
+  }
+
+  /**
+   * The confidential threshold check — the one capability the deployed
+   * workflow actually provides, shaped to drop straight into
+   * EnforceContext.requiresStepUp in @bonded/enforcer.
+   *
+   * This is the whole point of the CRE layer: irreversible_above stays a
+   * Vault DON secret inside the enclave, and only this boolean crosses back,
+   * so the threshold cannot be binary-searched by probing the enforcer.
+   *
+   * Deliberately does NOT catch its own errors. enforce() treats a throw here
+   * as ATTESTATION_MISSING and holds — an enclave that cannot be reached has
+   * not said yes. Swallowing the error and returning false would convert an
+   * outage into a silent auto-approval, which is the exact failure this
+   * project exists to prevent.
+   *
+   * ONE THING TO FILL IN AT DEPLOY TIME: triggerUrl. Take it from
+   * `cre workflow show stepup-threshold --target <target>` after deploying;
+   * do not guess it. The request must be signed by a key listed in the
+   * workflow's authorizedKeys (config.staging.json) or the trigger rejects it.
+   */
+  async requiresStepUp(input: {
+    proposalHash: Hash32;
+    valueUSDC: bigint;
+  }): Promise<boolean> {
+    const triggerUrl = this.httpTriggerUrl();
+
+    const response = await fetch(triggerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        proposalHash: input.proposalHash,
+        // String, not a JS number: valueUSDC is 6-decimal fixed point and the
+        // workflow parses it with BigInt(). JSON numbers would lose precision
+        // above 2^53 and silently change which side of the threshold it lands.
+        proposalValueUSDC: input.valueUSDC.toString(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `CRE stepup-threshold trigger failed: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const body = (await response.json()) as { requiresStepUp?: boolean };
+    if (typeof body.requiresStepUp !== 'boolean') {
+      throw new Error('CRE stepup-threshold returned no boolean requiresStepUp');
+    }
+    return body.requiresStepUp;
+  }
+
+  /**
+   * Not verified against a deployed workflow — see the VERIFICATION STATUS
+   * block above. Kept as a single seam so there is exactly one place to
+   * correct once `cre workflow show` gives the real trigger URL.
+   */
+  private httpTriggerUrl(): string {
+    return `${this.coreApiUrl}/api/v1/workflows/${this.workflowId}/trigger`;
   }
 
   /**
@@ -139,9 +221,15 @@ export class ChainlinkCREAuthority implements IAuthority {
 /**
  * CRE Simulation Mode
  *
- * Used when running `cre simulate` locally.
- * Derives signatures from a local test key — NOT for production.
- * Document the cre simulate invocation in FEEDBACK/CHAINLINK.md.
+ * WARNING — what this returns is NOT an ECDSA signature. It is an HMAC-SHA256
+ * digest shaped like one. BondedVault.settle() and confirmStepUp() both call
+ * ecrecover on their input, so anything produced here is rejected on-chain,
+ * as it should be. This class is a placeholder for local flow-testing only;
+ * it cannot be promoted to a real path by changing configuration, and nothing
+ * that touches a real chain should accept its output.
+ *
+ * For the genuine local path, use `cre workflow simulate` against
+ * cre/stepup-threshold — that exercises the real handler in the real SDK.
  */
 export class CRESimulationAuthority implements IAuthority {
   private readonly signingKey: string;

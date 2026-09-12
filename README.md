@@ -681,10 +681,23 @@ transcript at `docs/evidence/cre-stepup-threshold-simulation.txt`). The last
 step — linking the deploying key to the org via `cre account link-key` — is
 mid-flight with Chainlink's platform team, and the console states the current
 enforcement path on every page rather than implying enclave custody ahead of
-schedule. `packages/authority/src/chainlink/tee.ts` already implements the
-`IAuthority` interface the moment the deployed workflow is wired in — the
-seam was designed for this swap from day one (`packages/authority/src/interface.ts`),
-so completing it is a constructor change, not a rewrite.
+schedule.
+
+The delegation seam is built and tested rather than promised:
+`EnforceContext.requiresStepUp` in `packages/enforcer` lets step 5 hand the
+threshold decision to the enclave instead of reading
+`policy.irreversible_above` locally, and
+`ChainlinkCREAuthority.requiresStepUp()` is shaped to drop straight into it.
+It fails closed — an unreachable enclave yields `HELD_FOR_STEPUP` /
+`ATTESTATION_MISSING`, never a silent clear, and there are unit tests for
+exactly that branch.
+
+`docs/CRE_ADAPTATION.md` is the honest cost breakdown of finishing the job.
+Short version: threshold confidentiality is roughly a trigger URL and a
+constructor away once linking is unblocked; moving *verdict signing* into the
+enclave is further out, because the current workflow computes a boolean and
+never holds the signing key — that part needs workflow changes and a vault
+redeploy (`enrolledSigner` is immutable), not configuration.
 
 **Attack corpus: 2 of 3 real agents complied, Bonded refused all of them.**
 The naive-agent harness (`packages/attack-corpus/harness/naive-agent-claude.ts`,

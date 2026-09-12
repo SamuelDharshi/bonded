@@ -201,3 +201,119 @@ describe('enforce()', () => {
     expect(tvl?.passed).toBe(false);
   });
 });
+
+// ─── Step 5 delegation seam (confidential threshold oracle) ───────────────────
+//
+// These cover ctx.requiresStepUp, the port that lets the irreversible
+// threshold live inside a TEE instead of in the policy artifact. The risk
+// being tested is fail-OPEN: a threshold oracle that errors, or that the
+// enforcer forgets to consult, silently clears money it should have held.
+
+describe('enforce() — step 5 threshold delegation', () => {
+  it('uses the oracle instead of policy.irreversible_above when supplied', async () => {
+    const query = createFixtureQueryFn(DEFAULT_FIXTURE);
+    // 50 USDC is BELOW the policy's 100 USDC threshold, so the local path
+    // would clear. The oracle says hold — the oracle must win.
+    const { verdict } = await enforce(
+      makeProposal(),
+      TEST_POLICY,
+      makeCtx({ requiresStepUp: async () => true }),
+      query,
+    );
+
+    expect(verdict.outcome).toBe(OUTCOME.HELD_FOR_STEPUP);
+    expect(verdict.reasonCode).toBe(ReasonCode.IRREVERSIBLE_UNCONFIRMED);
+  });
+
+  it('clears when the oracle says no step-up is needed, even above the local threshold', async () => {
+    const query = createFixtureQueryFn(DEFAULT_FIXTURE);
+    // 150 USDC is ABOVE the policy's 100 USDC threshold. With the oracle
+    // present, policy.irreversible_above must not be consulted at all.
+    const { verdict } = await enforce(
+      makeProposal({
+        action: {
+          kind: 'swap',
+          target: '0xtarget00000000000000000000000000000000',
+          calldata: '0x',
+          valueUSDC: '150000000',
+        },
+      }),
+      TEST_POLICY,
+      makeCtx({ requiresStepUp: async () => false }),
+      query,
+    );
+
+    expect(verdict.outcome).toBe(OUTCOME.CLEARED);
+    expect(verdict.reasonCode).toBe(ReasonCode.OK);
+  });
+
+  it('receives the proposal hash and value the enforcer actually evaluated', async () => {
+    const query = createFixtureQueryFn(DEFAULT_FIXTURE);
+    const seen: { proposalHash: string; valueUSDC: bigint }[] = [];
+
+    await enforce(
+      makeProposal(),
+      TEST_POLICY,
+      makeCtx({
+        requiresStepUp: async (input) => {
+          seen.push(input);
+          return false;
+        },
+      }),
+      query,
+    );
+
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.valueUSDC).toBe(50_000_000n);
+    expect(seen[0]?.proposalHash).toBe(
+      '0xdeadbeef00000000000000000000000000000000000000000000000000000000',
+    );
+  });
+
+  it('HOLDS, never clears, when the oracle is unreachable', async () => {
+    const query = createFixtureQueryFn(DEFAULT_FIXTURE);
+    // An enclave we cannot reach has not said yes. Fail-closed: this is the
+    // whole thesis, and it is the one branch where a thrown error could
+    // plausibly have been swallowed into a CLEARED.
+    const { verdict } = await enforce(
+      makeProposal(),
+      TEST_POLICY,
+      makeCtx({
+        requiresStepUp: async () => {
+          throw new Error('enclave unreachable');
+        },
+      }),
+      query,
+    );
+
+    expect(verdict.outcome).toBe(OUTCOME.HELD_FOR_STEPUP);
+    expect(verdict.reasonCode).toBe(ReasonCode.ATTESTATION_MISSING);
+  });
+
+  it('still refuses forbidden actions before ever consulting the oracle', async () => {
+    const query = createFixtureQueryFn(DEFAULT_FIXTURE);
+    let consulted = false;
+
+    const { verdict } = await enforce(
+      makeProposal({
+        action: {
+          kind: 'approve_unlimited',
+          target: '0xtarget00000000000000000000000000000000',
+          calldata: '0x',
+          valueUSDC: '50000000',
+        },
+      }),
+      TEST_POLICY,
+      makeCtx({
+        requiresStepUp: async () => {
+          consulted = true;
+          return false;
+        },
+      }),
+      query,
+    );
+
+    expect(verdict.reasonCode).toBe(ReasonCode.POLICY_FORBIDDEN_ACTION);
+    expect(consulted).toBe(false);
+  });
+});

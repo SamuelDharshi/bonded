@@ -38,6 +38,29 @@ export interface EnforceContext {
   currentTimestamp: number;
   /** Total USDC spent by this agent in the current budget period (6 decimals, bigint) */
   spentThisPeriod: bigint;
+  /**
+   * OPTIONAL confidential threshold oracle — step 5's delegation seam.
+   *
+   * When absent (the default, and what every existing test exercises), step 5
+   * compares valueUSDC against policy.irreversible_above locally, in
+   * plaintext. That is correct but it is NOT confidential: the threshold sits
+   * in the policy artifact, so anyone holding the artifact knows exactly where
+   * the step-up boundary is and can binary-search right up to it.
+   *
+   * When present, step 5 asks this instead and never reads
+   * policy.irreversible_above at all. The intended implementation is the
+   * deployed Chainlink CRE handlerInTee workflow (cre/stepup-threshold),
+   * which holds the threshold as a Vault DON secret inside an AWS Nitro
+   * enclave and returns only this boolean — the number itself never leaves.
+   *
+   * This is a port, not an implementation: the enforcer stays non-generative
+   * and makes no network calls of its own. Whoever constructs the context
+   * decides what answers.
+   */
+  requiresStepUp?: (input: {
+    proposalHash: Hash32;
+    valueUSDC: bigint;
+  }) => Promise<boolean>;
 }
 
 function buildVerdict(
@@ -212,9 +235,27 @@ export async function enforce(
   }
 
   // ── STEP 5: Irreversible threshold check ──────────────────────────────────
-  const irreversibleAbove = BigInt(policy.irreversible_above);
+  // Delegated when ctx.requiresStepUp is supplied (confidential path: the
+  // threshold lives in a TEE and only the boolean crosses back), otherwise
+  // compared locally against the policy artifact. See EnforceContext.
+  //
+  // Fail-closed on both paths: if the oracle is unreachable we hold rather
+  // than clear. An authority we cannot ask is not an authority that said yes.
+  let needsStepUp: boolean;
+  if (ctx.requiresStepUp) {
+    try {
+      needsStepUp = await ctx.requiresStepUp({
+        proposalHash: proposal.id,
+        valueUSDC,
+      });
+    } catch {
+      return finalize(OUTCOME.HELD_FOR_STEPUP, ReasonCode.ATTESTATION_MISSING);
+    }
+  } else {
+    needsStepUp = valueUSDC > BigInt(policy.irreversible_above);
+  }
 
-  if (valueUSDC > irreversibleAbove) {
+  if (needsStepUp) {
     return finalize(OUTCOME.HELD_FOR_STEPUP, ReasonCode.IRREVERSIBLE_UNCONFIRMED);
   }
 
