@@ -794,9 +794,26 @@ standardized subgraphs go through `GRAPH_GATEWAY_BASE_URL`.
 
 ## What is deliberately not built
 
-See `docs/FUTURE.md` for the full list — Ledger as the active authority layer,
-the kill-switch console, Arc mainnet deployment, and the naive-agent side of the
-attack corpus.
+Per the project's own scope decisions, verbatim:
+
+- We do not defend against a **compromised enforcer**. Bonded moves trust
+  from a large generative model to a small, auditable, non-generative
+  component. It does not eliminate trust.
+- We do not defend against **premises that are true but misleading**. If an
+  attacker manipulates real TVL, re-derivation confirms the manipulated
+  number. Bonded catches lying, not reality distortion.
+- We do not cover **every attacker-writable field**. The quarantine list in
+  `packages/quarantine/FIELDS.md` is enumerated and explicitly incomplete.
+- **No attested inference.** We considered running the proposer in a TEE and
+  decided against it: if you do not trust the model's output, you do not
+  need to trust its execution environment. Stated as a design decision, not
+  an omission.
+- The **kill-switch / revocation console** is designed but unbuilt
+  (`docs/FUTURE.md`).
+- Arc mainnet: deployment-ready, not deployed, unless the Sept 30 window is
+  used.
+
+See `docs/FUTURE.md` for the fuller narrative behind each of these.
 
 ## Further reading
 
