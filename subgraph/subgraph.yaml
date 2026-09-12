@@ -26,6 +26,37 @@ dataSources:
     name: BondedVault
     network: arc-testnet
     source:
+      address: "0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8"
+      abi: BondedVault
+      startBlock: 61233680
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VerdictRecord
+        - StepUpRecord
+      abis:
+        - name: BondedVault
+          file: ./abis/BondedVault.json
+      eventHandlers:
+        - event: VerdictSettled(indexed bytes32,indexed address,uint8,uint16,uint256)
+          handler: handleVerdictSettled
+        - event: StepUpArmed(indexed bytes32,indexed address)
+          handler: handleStepUpArmed
+        - event: StepUpConfirmed(indexed bytes32)
+          handler: handleStepUpConfirmed
+      file: ./src/mappings.ts
+  # The superseded vault, kept indexed so /log does not lose the verdicts
+  # that really settled against it. Its IRREVERSIBLE_ABOVE was 100 USDC,
+  # which no balance this project holds could ever reach, which is why it
+  # was replaced rather than reconfigured — the constant is compile-time.
+  # Same ABI, same handlers, same entities: history stays queryable and
+  # new settlements land on the current vault.
+  - kind: ethereum
+    name: BondedVaultLegacy
+    network: arc-testnet
+    source:
       address: "0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE"
       abi: BondedVault
       startBlock: 61233680

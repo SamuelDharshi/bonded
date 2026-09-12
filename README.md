@@ -643,7 +643,7 @@ Verified in this environment, not asserted.
   per proposal. All four verdict paths observed against live data.
 - **Deployed on Arc testnet** (chain id `5042002`):
   [`BondedRegistry`](https://testnet.arcscan.app/address/0xB825225163aEf4353d0110BA63d0d811A17B8205) ·
-  [`BondedVault`](https://testnet.arcscan.app/address/0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE) ·
+  [`BondedVault`](https://testnet.arcscan.app/address/0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8) ·
   [`AttackToken`](https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5).
   Wired to real Arc testnet USDC, verified via `symbol()`/`decimals()` on-chain
   — returns `"USDC"` / `6`, not assumed.

@@ -7,7 +7,8 @@
     "commit-policy": "tsx src/commit-policy.ts",
     "settle": "tsx src/settle.ts",
     "fund-vault": "tsx src/fund-vault.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "recover": "tsx src/recover.ts"
   },
   "dependencies": {
     "@bonded/compiler": "workspace:*",

@@ -93,7 +93,7 @@ contract BondedVaultTest is Test {
 
     function test_ClearedVerdictReleasesUSDC() public {
         address recipient    = makeAddr("recipient");
-        uint256 value        = 50 * 10 ** 6; // 50 USDC
+        uint256 value        = 500_000; // 0.5 USDC — under IRREVERSIBLE_ABOVE, routine path
         bytes32 proposalHash = keccak256("proposal-1");
 
         uint256 balBefore = usdc.balanceOf(recipient);
@@ -121,10 +121,10 @@ contract BondedVaultTest is Test {
 
     function test_ReplaySameProposalReverts() public {
         bytes32 proposalHash = keccak256("proposal-replay");
-        _settle(proposalHash, 0, 0, 10 * 10 ** 6, makeAddr("r"));
+        _settle(proposalHash, 0, 0, 500_000, makeAddr("r")); // 0.5 USDC — routine path
 
         vm.expectRevert(abi.encodeWithSelector(BondedVault.AlreadySettled.selector, proposalHash));
-        _settle(proposalHash, 0, 0, 10 * 10 ** 6, makeAddr("r"));
+        _settle(proposalHash, 0, 0, 500_000, makeAddr("r")); // 0.5 USDC — routine path
     }
 
     function test_StalePolicyReverts() public {
@@ -132,7 +132,7 @@ contract BondedVaultTest is Test {
         bytes32 proposalHash = keccak256("proposal-stale");
         uint64  blockChecked = uint64(block.number);
         bytes32 logRef       = keccak256("log");
-        bytes memory action  = _transferAction(makeAddr("r"), 10 * 10 ** 6);
+        bytes memory action  = _transferAction(makeAddr("r"), 500_000); // 0.5 USDC — routine path
         bytes memory sig     = _signVerdict(proposalHash, wrongPolicy, 0, 0, blockChecked, logRef);
 
         vm.prank(agent);
@@ -142,7 +142,7 @@ contract BondedVaultTest is Test {
 
     function test_IrreversibleRevertsWithoutStepUp() public {
         bytes32 proposalHash = keccak256("proposal-big");
-        uint256 value        = 150 * 10 ** 6; // 150 USDC > 100 threshold
+        uint256 value        = 2 * 10 ** 6; // 2 USDC > 1 USDC IRREVERSIBLE_ABOVE
 
         uint64  blockChecked = uint64(block.number);
         bytes32 logRef       = keccak256("log");
@@ -156,7 +156,7 @@ contract BondedVaultTest is Test {
 
     function test_StepUpConfirmationAllowsExecution() public {
         bytes32 proposalHash = keccak256("proposal-stepup");
-        uint256 value        = 150 * 10 ** 6;
+        uint256 value        = 2 * 10 ** 6; // 2 USDC > 1 USDC IRREVERSIBLE_ABOVE
         address recipient    = makeAddr("recipient-stepup");
 
         // 1. Submit HELD_FOR_STEPUP
@@ -193,6 +193,23 @@ contract BondedVaultTest is Test {
         address recipient = makeAddr("fuzz-recipient");
         uint256 propIndex = 0;
 
+        // Seed spentThisPeriod to just under the cap.
+        //
+        // The loop below is capped at IRREVERSIBLE_ABOVE per settle to stay on
+        // the routine path, and that is now 1 USDC. Twenty 1-USDC settles come
+        // nowhere near a 500 USDC BUDGET_MAX, so without this the willExceed
+        // branch below is unreachable and the test silently stops checking the
+        // invariant it exists for. Seeding uses the step-up path precisely
+        // because a single large routine settle is no longer possible.
+        {
+            uint256 seed      = vault.BUDGET_MAX() - 10 * 10 ** 6; // leave 10 USDC of room
+            bytes32 seedHash  = keccak256("fuzz-budget-seed");
+            _settle(seedHash, 2, 6, seed, recipient);          // arms the gate
+            vault.confirmStepUp(seedHash, _signStepUp(seedHash));
+            _settle(seedHash, 0, 0, seed, recipient);          // executes
+            assertEq(vault.spentThisPeriod(agent), seed);
+        }
+
         for (uint256 i = 0; i < amounts.length; i++) {
             // Bounded to IRREVERSIBLE_ABOVE, not BUDGET_MAX: this test isolates
             // the budget-accounting invariant on the routine (non-step-up) path.
@@ -223,7 +240,7 @@ contract BondedVaultTest is Test {
 
         uint64  blockChecked = uint64(block.number);
         bytes32 logRef       = keccak256("log");
-        bytes memory action  = _transferAction(makeAddr("r"), 10 * 10 ** 6);
+        bytes memory action  = _transferAction(makeAddr("r"), 500_000); // 0.5 USDC — routine path
         bytes memory sig     = _signVerdict(hash, policyHash, 0, 0, blockChecked, logRef);
 
         vm.prank(agent);

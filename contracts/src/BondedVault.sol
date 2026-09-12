@@ -25,7 +25,7 @@ contract BondedVault is ReentrancyGuard {
     // ─── Constants ────────────────────────────────────────────────────────────
 
     uint256 public constant PERIOD_DURATION  = 7 days;
-    uint256 public constant IRREVERSIBLE_ABOVE = 100_000_000; // 100 USDC (6 decimals)
+    uint256 public constant IRREVERSIBLE_ABOVE = 1_000_000; // 1 USDC (6 decimals)
     uint256 public constant BUDGET_MAX       = 500_000_000;  // 500 USDC (6 decimals)
 
     uint8 private constant OUTCOME_CLEARED    = 0;

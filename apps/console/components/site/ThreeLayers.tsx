@@ -26,7 +26,7 @@ const layers = [
     detail:
       "BondedVault holds USDC and releases it only against a signed Verdict. USDC-native gas, so the agent never acquires a second token to pay for itself. Without it there is no spending account to protect.",
     cta: "BondedVault on the explorer",
-    href: "https://testnet.arcscan.app/address/0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE",
+    href: "https://testnet.arcscan.app/address/0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8",
     external: true,
   },
   {

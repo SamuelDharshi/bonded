@@ -49,7 +49,7 @@ const arcTestnet = defineChain({
   rpcUrls: { default: { http: [process.env.ARC_RPC_URL ?? ''] } },
 });
 
-const VAULT = (process.env.BONDED_VAULT_ADDRESS ?? '0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE') as `0x${string}`;
+const VAULT = (process.env.BONDED_VAULT_ADDRESS ?? '0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8') as `0x${string}`;
 const USDC = (process.env.USDC_ADDRESS ?? '0x3600000000000000000000000000000000000000') as `0x${string}`;
 const REGISTRY = (process.env.BONDED_REGISTRY_ADDRESS ?? '0xB825225163aEf4353d0110BA63d0d811A17B8205') as `0x${string}`;
 const LIVE_POOL_ID = '0x6c561b446416e1a00e8e93e221854d6ea4171372';
