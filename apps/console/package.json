@@ -19,6 +19,7 @@
     "framer-motion": "^11.0.0",
     "geist": "^1.7.2",
     "lucide-react": "^0.447.0",
+    "mermaid": "^12.0.0",
     "next": "15.0.0",
     "ogl": "^1.0.11",
     "react": "^19.0.0",
