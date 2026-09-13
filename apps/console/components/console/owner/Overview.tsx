@@ -109,10 +109,19 @@ function Ready({ state }: { state: OwnerState }) {
         <h2 className="font-mono text-small uppercase tracking-wide text-hold">
           {pending.length} payment{pending.length > 1 ? 's' : ''} waiting for you
         </h2>
+        {/* Deliberately does not assert WHY these are held.
+            A payment stops for more than one reason: the amount exceeding the
+            threshold, or the threshold oracle being unreachable, in which case
+            the enforcer fails closed and holds regardless of size. This panel
+            sums several holds, and a sum exceeding the threshold says nothing
+            about whether any individual one does — it read "1.5 USDC is held
+            because it exceeds your 1 USDC threshold" over three 0.5 USDC holds,
+            none of which exceeded anything. The per-payment reason belongs on
+            /app/approvals, where each is shown on its own. */}
         <p className="text-body text-manifest/70 mt-2 max-w-2xl">
-          {formatUSDC(held)} USDC is held because it exceeds your{' '}
-          {formatUSDC(state.limits.irreversibleAbove)} USDC threshold. Every claimed fact was
-          re-derived and passed — the amount is what stopped it. Nothing moves until you sign.
+          {formatUSDC(held)} USDC across {pending.length} payment
+          {pending.length > 1 ? 's' : ''} is waiting for your signature. Every claimed fact was
+          re-derived and passed. Nothing moves until you confirm.
         </p>
         <div className="mt-4">
           <Link

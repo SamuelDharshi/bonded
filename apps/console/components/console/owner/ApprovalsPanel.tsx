@@ -45,7 +45,7 @@ export function ApprovalsPanel({
   return (
     <Panel
       title={`${pending.length} payment${pending.length > 1 ? 's' : ''} waiting for you`}
-      note="Every premise passed — the amount is what held these. The vault will not release one until you confirm, and it accepts a confirmation only from your address: not a signature from the enforcer, and not from the agent. Confirming releases exactly the action shown and nothing else."
+      note="Every premise passed; these stopped anyway. The vault will not release one until you confirm, and it accepts a confirmation only from your address: not a signature from the enforcer, and not from the agent. Confirming releases exactly the action shown and nothing else."
     >
       <div className="space-y-3">
         {pending.map((h) => (
@@ -83,6 +83,18 @@ export function ApprovalsPanel({
                 Confirm this payment
               </Button>
             </div>
+
+            {/* The honest per-payment reason. Over the threshold is one cause;
+                the other is the threshold oracle being unreachable, where the
+                enforcer fails closed and holds whatever the size. Claiming the
+                first when it was the second would be a guess dressed as a fact. */}
+            {h.valueUSDC && (
+              <p className="text-small text-manifest/60 mt-2">
+                {BigInt(h.valueUSDC) > BigInt(state.limits.irreversibleAbove)
+                  ? `Held because ${formatUSDC(h.valueUSDC)} USDC exceeds your ${formatUSDC(state.limits.irreversibleAbove)} USDC threshold.`
+                  : `Held even though ${formatUSDC(h.valueUSDC)} USDC is under your ${formatUSDC(state.limits.irreversibleAbove)} USDC threshold — the confirmation check could not be completed, so the enforcer held rather than cleared.`}
+              </p>
+            )}
 
             {h.valueUSDC && h.amountVerifiedAgainstChain && (
               <p className="text-small text-manifest/50 mt-2">
