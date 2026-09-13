@@ -1,7 +1,12 @@
 # The script — read this aloud
 
-One continuous take, about four minutes. Everything in **[brackets]** is
-something you do, not something you say. Everything else is spoken word for word.
+One continuous take. Everything in **[brackets]** is something you do, not
+something you say. Everything else is spoken word for word.
+
+**Length: 918 spoken words — about 6 minutes with the demo pauses.** Measured,
+not estimated. If your slot is 3-4 minutes, take the cuts at the bottom before
+you record rather than rushing the delivery; speaking this faster is the one
+thing that will make it land worse.
 
 Before you start: `pnpm --filter @bonded/settlement fund-vault 3`, then
 `pnpm dev`. Browser on `localhost:3000/deck`, terminal beside it.
@@ -190,10 +195,20 @@ The model proposes. It cannot approve itself.
 
 ---
 
-## If you need it shorter
+## Cutting it to ~4 minutes
 
-Cut slide 3 and the `rogue` beat. That takes it to about three minutes and loses
-nothing structural.
+In this order, until it fits. Each is self-contained, so nothing before or after
+needs rewording:
+
+1. **Slide 3** (why prompts fail) — 18s. The argument survives without it.
+2. **The `rogue` beat** — 15s. The weakest of the four refusals.
+3. **Slide 11** (using it) — 20s. Move "zero secrets you hand over" into the
+   close instead.
+4. **Slide 8's first two paragraphs** — keep only the Chainlink status, which is
+   the one a judge will ask about.
+
+All four takes roughly 70 seconds out, landing near 4:30. For a hard 3-minute
+slot, also drop the `forbidden` beat and go straight from `lie` to `big`.
 
 ## If something goes wrong on camera
 
