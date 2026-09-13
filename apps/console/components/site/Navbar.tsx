@@ -151,37 +151,37 @@ export default function Navbar() {
       <div className="flex items-center justify-between h-[60px] px-6 md:px-[48px] max-w-[1400px] mx-auto">
 
         {/* ── Logo ──
-            The mark arrives as the hero's copy leaves. While the hero owns it,
-            the small square swatch stands in so the bar is never empty on the
-            left — a gap there reads as a broken image rather than a deliberate
-            handover. The wordmark stays put throughout; only the glyph swaps,
-            so nothing beside it shifts as you scroll. */}
-        <Link href="/" className="flex items-center gap-[10px] shrink-0 group">
-          <span className="relative w-[26px] h-[26px] grid place-items-center shrink-0">
-            {/* Stand-in, visible only while the hero holds the logo. */}
-            <span
-              aria-hidden
-              className="absolute w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform"
-              style={{ opacity: 1 - logoOwnership }}
-            />
-            {/* The mark itself. Rounded corners as asked; it scales up slightly
-                into place rather than simply appearing. */}
-            <Image
-              src="/media/bonded_logo.png"
-              alt=""
-              width={52}
-              height={52}
-              aria-hidden={logoOwnership === 0}
-              className="absolute w-[26px] h-[26px] object-contain rounded-[8px] group-hover:scale-105"
-              style={{
-                opacity: logoOwnership,
-                transform: `scale(${0.82 + logoOwnership * 0.18})`,
-                filter: `blur(${(1 - logoOwnership) * 2.5}px)`,
-                transition: "opacity 120ms linear, transform 160ms ease-out, filter 120ms linear",
-              }}
-            />
-          </span>
-          <span className="font-mono text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
+            Empty while the hero is in view. The previous version kept a small
+            square swatch and the wordmark visible throughout so the bar was
+            never blank on the left — but that put a mark in the bar at the exact
+            moment the hero is showing the real one, which is the duplication the
+            handover exists to avoid. The bar simply has nothing there until the
+            hero lets go, and the whole lockup (mark + wordmark) arrives together.
+
+            Off the landing page there is no hero, so logoOwnership is 1 from the
+            first frame and this is always visible. */}
+        <Link
+          href="/"
+          aria-hidden={logoOwnership === 0}
+          tabIndex={logoOwnership === 0 ? -1 : 0}
+          className="flex items-center gap-[10px] shrink-0 group"
+          style={{
+            opacity: logoOwnership,
+            // Rises into place rather than fading on the spot, mirroring the
+            // hero copy's exit.
+            transform: `translateY(${(1 - logoOwnership) * 6}px)`,
+            pointerEvents: logoOwnership < 0.5 ? 'none' : 'auto',
+            transition: 'opacity 140ms linear, transform 200ms ease-out',
+          }}
+        >
+          <Image
+            src="/media/bonded_logo.png"
+            alt="Bonded"
+            width={52}
+            height={52}
+            className="w-[26px] h-[26px] object-contain rounded-[8px] transition-transform group-hover:scale-105"
+          />
+          <span className="font-mono text-[13px] text-[#10314A] tracking-[0.5px]">
             Bonded
           </span>
         </Link>
@@ -254,7 +254,7 @@ export default function Navbar() {
           {inApp ? (
             <Link
               href="/app/start"
-              className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+              className="font-mono text-[11px] text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
             >
               Set up your account
             </Link>
@@ -268,7 +268,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href={APP_HREF}
-                className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+                className="font-mono text-[11px] text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
               >
                 Connect &amp; get started
               </Link>
@@ -317,7 +317,7 @@ export default function Navbar() {
             href={APP_HREF}
             onClick={() => setMenuOpen(false)}
             aria-current={inApp ? "page" : undefined}
-            className="flex items-center gap-2 w-full font-mono text-[12px] font-bold tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
+            className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
             style={{ color: inApp ? "#1E7BB8" : "#10314A" }}
           >
             <span
@@ -382,7 +382,7 @@ export default function Navbar() {
             <Link
               href={inApp ? "/app/start" : APP_HREF}
               onClick={() => setMenuOpen(false)}
-              className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
+              className="font-mono text-[11px] text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
               {inApp ? "Set up your account" : "Connect & get started"}
             </Link>

@@ -122,7 +122,7 @@ export function Gate({
         </p>
         <Link
           href="/app/start"
-          className="inline-block font-mono text-small font-bold text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
+          className="inline-block font-mono text-small text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
         >
           Continue setting up
         </Link>

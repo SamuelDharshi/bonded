@@ -41,6 +41,10 @@ export interface OwnerState {
   limits: {
     irreversibleAbove: string;
     budgetMax: string;
+    policyIrreversibleAbove: string | null;
+    policyBudgetMax: string | null;
+    /** null when no policy is published; false when the vault disagrees with it. */
+    matchesPolicy: boolean | null;
     spentThisPeriod: string;
     periodStart: string;
     periodDurationSeconds: number;
@@ -122,7 +126,8 @@ function computeProgress(state: OwnerState | null): Progress {
   // Treated as satisfied once the other three are: the defaults are real limits,
   // not a placeholder, and blocking someone on acknowledging them would be
   // ceremony rather than safety.
-  const limitsReviewed = policyReady && funded && hasAgent;
+  const limitsInSync = state?.limits.matchesPolicy !== false;
+  const limitsReviewed = policyReady && funded && hasAgent && limitsInSync;
 
   const steps = [policyReady, funded, hasAgent, limitsReviewed];
   const nextStep = steps.findIndex((s) => !s);
@@ -132,7 +137,7 @@ function computeProgress(state: OwnerState | null): Progress {
     funded,
     hasAgent,
     limitsReviewed,
-    done: policyReady && funded && hasAgent,
+    done: policyReady && funded && hasAgent && limitsInSync,
     nextStep: nextStep === -1 ? 4 : nextStep,
   };
 }

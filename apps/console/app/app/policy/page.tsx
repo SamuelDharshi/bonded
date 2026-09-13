@@ -2,6 +2,7 @@
 
 import { Gate } from '../../../components/console/owner/Gate';
 import { PolicyPanel } from '../../../components/console/owner/PolicyPanel';
+import { LimitsSync } from '../../../components/console/owner/LimitsSync';
 import { useOwner } from '../../../components/console/owner/OwnerProvider';
 
 /** /app/policy — the rules, and changing them. */
@@ -19,16 +20,21 @@ export default function PolicyPage() {
 
       <Gate>
         {(state, account) => (
-          <PolicyPanel
-            account={account}
-            status={state.policy.status}
-            onchainHash={state.policy.onchainHash}
-            publishedHash={state.policy.publishedHash}
-            wrongChain={wrongChain}
-            busy={busy !== null}
-            setBusy={(b) => { if (!b) setMessage(null); }}
-            onChanged={() => void refresh()}
-          />
+          <>
+            {/* Before the editor: a mismatch here is why a later settle reverts,
+                so it should be the first thing on the page, not a footnote. */}
+            <LimitsSync state={state} account={account} />
+            <PolicyPanel
+              account={account}
+              status={state.policy.status}
+              onchainHash={state.policy.onchainHash}
+              publishedHash={state.policy.publishedHash}
+              wrongChain={wrongChain}
+              busy={busy !== null}
+              setBusy={(b) => { if (!b) setMessage(null); }}
+              onChanged={() => void refresh()}
+            />
+          </>
         )}
       </Gate>
     </>

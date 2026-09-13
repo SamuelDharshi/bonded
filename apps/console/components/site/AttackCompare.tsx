@@ -51,7 +51,7 @@ function Panel({
       {/* Panel header */}
       <div className="flex items-center justify-between h-[44px] px-4 md:px-[20px] bg-[#F2F8FD] border-b border-b-[#CFE3F2]">
         <span
-          className="font-mono text-[10px] md:text-[11px] font-bold tracking-[0.5px]"
+          className="font-mono text-[10px] md:text-[11px] tracking-[0.5px]"
           style={{ color: accent }}
         >
           {side}
@@ -73,7 +73,7 @@ function Panel({
         <div className="absolute inset-0 bg-[rgba(6,19,27,0.55)]" />
         <Link
           href="/app/start"
-          className="relative font-mono text-[11px] font-bold tracking-[0.5px] hover:underline"
+          className="relative font-mono text-[11px] tracking-[0.5px] hover:underline"
           style={{ color: accentOnStill }}
         >
           Put your own rules behind it &gt;

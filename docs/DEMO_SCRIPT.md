@@ -64,12 +64,16 @@ it depends on so a failure points at what to fix.
   The threshold lives in the Vault DON as `IRREVERSIBLE_THRESHOLD_USDC`.
   Evidence: `docs/evidence/cre-stepup-threshold-deployment.txt`.
 
-  **Say this precisely.** It is deployed; it is not yet *called*. The enforcer
-  still compares the threshold locally, so the enclave holds the secret while
-  `requiresStepUp` has not asked it. "Deployed and active, and the enforcer does
-  not call it yet" is the honest sentence — claiming the confidential path is
-  live in enforcement would be the one overclaim in an otherwise clean
-  submission, and it is checkable: `cre execution list` shows no executions.
+  **Say this precisely.** It is deployed, and the enforcer calls it — every
+  proposal over the threshold issues a signed JWT to the CRE gateway, and those
+  invocations appear in `cre execution list`. They currently fail inside
+  Chainlink: the confidential-workflow DON reports "DON members not set", which
+  is private-beta provisioning on their side, and `workflows.execute` returns
+  asynchronously besides. So the threshold comparison falls back to the policy
+  artifact, and the API reports which path decided every verdict. Say "deployed
+  and invoked; the enclave verdict is pending Chainlink's provisioning" — not
+  "the confidential path is live", which `cre execution status` would disprove
+  in one command.
 
 - ✅ **Step 8** — real. Verdicts have settled on Arc testnet across both
   vault deployments:
@@ -90,10 +94,11 @@ it depends on so a failure points at what to fix.
 
 ## What NOT to claim in the video
 
-- Do not say the confidential threshold check is live in the enforcement path.
-  It is deployed and active, and nothing has called it yet — `cre execution
-  list` shows zero executions, so the claim is trivially falsifiable. Say
-  "deployed and active; wiring the enforcer's call to it is the remaining step".
+- Do not say the confidential threshold check is answering. It is deployed and
+  genuinely invoked, and the executions FAIL on Chainlink's side. Say "deployed
+  and invoked; the enclave verdict is pending their provisioning", and show
+  `cre execution list` if asked — the invocations are real, the failures are
+  theirs, and the fallback is reported in every API response.
 - Do not say the naive-agent corpus runs the shipped starter-kit codebases.
   Say three real models were tested directly against the real token. The
   transcripts are genuine; the harness around them is ours.

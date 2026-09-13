@@ -7,6 +7,7 @@ import { Gate } from './Gate';
 import { PolicyPanel } from './PolicyPanel';
 import { FundsPanel } from './FundsPanel';
 import { AgentsPanel } from './AgentsPanel';
+import { LimitsSync } from './LimitsSync';
 import { formatUSDC } from '../../../lib/bonded/wallet';
 
 /**
@@ -116,7 +117,12 @@ export function Wizard() {
 
             {step === 2 && <AgentsPanel state={s} account={account} compact />}
 
-            {step === 3 && <Done state={s} />}
+            {/* A disagreement between policy and vault blocks completion: an
+                agent authorized at that point produces reverts, not payments. */}
+            {step === 3 && s.limits.matchesPolicy === false && (
+              <LimitsSync state={s} account={account} />
+            )}
+            {step === 3 && s.limits.matchesPolicy !== false && <Done state={s} />}
 
             {/* Backwards only. Forward movement is earned by the chain, not by a
                 button, so there is no "next" to press past unfinished work. */}
@@ -178,7 +184,7 @@ function Done({ state }: { state: ReturnType<typeof useOwner>['state'] }) {
       <div className="flex flex-wrap items-center gap-4 mt-5">
         <Link
           href="/app"
-          className="font-mono text-small font-bold text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
+          className="font-mono text-small text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
         >
           Go to your dashboard
         </Link>

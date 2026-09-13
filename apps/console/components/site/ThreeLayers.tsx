@@ -88,7 +88,7 @@ export default function ThreeLayers() {
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#FFFFFF] to-transparent" />
       </div>
 
-      <span className="relative z-10 font-mono text-[10px] md:text-[12px] font-bold text-[#1E7BB8] tracking-[1px]">
+      <span className="relative z-10 font-mono text-[10px] md:text-[12px] text-[#1E7BB8] tracking-[1px]">
         Three layers, one frozen seam
       </span>
 

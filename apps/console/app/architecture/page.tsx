@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Shell } from '../../components/shared/Shell';
 import { NextStep } from '../../components/shared/NextStep';
 
@@ -13,6 +14,8 @@ type LayerStatus = { label: string; live: boolean };
 const LAYERS: {
   name: string;
   sponsor: string;
+  /** Sponsor mark, where the layer has one. The enforcer core is ours. */
+  logo?: string;
   pkg: string;
   detail: string;
   status: LayerStatus;
@@ -20,6 +23,7 @@ const LAYERS: {
   {
     name: 'Truth',
     sponsor: 'The Graph',
+    logo: '/media/thegraph_logo.png',
     pkg: '@bonded/standardized',
     detail:
       'Re-derives every claimed premise from Messari-standardized subgraphs through the Graph Gateway, at a single pinned block. cache: no-store on the enforcement path — a stale premise is a correctness bug, not a latency optimisation.',
@@ -36,14 +40,16 @@ const LAYERS: {
   {
     name: 'Authority',
     sponsor: 'Chainlink CRE',
+    logo: '/media/chainlink_Logo.png',
     pkg: '@bonded/authority',
     detail:
-      'The handlerInTee workflow reads irreversible_above as a Vault DON secret inside an AWS Nitro enclave and returns only a boolean, so the threshold cannot be binary-searched by probing the enforcer. It is deployed and ACTIVE on the CRE DON (workflow bonded-stepup-threshold-staging, id 00771462…, registered on Ethereum mainnet), with the threshold held by the Vault DON under secret id IRREVERSIBLE_THRESHOLD_USDC. What is NOT yet done is the call: requiresStepUp still compares the threshold locally against the policy artifact, so today the enclave holds the secret but the enforcer has not asked it. That seam is built, tested and fails closed — an unreachable enclave holds, never clears — and swapping the local comparison for the deployed workflow is the remaining step.',
-    status: { label: 'Deployed and active — not yet called; threshold still compared locally', live: false },
+      'A handlerInTee workflow reads irreversible_above as a Vault DON secret inside an AWS Nitro enclave and returns only a boolean, so the threshold cannot be binary-searched by probing the enforcer. Deployed and ACTIVE on the CRE DON as bonded-stepup-threshold-staging (id 00771462…, registered in the Workflow Registry on Ethereum mainnet), and the enforcer calls it: every proposal over the line issues a JWT signed by the enrolled key to the CRE gateway, and those invocations appear in cre execution list. Chainlink currently returns the execution asynchronously and its confidential-workflow DON reports "DON members not set" — private beta provisioning on their side — so the enclave cannot yet return a verdict in time to decide. requiresStepUp then falls back to comparing the policy artifact, and every response says which path decided it. The seam fails closed by design: set CRE_REQUIRE_ENCLAVE=true and an unreachable enclave holds instead.',
+    status: { label: 'Deployed and invoked — enclave verdict pending Chainlink provisioning', live: true },
   },
   {
     name: 'Settlement',
     sponsor: 'Arc',
+    logo: '/media/arc_logo.jpg',
     pkg: 'contracts/BondedVault.sol',
     detail:
       'Holds USDC. settle() accepts only a signed Verdict, in strict mark -> check -> call -> settle -> emit order. HELD_FOR_STEPUP cannot execute via settle() alone — confirmStepUp() requires a separate, independently verified confirmation.',
@@ -65,9 +71,23 @@ export default function ArchitecturePage() {
           {LAYERS.map((layer, i) => (
             <div key={layer.name}>
               <div className="border border-hairline rounded-control p-5 bg-deepwater">
-                <div className="flex items-baseline justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <p className="text-h2 text-manifest">{layer.name}</p>
-                  <p className="text-small font-mono text-manifest/40">{layer.sponsor}</p>
+                  {/* The mark in its own colours, rounded, sized to sit level
+                      with the layer name. No plate and no grayscale — three
+                      brand logos greyed out read as disabled controls. */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    {layer.logo && (
+                      <Image
+                        src={layer.logo}
+                        alt={layer.sponsor}
+                        width={160}
+                        height={44}
+                        className="h-[26px] md:h-[30px] w-auto object-contain rounded-[6px]"
+                      />
+                    )}
+                    <p className="text-small font-mono text-manifest/40">{layer.sponsor}</p>
+                  </div>
                 </div>
                 <p className="text-small font-mono text-manifest/50 mt-1">{layer.pkg}</p>
 

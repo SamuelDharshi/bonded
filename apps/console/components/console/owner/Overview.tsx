@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { formatUSDC } from '../../../lib/bonded/wallet';
 import { Addr, Panel } from './primitives';
 import { Gate } from './Gate';
+import { LimitsSync } from './LimitsSync';
 import { useOwner, type OwnerState } from './OwnerProvider';
 
 /**
@@ -31,8 +32,9 @@ export function Overview() {
       </div>
 
       <Gate>
-        {(state) => (
+        {(state, account) => (
           <div className="space-y-5">
+            <LimitsSync state={state} account={account} />
             {!progress.done ? <SetupCallout state={state} /> : <Ready state={state} />}
             <Holdings state={state} />
           </div>
@@ -83,7 +85,7 @@ function SetupCallout({ state }: { state: OwnerState }) {
       <div className="mt-5">
         <Link
           href="/app/start"
-          className="inline-block font-mono text-small font-bold text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
+          className="inline-block font-mono text-small text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
         >
           {progress.nextStep === 0 ? 'Start setting up' : 'Continue setting up'}
         </Link>
@@ -115,7 +117,7 @@ function Ready({ state }: { state: OwnerState }) {
         <div className="mt-4">
           <Link
             href="/app/approvals"
-            className="inline-block font-mono text-small font-bold text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
+            className="inline-block font-mono text-small text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
           >
             Review and confirm
           </Link>

@@ -16,6 +16,7 @@ Built for ETHOnline 2026 · The Graph · Arc · Chainlink CRE
 - [The `enforce()` decision flow](#the-enforce-decision-flow)
 - [Anatomy of a proposal](#anatomy-of-a-proposal)
 - [The four layers](#the-four-layers)
+- [Sponsor technologies — where each one is actually used](#sponsor-technologies--where-each-one-is-actually-used)
 - [Repository map](#repository-map)
 - [Screens, and what each one proves](#screens-and-what-each-one-proves)
 - [Getting started](#getting-started)
@@ -368,6 +369,81 @@ both implementations satisfy.
 
 ---
 
+## Sponsor technologies — where each one is actually used
+
+Not a list of logos. Each row points at the file that does the work, and a
+command that proves it runs.
+
+### The Graph — the Truth layer
+
+| Claim | Where |
+|---|---|
+| Messari **standardized** subgraphs, so one premise definition resolves across any DEX-AMM protocol | [`packages/standardized/src/schemas/messari-dex-amm.ts`](packages/standardized/src/schemas/messari-dex-amm.ts) |
+| Queried through the **decentralised Gateway** with an API key, not a hosted endpoint | [`packages/standardized/src/gateway.ts`](packages/standardized/src/gateway.ts) — `buildGatewayUrl`, which also distinguishes deployment IDs (`/deployments/id/`) from subgraph IDs (`/subgraphs/id/`) |
+| Every premise in one decision resolves at **one pinned block**, so the set is internally consistent | [`apps/console/lib/bonded/graph.ts`](apps/console/lib/bonded/graph.ts) — `createLiveContext` reads `_meta { block { number } }` first |
+| `cache: 'no-store'` on the enforcement path — a stale premise is a correctness bug, not a latency win | [`packages/standardized/src/gateway.ts`](packages/standardized/src/gateway.ts) |
+| Bonded's **own subgraph** indexes the vault and registry, across three deployments so history survives migrations | [`subgraph/subgraph.yaml`](subgraph/subgraph.yaml), [`subgraph/src/mappings.ts`](subgraph/src/mappings.ts) |
+| The owner console reads agents and holds from it | [`apps/console/app/api/v1/owners/[owner]/route.ts`](apps/console/app/api/v1/owners/%5Bowner%5D/route.ts) |
+
+```bash
+pnpm --filter @bonded/standardized proof   # one schema, resolved live
+pnpm --filter @bonded/settlement agent lie # claimed 412M vs re-derived ~127M -> REFUSED
+```
+
+14 tests in [`packages/standardized/src/__tests__/gateway.test.ts`](packages/standardized/src/__tests__/gateway.test.ts) cover both URL shapes and assert the API key never leaks into a logged URL.
+
+### Arc — the Settlement layer
+
+| Claim | Where |
+|---|---|
+| `BondedVault` holds USDC and releases it only against a verdict signed by the enrolled enforcer | [`contracts/src/BondedVault.sol`](contracts/src/BondedVault.sol) — `settle()` |
+| The signature covers the **action**, so a verdict authorises one exact payment | `verdictDigest()` in the same file; shared definition in [`packages/seam/src/vault.ts`](packages/seam/src/vault.ts) |
+| Per-owner balances, per-owner rolling budgets, hard anti-replay | `balanceOf`, `spentThisPeriod`, `settled` in `BondedVault.sol` |
+| The human gate is a transaction **from the owner**, not a signature from the enforcer | `confirmStepUp()` |
+| Policy commitments, versioned per owner | [`contracts/src/BondedRegistry.sol`](contracts/src/BondedRegistry.sol) |
+| Gas paid in USDC — an agent with a spending balance needs no second asset | [`packages/settlement/src/chain.ts`](packages/settlement/src/chain.ts) — the Arc chain definition |
+
+```bash
+cd contracts && forge test          # 38 tests, including the drain regressions
+pnpm --filter @bonded/settlement agent   # a real settlement on Arc testnet
+```
+
+Live: [`BondedVault`](https://testnet.arcscan.app/address/0x027C61c1418157b112B82F30894F8aC1F074AF85) · [`BondedRegistry`](https://testnet.arcscan.app/address/0xB825225163aEf4353d0110BA63d0d811A17B8205) · [`AttackToken`](https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5)
+
+### Chainlink CRE — the Authority layer
+
+| Claim | Where |
+|---|---|
+| A real `handlerInTee` confidential workflow, not the template | [`cre/stepup-threshold/workflow.ts`](cre/stepup-threshold/workflow.ts) |
+| The threshold is a **Vault DON secret**, read inside the enclave, never logged, never returned | `runtime.getSecret({ id, namespace })` in that file — only a boolean leaves |
+| Deployed and **ACTIVE** on the CRE DON, registered on Ethereum mainnet | [`docs/evidence/cre-stepup-threshold-deployment.txt`](docs/evidence/cre-stepup-threshold-deployment.txt) |
+| The enforcer **calls it** — JWT signed by the enrolled key, per proposal over the line | [`apps/console/lib/bonded/cre.ts`](apps/console/lib/bonded/cre.ts) |
+| Wired through the enforcer's existing delegation port, not bolted on | `EnforceContext.requiresStepUp` in [`packages/enforcer/src/enforce.ts`](packages/enforcer/src/enforce.ts) |
+| Fails closed: an unreachable enclave **holds**, never clears | 5 tests in [`packages/enforcer/src/__tests__/enforce.test.ts`](packages/enforcer/src/__tests__/enforce.test.ts) |
+
+```bash
+cre workflow list --target staging-settings        # ACTIVE
+cre execution list bonded-stepup-threshold-staging # invocations from the enforcer
+```
+
+**What is not working, precisely.** The invocations reach Chainlink and are
+recorded, but the executions fail inside their infrastructure with
+`confidential-workflow ... DON members not set` — confidential workflows are in
+private beta and the enclave DON is not provisioned for this org. Separately,
+`workflows.execute` is asynchronous: it returns `ACCEPTED` plus an execution id,
+so a verdict needed synchronously has to be polled for.
+
+So `requiresStepUp` attempts the enclave and falls back to comparing the policy
+artifact when it cannot answer — correct, but not confidential. **Every API
+response reports which path decided it** (`evidence.thresholdPath`, plus
+`evidence.creError` when the sealed path was tried and failed), so the two are
+never confusable. Set `CRE_REQUIRE_ENCLAVE=true` to hold instead of falling
+back, which is the right setting once the enclave answers.
+
+Full account, including what took days and why: [`docs/CRE_INTEGRATION_REPORT.md`](docs/CRE_INTEGRATION_REPORT.md).
+
+---
+
 ## Repository map
 
 ```
@@ -685,7 +761,7 @@ onboarding steps in order.
 
 ### Roadmap — what's next, and where each piece stands today
 
-**Chainlink CRE: deployed and ACTIVE — the enforcer does not call it yet.**
+**Chainlink CRE: deployed, ACTIVE, and invoked — the enclave cannot answer yet.**
 
 The `handlerInTee` workflow is real, not the hello-world template: the enclave
 fetches `irreversible_above` as a Vault DON secret, compares it by strict
@@ -704,13 +780,22 @@ The threshold sits in the Vault DON under `IRREVERSIBLE_THRESHOLD_USDC`.
 Evidence: `docs/evidence/cre-stepup-threshold-deployment.txt`; the simulation
 transcript covering both branches is alongside it.
 
-**And the part that is not done, stated plainly:** nothing has called it.
-`requiresStepUp` still compares the threshold locally against the policy
-artifact, so the enclave holds the secret while the enforcer has not asked it —
-`cre execution list` shows zero executions, which makes this trivially
-checkable either way. Wiring that call is the remaining step, and it is a call
-site, not a redesign: the seam is built, tested, and fails closed, so an
-unreachable enclave holds rather than clears.
+**And the part that is not done, stated plainly.** The enforcer now calls it:
+each proposal over the line issues a JWT signed by the enrolled key to the CRE
+gateway, and those invocations show up in `cre execution list`. They fail there.
+Two reasons, both on Chainlink's side:
+
+- the confidential-workflow DON reports `DON members not set` — private beta
+  provisioning that is not ours to grant;
+- `workflows.execute` is asynchronous, returning `ACCEPTED` and an execution id,
+  so a verdict needed before signing has to be polled for.
+
+`requiresStepUp` therefore falls back to comparing the policy artifact, which is
+correct but not confidential, and every response reports which path decided it
+(`evidence.thresholdPath`, and `evidence.creError` when the sealed path was
+tried). `CRE_REQUIRE_ENCLAVE=true` makes it hold instead of falling back — the
+right setting the moment the enclave can answer, and the reason the seam was
+built to fail closed in the first place.
 
 Two notes for anyone reproducing this. `cre secrets create` needs
 `--secrets-auth browser` to use the private registry, which assigns its own

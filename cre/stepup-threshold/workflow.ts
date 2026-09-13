@@ -19,6 +19,8 @@ import { z } from 'zod'
 export const configSchema = z.object({
 	authorizedKeys: z.array(z.string()),
 	secretId: z.string(),
+	// Where the Vault DON holds it. Optional so existing configs keep working.
+	secretNamespace: z.string().optional(),
 })
 type Config = z.infer<typeof configSchema>
 
@@ -66,7 +68,13 @@ export const onStepUpCheck = (
 	// DON node memory, matching the same "encrypted at rest, decrypted only
 	// behind a hardware/enclave gate" discipline packages/authority already
 	// documents for the ring-custody path.
-	const thresholdUSDC = runtime.getSecret({ id: config.secretId }).result().value
+	// `namespace` matters and defaults badly. `cre secrets create` stores under
+	// "main" (the same default `cre secrets list` shows), but an omitted
+	// namespace here resolves to "default", and the mismatch surfaces only at
+	// execution time as "secret retrieval failed ... (namespace: default)".
+	const thresholdUSDC = runtime
+		.getSecret({ id: config.secretId, namespace: config.secretNamespace ?? 'main' })
+		.result().value
 
 	// BigInt comparison, never a float -- same fixed-point discipline as
 	// packages/seam/src/types.ts and packages/enforcer/src/withinTolerance.ts.

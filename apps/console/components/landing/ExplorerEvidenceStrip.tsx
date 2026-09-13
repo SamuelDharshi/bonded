@@ -158,7 +158,7 @@ export async function ExplorerEvidenceStrip() {
               <p className="text-small text-[#6E8CA5]">
                 <span className="font-mono">name()</span> — read live from Arc testnet
               </p>
-              <p className="text-body font-mono text-[#0B4F7D] font-bold mt-2 break-all">{token.name}</p>
+              <p className="text-body font-mono text-[#0B4F7D] mt-2 break-all">{token.name}</p>
 
               <p className="text-small text-[#6E8CA5] mt-6">
                 <span className="font-mono">symbol()</span>

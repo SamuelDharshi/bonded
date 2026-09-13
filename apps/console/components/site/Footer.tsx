@@ -124,24 +124,38 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-6 md:px-[120px] py-4 md:h-[56px] border-t border-t-[#CFE3F2] gap-3 sm:gap-0">
-        <span className="font-mono text-[11px] text-[#6E8CA5] tracking-[1px]">
-          © 2026 Bonded. Built at ETHOnline 2026. MIT licensed.
+      {/* ── Wordmark ──
+          The bottom bar held a copyright line, a GitHub link and a chain label,
+          all of which already appear in the columns above. What is left is the
+          brand device: the name, oversized, fading downward into the page edge.
+
+          Set in the sans face and lowercase on purpose — at this size the mono
+          face's fixed advance widths open ugly gaps between letters, and the
+          tight tracking below is what stops the word reading as six separate
+          characters.
+
+          `text` rather than an image so it stays crisp at any width, and it is
+          clipped by the footer's overflow rather than sized in px, so it fills
+          the width on a phone and on a 32-inch display without a breakpoint. */}
+      <div
+        aria-hidden
+        className="relative z-0 w-full overflow-hidden select-none pointer-events-none mt-6 md:mt-10"
+      >
+        <span
+          className="block font-sans font-bold lowercase leading-[0.78] text-center whitespace-nowrap
+                     text-[22vw] tracking-[-0.055em] text-[#10314A]"
+          style={{
+            // Fades out downward: solid at the top of the glyphs, gone by the
+            // baseline, so the word appears to sink into the page.
+            backgroundImage:
+              'linear-gradient(to bottom, rgba(16,49,74,0.13) 0%, rgba(16,49,74,0.06) 45%, rgba(16,49,74,0) 88%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}
+        >
+          bonded
         </span>
-        <div className="flex items-center gap-6 md:gap-[32px]">
-          <a
-            href="https://github.com/SamuelDharshi/bonded"
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono text-[11px] text-[#6E8CA5] tracking-[1px] hover:text-[#52738D] transition-colors"
-          >
-            GitHub
-          </a>
-          <span className="font-mono text-[11px] font-bold text-[#1E7BB8] tracking-[1px]">
-            Arc testnet // 5042002
-          </span>
-        </div>
       </div>
 
     </footer>

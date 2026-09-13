@@ -28,7 +28,7 @@ export function NextStep({
       <div className="mt-4 flex flex-wrap items-center gap-4">
         <Link
           href={action.href}
-          className="font-mono text-small font-bold text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
+          className="font-mono text-small text-harbor bg-[#1E7BB8] tracking-wide px-4 py-2.5 rounded-control hover:bg-[#17618F] transition-colors"
         >
           {action.label}
         </Link>

@@ -247,6 +247,20 @@ export async function GET(
     (h): h is NonNullable<typeof h> => h !== null,
   );
 
+  // Do the vault's limits agree with the policy the enforcer reads?
+  //
+  // They are two separate facts and nothing forced them to match: the policy is
+  // committed to the registry, the limits live on the vault, and an owner who
+  // changes one without the other gets a verdict the vault then rejects. That
+  // failure surfaces as `execution reverted` at settle time, far from its cause,
+  // so it is detected here and reported as a first-class piece of state.
+  const policyArtifact = policy.status === 'ok' ? policy.stored.policy : null;
+  const limitsMatchPolicy =
+    policyArtifact === null
+      ? null
+      : BigInt(policyArtifact.irreversible_above) === limits[0] &&
+        BigInt(policyArtifact.budget.max) === limits[1];
+
   return NextResponse.json({
     owner,
     vault: VAULT,
@@ -259,6 +273,11 @@ export async function GET(
     limits: {
       irreversibleAbove: limits[0].toString(),
       budgetMax: limits[1].toString(),
+      // What the policy says they should be, so the UI can offer to fix it
+      // rather than merely reporting a disagreement.
+      policyIrreversibleAbove: policyArtifact?.irreversible_above ?? null,
+      policyBudgetMax: policyArtifact?.budget.max ?? null,
+      matchesPolicy: limitsMatchPolicy,
       spentThisPeriod: spent.toString(),
       periodStart: periodStart.toString(),
       periodDurationSeconds: 7 * 24 * 60 * 60,

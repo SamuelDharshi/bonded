@@ -1,6 +1,45 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+
+  "//": "Turborepo hides env vars from tasks unless declared. On Vercel that surfaced as 'these variables WILL NOT be available to your application' for every var on the project. The build still passed, which is the misleading part: the console would have deployed with NEXT_PUBLIC_* undefined, falling back to hardcoded defaults, and the wallet could not add the Arc network at all because NEXT_PUBLIC_ARC_RPC_URL has no default. NEXT_PUBLIC_* matters most because Next inlines it at BUILD time — setting it afterwards changes nothing. Server-side names are read at request time by force-dynamic routes and injected by the host at runtime, but they are declared too so the warning goes quiet and so the cache key changes when they change. Declared values join the task hash, which is correct: a build made against a different vault address is a different build.",
+
+  "globalEnv": [
+    "ARC_RPC_URL",
+    "ARC_CHAIN_ID",
+    "ARC_EXPLORER_URL",
+    "USDC_ADDRESS",
+    "ATTACK_TOKEN_ADDRESS",
+
+    "BONDED_REGISTRY_ADDRESS",
+    "BONDED_VAULT_ADDRESS",
+    "BONDED_SUBGRAPH_ID",
+    "BONDED_DATA_DIR",
+
+    "ENFORCER_SIGNER_ADDRESS",
+    "ENFORCER_SIGNER_PRIVATE_KEY",
+
+    "GRAPH_API_KEY",
+    "GRAPH_GATEWAY_URL",
+    "GRAPH_GATEWAY_BASE_URL",
+
+    "CRE_ETH_PRIVATE_KEY",
+    "CRE_WORKFLOW_ID",
+    "CRE_DON_ID",
+    "CRE_SECRET_LABEL",
+
+    "GROQ_API_KEY",
+    "ANTHROPIC_API_KEY",
+
+    "NEXT_PUBLIC_ARC_CHAIN_ID",
+    "NEXT_PUBLIC_ARC_RPC_URL",
+    "NEXT_PUBLIC_BONDED_VAULT_ADDRESS",
+    "NEXT_PUBLIC_BONDED_REGISTRY_ADDRESS",
+    "NEXT_PUBLIC_USDC_ADDRESS",
+
+    "NEXT_DIST_DIR"
+  ],
+
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

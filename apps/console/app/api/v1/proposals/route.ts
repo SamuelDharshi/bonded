@@ -20,6 +20,7 @@ import {
 } from '../../../../lib/bonded/chain';
 import { createLiveContext } from '../../../../lib/bonded/graph';
 import { loadPolicy } from '../../../../lib/bonded/policyStore';
+import { creConfigured, creRequiresStepUp } from '../../../../lib/bonded/cre';
 
 export const dynamic = 'force-dynamic';
 
@@ -325,6 +326,12 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   const onchainHash = lookup.onchainHash;
 
+  // Surfaced so a caller can tell which path produced the threshold decision
+  // rather than having to trust that one was used.
+  let thresholdPath: 'chainlink-cre-enclave' | 'local-policy-artifact' | 'local-fallback-after-cre-error' =
+    'local-policy-artifact';
+  let creError: string | null = null;
+
   /**
    * Step 5's delegation seam, wired to the chain.
    *
@@ -352,8 +359,56 @@ export async function POST(req: Request): Promise<NextResponse> {
     proposalHash: `0x${string}`;
     valueUSDC: bigint;
   }): Promise<boolean> => {
-    if (amount <= BigInt(policy.irreversible_above)) return false;
+    // Is this over the line? Ask the enclave when it is deployed, so the
+    // threshold stays inside it; fall back to the policy artifact when it is
+    // not. The local path is correct but not confidential — anyone holding the
+    // artifact knows exactly where the boundary sits and can binary-search up
+    // to it.
+    const localAnswer = () => amount > BigInt(policy.irreversible_above);
 
+    let overThreshold: boolean;
+    if (creConfigured()) {
+      try {
+        const answer = await creRequiresStepUp(enforcerAccount(), proposalHash, amount);
+        overThreshold = answer.requiresStepUp;
+        thresholdPath = 'chainlink-cre-enclave';
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        console.error('[CRE] threshold check failed:', detail);
+        creError = detail;
+
+        // Two defensible behaviours, and which one is right depends on whether
+        // the enclave is load-bearing for this deployment:
+        //
+        //   CRE_REQUIRE_ENCLAVE=true  rethrow -> enforce() records
+        //                             ATTESTATION_MISSING and HOLDS. Correct for
+        //                             a production system where the threshold
+        //                             must stay confidential or nothing moves.
+        //
+        //   default                   fall back to comparing the policy
+        //                             artifact. Correct but NOT confidential,
+        //                             and reported as such in every response so
+        //                             it cannot be mistaken for the sealed path.
+        //
+        // The default is the fallback because the enclave currently fails inside
+        // Chainlink's infrastructure ("DON members not set" — confidential
+        // workflows are in private beta), and holding every payment on someone
+        // else's provisioning would make the product unusable while claiming
+        // nothing extra.
+        if (process.env.CRE_REQUIRE_ENCLAVE === 'true') throw err;
+
+        overThreshold = localAnswer();
+        thresholdPath = 'local-fallback-after-cre-error';
+      }
+    } else {
+      overThreshold = localAnswer();
+      thresholdPath = 'local-policy-artifact';
+    }
+
+    if (!overThreshold) return false;
+
+    // Over the line, but the owner may already have confirmed. That is a fact
+    // about the chain, not about the threshold, so it is asked here either way.
     const confirmed = await client.readContract({
       address: VAULT, abi: VAULT_ABI, functionName: 'stepUpConfirmed', args: [proposalHash],
     });
@@ -464,6 +519,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       queryPath: 'live-gateway',
       pinnedBlock: block.toString(),
       alreadyArmed,
+      thresholdPath,
+      // Present only when the sealed path was attempted and failed, so a caller
+      // is never left guessing why the fallback was used.
+      creError,
       note: 'Every premise above was re-derived at this block, independent of the agent.',
     },
   });

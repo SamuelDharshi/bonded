@@ -7,10 +7,16 @@ days and a reader is entitled to know whether that was our problem or the
 platform's. Some of it was neither, and one of the worst parts was ours.
 
 **Outcome, up front.** The confidential threshold workflow is **deployed and
-ACTIVE** on the CRE DON. The threshold lives in the Vault DON inside an AWS
-Nitro enclave. The enforcer does **not** call it yet — that is stated plainly
-everywhere it could be misread, and it is checkable: `cre execution list` returns
-zero executions.
+ACTIVE** on the CRE DON, the threshold lives in the Vault DON, and **the enforcer
+calls it** — every proposal over the line issues a signed JWT to the CRE gateway,
+and those invocations appear in `cre execution list`.
+
+They fail there, for reasons on Chainlink's side: the confidential-workflow DON
+reports `DON members not set` (private-beta provisioning), and
+`workflows.execute` is asynchronous besides. So the threshold comparison falls
+back to the policy artifact — correct, not confidential — and every API response
+reports which path decided it. `CRE_REQUIRE_ENCLAVE=true` makes it hold instead,
+which is the right setting the moment the enclave can answer.
 
 ---
 
@@ -149,11 +155,25 @@ and guess which prompt you hit.
 
 ### 2.7 Invoking a **deployed** HTTP-triggered workflow is undocumented
 
-Still open. The references cover testing an HTTP trigger *in simulation* via
-`curl http://localhost:8080/trigger`. Nothing covers the endpoint or request
-signing for a deployed workflow, and there is no `cre workflow invoke` command in
-1.32.0. This is exactly why the workflow is deployed but not yet called: the
-remaining work is finding the invocation contract, not writing enforcement logic.
+**Now resolved**, but not from the skill references — they cover only the
+simulation path (`curl http://localhost:8080/trigger`), and there is no
+`cre workflow invoke` command in 1.32.0. The answer is in Chainlink's
+"Triggering Deployed Workflows" guide: POST JSON-RPC `workflows.execute` to
+`https://01.gateway.zone-a.cre.chain.link` (public registry) with a JWT whose
+payload carries a SHA-256 digest of the **lexicographically key-sorted** body,
+signed EIP-191 by an authorized key. Implemented in
+`apps/console/lib/bonded/cre.ts`.
+
+Two things that guide could state more loudly:
+
+- **`workflows.execute` is asynchronous.** It returns `{status: "ACCEPTED",
+  workflow_execution_id}`, not a result. Any caller needing the answer
+  synchronously — which is the obvious use for a confidential threshold check —
+  has to poll, and handle the timeout by failing closed.
+- **Secret namespaces default inconsistently.** `cre secrets create` stores
+  under `main`; `runtime.getSecret({ id })` resolves `default` unless a
+  namespace is passed. The mismatch surfaces only at execution time as
+  `secret retrieval failed ... (namespace: default)`.
 
 ---
 
@@ -261,6 +281,16 @@ Offered as a report from one integration, not a complaint:
 
 ## 7. What remains
 
-One item: wire `requiresStepUp` to the deployed workflow, which needs §2.7
-resolved. Until then the threshold comparison stays local — correct, tested,
-fail-closed, and not confidential — and every surface in the project says so.
+Nothing on our side that can be finished unilaterally.
+
+- **Chainlink must provision the confidential-workflow DON.** Until
+  `DON members not set` clears, the enclave cannot execute regardless of what is
+  deployed or how it is called.
+- **The secret namespace fix needs a redeploy.** `workflow.ts` now passes
+  `namespace: 'main'` to match where `cre secrets create` stores it, but landing
+  it costs another mainnet `UpsertWorkflow`. Deliberately not spent: the
+  execution would still fail on the item above, so it would buy nothing today.
+- **If Chainlink keeps `workflows.execute` asynchronous**, the enforcer needs a
+  bounded poll after the `ACCEPTED` response, with the timeout failing closed.
+
+Everything either side of those is done and evidenced above.

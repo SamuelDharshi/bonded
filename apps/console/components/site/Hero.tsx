@@ -68,7 +68,7 @@ export default function Hero() {
       {/* Badge */}
       <div className="relative z-10 flex items-center justify-center gap-[8px] h-[32px] px-[12px] md:px-[16px] bg-[#E7F1FA] border-2 border-[#1E7BB8]">
         <div className="w-[8px] h-[8px] bg-[#1E7BB8] shrink-0" />
-        <span className="font-mono text-[9px] md:text-[11px] font-bold text-[#1E7BB8] tracking-[0.5px] whitespace-nowrap">
+        <span className="font-mono text-[9px] md:text-[11px] text-[#1E7BB8] tracking-[0.5px] whitespace-nowrap">
           Live on Arc testnet · ETHOnline 2026
         </span>
       </div>
