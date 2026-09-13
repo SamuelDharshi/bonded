@@ -11,7 +11,7 @@ it depends on so a failure points at what to fix.
 | 4 | terminal | `pnpm --filter @bonded/settlement agent lie` | Premise diff shows claimed 412M vs. live-re-derived ~127M; `PREMISE_MISMATCH` | `packages/standardized` on the live Gateway |
 | 5 | terminal | `pnpm --filter @bonded/settlement agent big` | 2 USDC against a 1 USDC threshold → `HELD_FOR_STEPUP`. No silent auto-approval above the threshold | `enforce()` step 5 |
 | 6 | `/app/approvals` | Confirm the held payment from the owner wallet, then `agent resume` | The hold is not a dead end. A human confirms from their own address, and only then does the vault release — three separate on-chain transactions | `/app/approvals`, `BondedVault.confirmStepUp()` |
-| 7 | CRE simulation | `cre workflow simulate stepup-threshold --target staging-settings` | The confidential threshold check runs inside a TEE and returns only a boolean | `cre/stepup-threshold`, simulated (not yet deployed — see below) |
+| 7 | CRE | `cre workflow list --target staging-settings` | The confidential threshold workflow is deployed and ACTIVE on the CRE DON, its threshold held by the Vault DON | `cre/stepup-threshold`, deployed — not yet wired into the call path |
 | 8 | Arc explorer | Show the settled transactions | A CLEARED verdict really released USDC; a REFUSED verdict settled with none moved | `packages/settlement`, `BondedVault.settle()` |
 | 9 | `/log` | Scroll the decision log | Every entry — both vaults, before and after the redeploy — links to a real Arc explorer transaction | Subgraph deployed to Studio, indexing the live contracts |
 | 10 | `/app/policy` | Compile a policy, show the hash matching the on-chain commitment | The artifact is compiled, committed from the owner wallet and published — the enforcer only accepts one that hashes to the commitment | `/api/v1/policies/compile`, `BondedRegistry` |
@@ -54,13 +54,23 @@ it depends on so a failure points at what to fix.
   The confirmation is sent from the owner's own wallet at `/app/approvals` —
   there is no longer any path by which the web tier signs, which is why
   `STEPUP_DEMO_SIGNING` and `/api/stepup` no longer exist.
-- ✅ **Step 7** — the confidential workflow is real and simulates correctly
-  for both branches (`docs/evidence/cre-stepup-threshold-simulation.txt`).
-  **Not yet deployed** — CRE org access is enabled, but final key-linking is
-  stuck on a Chainlink platform-side account issue, reported to their
-  support. Say this plainly in the video rather than implying deployment:
-  "simulates correctly inside a TEE; deployment is in progress with
-  Chainlink."
+- ✅ **Step 7** — **deployed and ACTIVE**, which it was not until today.
+  `bonded-stepup-threshold-staging`, workflow id `00771462…`, registered in the
+  Workflow Registry on Ethereum mainnet
+  (`0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5`), owner linked in
+  [`0x1ca93364…`](https://etherscan.io/tx/0x1ca933647b7b25a0fe5d3e7b47fa7ffb0f28c770b16a06fdcb14ad7c70ef160a),
+  registered in
+  [`0x9a7a7967…`](https://etherscan.io/tx/0x9a7a796783cafc485a43c17b174ccb74b4c98384aece1b48f7aa919505b9b60b).
+  The threshold lives in the Vault DON as `IRREVERSIBLE_THRESHOLD_USDC`.
+  Evidence: `docs/evidence/cre-stepup-threshold-deployment.txt`.
+
+  **Say this precisely.** It is deployed; it is not yet *called*. The enforcer
+  still compares the threshold locally, so the enclave holds the secret while
+  `requiresStepUp` has not asked it. "Deployed and active, and the enforcer does
+  not call it yet" is the honest sentence — claiming the confidential path is
+  live in enforcement would be the one overclaim in an otherwise clean
+  submission, and it is checkable: `cre execution list` shows no executions.
+
 - ✅ **Step 8** — real. Verdicts have settled on Arc testnet across both
   vault deployments:
   [CLEARED, 1 USDC released](https://testnet.arcscan.app/tx/0x05b7a368e5f200d15b673feebcddbcd5928ab19890420dc639bf19ba42c8a631),
@@ -80,8 +90,10 @@ it depends on so a failure points at what to fix.
 
 ## What NOT to claim in the video
 
-- Do not say CRE is deployed. Say it simulates correctly and deployment is
-  in progress.
+- Do not say the confidential threshold check is live in the enforcement path.
+  It is deployed and active, and nothing has called it yet — `cre execution
+  list` shows zero executions, so the claim is trivially falsifiable. Say
+  "deployed and active; wiring the enforcer's call to it is the remaining step".
 - Do not say the naive-agent corpus runs the shipped starter-kit codebases.
   Say three real models were tested directly against the real token. The
   transcripts are genuine; the harness around them is ours.

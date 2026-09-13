@@ -685,17 +685,38 @@ onboarding steps in order.
 
 ### Roadmap — what's next, and where each piece stands today
 
-**Chainlink CRE: workflow built, tested, and passing — final key-linking in
-progress with Chainlink.** Org access to CRE deploy is **enabled**. The
-`handlerInTee` workflow is real (not the hello-world template): the enclave
+**Chainlink CRE: deployed and ACTIVE — the enforcer does not call it yet.**
+
+The `handlerInTee` workflow is real, not the hello-world template: the enclave
 fetches `irreversible_above` as a Vault DON secret, compares it by strict
-`BigInt`, and returns only a boolean — the threshold never leaves the enclave
-and is never logged. It simulates correctly for both branches (8/8 tests,
-transcript at `docs/evidence/cre-stepup-threshold-simulation.txt`). The last
-step — linking the deploying key to the org via `cre account link-key` — is
-mid-flight with Chainlink's platform team, and the console states the current
-enforcement path on every page rather than implying enclave custody ahead of
-schedule.
+`BigInt`, and returns only a boolean, so the threshold never leaves the enclave
+and is never logged. A threshold an attacker can read is a threshold they can
+binary-search up to.
+
+It is live: workflow `bonded-stepup-threshold-staging`, id `00771462…`,
+registered in the Workflow Registry at
+[`0x4Ac54353…`](https://etherscan.io/address/0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5)
+on Ethereum mainnet — owner linked in
+[`0x1ca93364…`](https://etherscan.io/tx/0x1ca933647b7b25a0fe5d3e7b47fa7ffb0f28c770b16a06fdcb14ad7c70ef160a),
+registered in
+[`0x9a7a7967…`](https://etherscan.io/tx/0x9a7a796783cafc485a43c17b174ccb74b4c98384aece1b48f7aa919505b9b60b).
+The threshold sits in the Vault DON under `IRREVERSIBLE_THRESHOLD_USDC`.
+Evidence: `docs/evidence/cre-stepup-threshold-deployment.txt`; the simulation
+transcript covering both branches is alongside it.
+
+**And the part that is not done, stated plainly:** nothing has called it.
+`requiresStepUp` still compares the threshold locally against the policy
+artifact, so the enclave holds the secret while the enforcer has not asked it —
+`cre execution list` shows zero executions, which makes this trivially
+checkable either way. Wiring that call is the remaining step, and it is a call
+site, not a redesign: the seam is built, tested, and fails closed, so an
+unreachable enclave holds rather than clears.
+
+Two notes for anyone reproducing this. `cre secrets create` needs
+`--secrets-auth browser` to use the private registry, which assigns its own
+owner and sidesteps key linking entirely; `cre workflow deploy` instead uses
+the on-chain registry and does require a linked key, which costs a one-time
+mainnet transaction (~0.00005 ETH at the gas price on the day).
 
 The delegation seam is built and tested rather than promised:
 `EnforceContext.requiresStepUp` in `packages/enforcer` lets step 5 hand the

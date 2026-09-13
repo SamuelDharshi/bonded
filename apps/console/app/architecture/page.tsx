@@ -38,8 +38,8 @@ const LAYERS: {
     sponsor: 'Chainlink CRE',
     pkg: '@bonded/authority',
     detail:
-      'The handlerInTee workflow reads irreversible_above as a Vault DON secret inside an AWS Nitro enclave and returns only a boolean, so the threshold cannot be binary-searched by probing the enforcer. It simulates correctly for both branches; deployment is pending with Chainlink. Until it is deployed, enforce() compares the threshold locally against the policy artifact — correct, but not confidential. The seam it plugs into (EnforceContext.requiresStepUp) is built and tested, and fails closed: an unreachable enclave holds, never clears.',
-    status: { label: 'Simulated — deployment pending; threshold compared locally today', live: false },
+      'The handlerInTee workflow reads irreversible_above as a Vault DON secret inside an AWS Nitro enclave and returns only a boolean, so the threshold cannot be binary-searched by probing the enforcer. It is deployed and ACTIVE on the CRE DON (workflow bonded-stepup-threshold-staging, id 00771462…, registered on Ethereum mainnet), with the threshold held by the Vault DON under secret id IRREVERSIBLE_THRESHOLD_USDC. What is NOT yet done is the call: requiresStepUp still compares the threshold locally against the policy artifact, so today the enclave holds the secret but the enforcer has not asked it. That seam is built, tested and fails closed — an unreachable enclave holds, never clears — and swapping the local comparison for the deployed workflow is the remaining step.',
+    status: { label: 'Deployed and active — not yet called; threshold still compared locally', live: false },
   },
   {
     name: 'Settlement',

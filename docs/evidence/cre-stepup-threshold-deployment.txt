@@ -1,0 +1,21 @@
+CRE deployment evidence — bonded-stepup-threshold-staging
+Captured: 2026-09-13T12:59:21Z
+
+Owner link transaction (Ethereum mainnet, one-time):
+  https://etherscan.io/tx/0x1ca933647b7b25a0fe5d3e7b47fa7ffb0f28c770b16a06fdcb14ad7c70ef160a
+Workflow registration transaction (UpsertWorkflow):
+  https://etherscan.io/tx/0x9a7a796783cafc485a43c17b174ccb74b4c98384aece1b48f7aa919505b9b60b
+
+Vault DON secret: secret_id=IRREVERSIBLE_THRESHOLD_USDC, namespace=main
+  created via --secrets-auth browser (private registry)
+
+--- cre workflow list --target staging-settings ---
+1. bonded-stepup-threshold-staging
+     Workflow ID:  00771462b003b4e3aaf0fa3d1ee25b147afd36b7e239dd0951c6e33a0c04af8b
+     Owner:        0f450674ce97de6e35cd26043f84d2826f193340
+     Status:       ACTIVE
+     Registry:     onchain:ethereum-mainnet
+     Address:      0x4Ac54353FA4Fa961AfcC5ec4B118596d3305E7e5
+
+Inspect executions:
+     cre execution list <workflow-id-or-name>
