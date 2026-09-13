@@ -1,4 +1,5 @@
 import { Shell } from '../../components/shared/Shell';
+import { NextStep } from '../../components/shared/NextStep';
 import { ScrollText } from 'lucide-react';
 
 /**
@@ -223,6 +224,10 @@ export default async function LogPage() {
             </div>
           </div>
         )}
+        <NextStep
+          lead="Every entry here is a verdict that settled on-chain against a committed policy. Your own activity appears in the same place once your agents start proposing."
+          secondary={{ label: 'Watch a proposal being judged', href: '/live' }}
+        />
       </div>
     </Shell>
   );

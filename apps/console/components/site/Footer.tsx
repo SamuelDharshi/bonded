@@ -3,6 +3,10 @@ import Image from "next/image";
 // Every link here resolves to something real — a working console route or the
 // public repo. No placeholder "#" hrefs, no pages that don't exist.
 const productLinks = [
+  // First, and named as an action rather than a page. The footer listed only
+  // the evidence pages, so the one place an owner does anything was absent from
+  // the site's own map of itself.
+  { label: "Your account", href: "/app" },
   { label: "Live enforcement", href: "/live" },
   { label: "Decision log", href: "/log" },
   { label: "Policy", href: "/policy" },
@@ -94,7 +98,7 @@ export default function Footer() {
         {/* Link columns */}
         <div className="grid grid-cols-3 md:flex md:flex-1 gap-8 md:gap-[80px]">
           {[
-            { heading: "Console", links: productLinks },
+            { heading: "Product", links: productLinks },
             { heading: "Project", links: resourceLinks },
             { heading: "On-chain", links: chainLinks },
           ].map((col) => (

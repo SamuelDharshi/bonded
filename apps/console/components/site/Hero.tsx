@@ -91,31 +91,53 @@ export default function Hero() {
 
       <div className="h-10 md:h-[48px]" />
 
-      {/* CTAs */}
+      {/* CTAs
+          Two paths, in the order people actually want them: set up the thing, or
+          watch it work first. "Watch it refuse" was the only primary action for a
+          long time, which pointed every visitor at a demo and left the product
+          undiscoverable. It keeps equal visual weight as the second button
+          because it is still the fastest way to understand what an account does.
+
+          "Read the architecture" drops to a text link below. It is the right
+          third step and the wrong third button. */}
       <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 md:gap-[16px] w-full sm:w-auto">
         <Link
-          href="/live"
+          href="/app"
           className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#1E7BB8] hover:bg-[#17618F] transition-colors"
         >
           <span className="font-grotesk text-[12px] font-bold text-[#FFFFFF] tracking-[0.5px]">
-            Watch it refuse
+            Open your account
           </span>
         </Link>
         <Link
-          href="/architecture"
-          className="flex items-center justify-center w-full sm:w-[200px] h-[56px] bg-[#FFFFFF] border-2 border-[#B4D3E9] hover:border-[#52738D] transition-colors"
+          href="/live"
+          className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#FFFFFF] border-2 border-[#B4D3E9] hover:border-[#52738D] transition-colors"
         >
           <span className="font-mono text-[12px] text-[#52738D] tracking-[0.5px]">
-            Read the architecture
+            Watch it refuse
           </span>
         </Link>
       </div>
 
       <div className="h-6 md:h-[24px]" />
 
-      <p className="relative z-10 font-mono text-[11px] text-[#52738D] tracking-[0.5px] text-center">
-        No wallet, no faucet, no signature required.
+      {/* The old line here read "No wallet, no faucet, no signature required."
+          That was true when the only button was a demo. It would now sit under
+          "Open your account", which does need a wallet — so it says which path
+          needs what, and states the part that stays true either way. */}
+      <p className="relative z-10 font-mono text-[11px] text-[#52738D] tracking-[0.5px] text-center max-w-[520px]">
+        Watching it work needs nothing. An account needs a wallet — never a private key,
+        yours or your agent&apos;s.
       </p>
+
+      <div className="h-4" />
+
+      <Link
+        href="/architecture"
+        className="relative z-10 font-mono text-[11px] text-[#52738D] tracking-[0.5px] underline underline-offset-4 decoration-[#B4D3E9] hover:decoration-[#52738D] transition-colors"
+      >
+        Read the architecture
+      </Link>
     </section>
   );
 }

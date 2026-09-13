@@ -16,6 +16,7 @@ import {
   walletClient,
 } from '../../../lib/bonded/wallet';
 import { Addr, Button, Field, Input, Panel, Status, TxLink } from './primitives';
+import { PolicyPanel } from './PolicyPanel';
 
 /**
  * The owner's console.
@@ -365,50 +366,18 @@ export function OwnerDashboard() {
       )}
 
       {/* ── Step 1: policy ────────────────────────────────────────────────── */}
-      <Panel
-        title="Your policy"
-        step={1}
-        done={policyOk}
-        note="The rules your agent is held to. You commit a hash of them on-chain from your own
-              wallet, so nobody — including this service — can change what you are enforcing.
-              The artifact itself is published separately, and is only accepted if it hashes to
-              what you committed."
-      >
-        {!state ? (
-          <p className="text-small text-manifest/40 font-mono">reading…</p>
-        ) : (
-          <>
-            <Field label="on-chain commitment" value={state.policy.onchainHash} />
-            <Field label="published artifact" value={state.policy.publishedHash ?? '—'} />
-            <Field
-              label="status"
-              value={
-                <span
-                  className={
-                    policyOk
-                      ? 'text-seal'
-                      : state.policy.status === 'stale'
-                        ? 'text-stamp'
-                        : 'text-hold'
-                  }
-                >
-                  {state.policy.status}
-                </span>
-              }
-            />
-            <p className="text-small text-manifest/50 mt-3 max-w-2xl">
-              {policyOk &&
-                'The published artifact matches your commitment, so the enforcer can read your rules.'}
-              {state.policy.status === 'not-committed' &&
-                'You have not committed a policy hash yet. Until you do, nothing can be enforced for you and every proposal from your agents is refused.'}
-              {state.policy.status === 'not-published' &&
-                'A hash is committed but the artifact has not been published, so the enforcer cannot read the rules behind it. Publish it with: pnpm --filter @bonded/settlement publish-policy'}
-              {state.policy.status === 'stale' &&
-                'The published artifact no longer matches your commitment — the policy changed. Nothing is enforced until the current artifact is published.'}
-            </p>
-          </>
-        )}
-      </Panel>
+      {state && (
+        <PolicyPanel
+          account={account as `0x${string}`}
+          status={state.policy.status}
+          onchainHash={state.policy.onchainHash}
+          publishedHash={state.policy.publishedHash}
+          wrongChain={wrongChain}
+          busy={busy !== null}
+          setBusy={(b) => setBusy(b ? 'Policy' : null)}
+          onChanged={() => void refresh(account)}
+        />
+      )}
 
       {/* ── Step 2: funds ─────────────────────────────────────────────────── */}
       <Panel

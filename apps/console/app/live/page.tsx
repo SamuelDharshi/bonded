@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Shell } from '../../components/shared/Shell';
+import { NextStep } from '../../components/shared/NextStep';
 import { StepUpGate } from '../../components/console/StepUpGate';
 import { ChevronRight, Pause, Play } from 'lucide-react';
 
@@ -338,6 +339,10 @@ export default function LivePage() {
         </div>
 
         <StepUpGate />
+        <NextStep
+          lead="That is the enforcer working against a policy someone committed. Set your own and it applies to your agents, against your deposit, with your confirmation threshold."
+          secondary={{ label: 'See every verdict that settled', href: '/log' }}
+        />
       </div>
     </Shell>
   );

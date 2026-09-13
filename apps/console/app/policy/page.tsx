@@ -1,6 +1,7 @@
 import { hashPolicy } from '@bonded/compiler';
 import type { Policy } from '@bonded/seam';
 import { Shell } from '../../components/shared/Shell';
+import { NextStep } from '../../components/shared/NextStep';
 import { PolicyRecompile } from '../../components/console/PolicyRecompile';
 
 export const dynamic = 'force-dynamic';
@@ -144,6 +145,10 @@ export default async function PolicyPage() {
         )}
 
         <PolicyRecompile />
+        <NextStep
+          lead="This is one policy, committed by one address. Yours is compiled, committed and published from your account — nothing here is editable by the service that enforces it."
+          secondary={{ label: 'Watch a policy being enforced', href: '/live' }}
+        />
       </div>
     </Shell>
   );

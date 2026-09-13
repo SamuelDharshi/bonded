@@ -1,4 +1,5 @@
 import { Shell } from '../../components/shared/Shell';
+import { NextStep } from '../../components/shared/NextStep';
 
 /**
  * Each layer carries its own live/pending status rather than letting the
@@ -114,6 +115,10 @@ export default function ArchitecturePage() {
             <code className="font-mono">packages/seam/src/types.ts</code>, frozen after the seam-v1 tag.
           </p>
         </div>
+        <NextStep
+          lead="Three layers, of which the vault and the enforcer are deployed and settling today. Putting your own money behind them takes four steps in your account."
+          secondary={{ label: 'See it settle', href: '/live' }}
+        />
       </div>
     </Shell>
   );

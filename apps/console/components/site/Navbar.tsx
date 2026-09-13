@@ -28,19 +28,29 @@ type NavLink = {
   href?: string;
 };
 
-const links: NavLink[] = [
+/**
+ * Two clusters, because they answer different questions.
+ *
+ * The anchors explain the idea and only exist on the landing page. The evidence
+ * pages show what the enforcer actually did. The product itself — /app, where an
+ * owner sets the authority everything else operates under — is not in this list
+ * at all: it is the call to action, because burying the one page that does
+ * something among six that describe it was the original problem.
+ */
+const anchorLinks: NavLink[] = [
   { label: "Compare", section: "compare", href: "/#compare" },
   { label: "Layers", section: "layers", href: "/#layers" },
+];
+
+const evidenceLinks: NavLink[] = [
   { label: "Live", href: "/live" },
   { label: "Log", href: "/log" },
   { label: "Policy", href: "/policy" },
   { label: "Corpus", href: "/corpus" },
   { label: "Architecture", href: "/architecture" },
-  // The owner's own console. Last in the list but first in the actual flow:
-  // nothing on the other pages can happen until someone has set a policy,
-  // funded a vault and authorized an agent here.
-  { label: "Your account", href: "/app" },
 ];
+
+const APP_HREF = "/app";
 
 function scrollTo(id: string) {
   const el = document.getElementById(id);
@@ -50,6 +60,7 @@ function scrollTo(id: string) {
 export default function Navbar() {
   const pathname = usePathname();
   const onLanding = pathname === "/";
+  const onApp = pathname === APP_HREF;
 
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("");
@@ -72,7 +83,7 @@ export default function Navbar() {
       return;
     }
 
-    const ids = links.map((l) => l.section).filter((v): v is string => Boolean(v));
+    const ids = anchorLinks.map((l) => l.section).filter((v): v is string => Boolean(v));
     const obs: IntersectionObserver[] = [];
 
     ids.forEach((id) => {
@@ -126,17 +137,15 @@ export default function Navbar() {
         </Link>
 
         {/* ── Desktop nav ── */}
-        <nav className="hidden md:flex items-center gap-[28px]">
-          {links.map((link) => {
-            const activeNow = isActive(link);
-
-            if (!isScrollAnchor(link)) {
+        <nav className="hidden md:flex items-center gap-[22px]">
+          {onLanding &&
+            anchorLinks.map((link) => {
+              const activeNow = isActive(link);
               return (
-                <Link
+                <button
                   key={link.label}
-                  href={link.href!}
-                  aria-current={activeNow ? "page" : undefined}
-                  className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
+                  onClick={() => link.section && scrollTo(link.section)}
+                  className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
                   style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
                 >
                   {link.label}
@@ -144,15 +153,23 @@ export default function Navbar() {
                     className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#1E7BB8] transition-all duration-300"
                     style={{ width: activeNow ? "100%" : "0%" }}
                   />
-                </Link>
+                </button>
               );
-            }
+            })}
 
+          {/* Separates "what this is" from "what it did". Purely a reading cue —
+              five evidence links in one undifferentiated row was why the product
+              entry got lost among them. */}
+          {onLanding && <span aria-hidden className="w-px h-[11px] bg-[#CFE3F2]" />}
+
+          {evidenceLinks.map((link) => {
+            const activeNow = isActive(link);
             return (
-              <button
+              <Link
                 key={link.label}
-                onClick={() => link.section && scrollTo(link.section)}
-                className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150 bg-transparent border-none cursor-pointer"
+                href={link.href!}
+                aria-current={activeNow ? "page" : undefined}
+                className="relative font-mono text-[10px] tracking-[0.5px] transition-colors duration-150"
                 style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
               >
                 {link.label}
@@ -160,12 +177,20 @@ export default function Navbar() {
                   className="absolute left-0 -bottom-[3px] h-[1.5px] bg-[#1E7BB8] transition-all duration-300"
                   style={{ width: activeNow ? "100%" : "0%" }}
                 />
-              </button>
+              </Link>
             );
           })}
         </nav>
 
-        {/* ── Desktop CTA ── */}
+        {/* ── Desktop CTA ──
+             The product, not the demo. "Watch it refuse" was the primary action
+             for a long time, which made the strongest page in the app the one
+             nobody was pointed at. It survives as the secondary link, because it
+             is still the best way to understand what the account is for.
+
+             On /app itself the pair swaps: someone already in their account does
+             not need a button to get there, and the useful next step is seeing
+             the thing work. */}
         <div className="hidden md:flex items-center gap-[14px]">
           <a
             href="https://github.com/SamuelDharshi/bonded"
@@ -175,12 +200,35 @@ export default function Navbar() {
           >
             Source
           </a>
-          <Link
-            href="/live"
-            className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
-          >
-            Watch it refuse
-          </Link>
+
+          {onApp ? (
+            <>
+              <span className="font-mono text-[10px] text-[#1E7BB8] tracking-[0.5px]">
+                Your account
+              </span>
+              <Link
+                href="/live"
+                className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+              >
+                Watch it refuse
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/live"
+                className="font-mono text-[10px] text-[#6E8CA5] tracking-[0.5px] hover:text-[#10314A] transition-colors"
+              >
+                Watch it refuse
+              </Link>
+              <Link
+                href={APP_HREF}
+                className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+              >
+                Open your account
+              </Link>
+            </>
+          )}
         </div>
 
         {/* ── Mobile burger ── */}
@@ -209,7 +257,7 @@ export default function Navbar() {
       <div
         className="md:hidden overflow-hidden transition-all duration-300"
         style={{
-          maxHeight:      menuOpen ? "460px" : "0px",
+          maxHeight:      menuOpen ? "620px" : "0px",
           background:     "rgba(255,255,255,0.94)",
           backdropFilter: "blur(16px) saturate(160%)",
           WebkitBackdropFilter: "blur(16px) saturate(160%)",
@@ -217,51 +265,81 @@ export default function Navbar() {
         }}
       >
         <nav className="flex flex-col px-6 py-5 gap-0">
-          {links.map((link) => {
-            const activeNow = isActive(link);
+          {/* Your account first on mobile. On a phone the list is scrolled, not
+              scanned, so the one entry that does something has to be reachable
+              without reading past five that describe it. */}
+          <Link
+            href={APP_HREF}
+            onClick={() => setMenuOpen(false)}
+            aria-current={onApp ? "page" : undefined}
+            className="flex items-center gap-2 w-full font-mono text-[12px] font-bold tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
+            style={{ color: onApp ? "#1E7BB8" : "#10314A" }}
+          >
+            <span
+              className="w-[4px] h-[4px] rounded-full shrink-0"
+              style={{ background: onApp ? "#1E7BB8" : "#1E7BB8" }}
+            />
+            Your account
+          </Link>
 
-            if (!isScrollAnchor(link)) {
+          {onLanding &&
+            anchorLinks.map((link) => {
+              const activeNow = isActive(link);
               return (
-                <Link
+                <button
                   key={link.label}
-                  href={link.href!}
-                  onClick={() => setMenuOpen(false)}
-                  aria-current={activeNow ? "page" : undefined}
-                  className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
+                  onClick={() => { if (link.section) scrollTo(link.section); setMenuOpen(false); }}
+                  className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
                   style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
                 >
                   <span
-                    className="w-[4px] h-[4px] rounded-full shrink-0"
+                    className="w-[4px] h-[4px] rounded-full shrink-0 transition-colors"
                     style={{ background: activeNow ? "#1E7BB8" : "#CFE3F2" }}
                   />
                   {link.label}
-                </Link>
+                </button>
               );
-            }
+            })}
 
+          <span className="font-mono text-[9px] tracking-[1px] text-[#9DB4C7] pt-4 pb-1">
+            WHAT IT DID
+          </span>
+
+          {evidenceLinks.map((link) => {
+            const activeNow = isActive(link);
             return (
-              <button
+              <Link
                 key={link.label}
-                onClick={() => { if (link.section) scrollTo(link.section); setMenuOpen(false); }}
-                className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors bg-transparent border-x-0 border-t-0 cursor-pointer"
+                href={link.href!}
+                onClick={() => setMenuOpen(false)}
+                aria-current={activeNow ? "page" : undefined}
+                className="flex items-center gap-2 w-full font-mono text-[12px] tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
                 style={{ color: activeNow ? "#1E7BB8" : "#6E8CA5" }}
               >
                 <span
-                  className="w-[4px] h-[4px] rounded-full shrink-0 transition-colors"
+                  className="w-[4px] h-[4px] rounded-full shrink-0"
                   style={{ background: activeNow ? "#1E7BB8" : "#CFE3F2" }}
                 />
                 {link.label}
-              </button>
+              </Link>
             );
           })}
+
           <div className="flex flex-col gap-[10px] pt-5">
-            <a href="https://github.com/SamuelDharshi/bonded" target="_blank" rel="noreferrer" className="font-mono text-[12px] text-[#6E8CA5] tracking-[0.5px]">Source</a>
+            <a
+              href="https://github.com/SamuelDharshi/bonded"
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-[12px] text-[#6E8CA5] tracking-[0.5px]"
+            >
+              Source
+            </a>
             <Link
-              href="/live"
+              href={onApp ? "/live" : APP_HREF}
               onClick={() => setMenuOpen(false)}
               className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
-              Watch it refuse
+              {onApp ? "Watch it refuse" : "Open your account"}
             </Link>
           </div>
         </nav>
