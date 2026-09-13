@@ -55,3 +55,6 @@ subgraph/node_modules/
 .next-verify
 .pending-proposal.json
 .data/
+
+# CRE deploy build output
+cre/**/binary.wasm.br.b64
