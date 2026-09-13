@@ -9,7 +9,8 @@
     "fund-vault": "tsx src/fund-vault.ts",
     "typecheck": "tsc --noEmit",
     "withdraw": "tsx src/withdraw.ts",
-    "recover-legacy": "tsx src/recover.ts"
+    "recover-legacy": "tsx src/recover.ts",
+    "stepup": "tsx src/stepup.ts"
   },
   "dependencies": {
     "@bonded/compiler": "workspace:*",

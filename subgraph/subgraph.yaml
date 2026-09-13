@@ -26,7 +26,44 @@ dataSources:
     name: BondedVault
     network: arc-testnet
     source:
-      address: "0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8"
+      address: "0x027C61c1418157b112B82F30894F8aC1F074AF85"
+      abi: BondedVault
+      startBlock: 61861357
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VerdictRecord
+        - StepUpRecord
+      abis:
+        - name: BondedVault
+          file: ./abis/BondedVault.json
+      eventHandlers:
+        - event: VerdictSettled(indexed bytes32,indexed address,uint8,uint16,uint256)
+          handler: handleVerdictSettled
+        - event: StepUpArmed(indexed bytes32,indexed address)
+          handler: handleStepUpArmed
+        - event: StepUpConfirmed(indexed bytes32)
+          handler: handleStepUpConfirmed
+      file: ./src/mappings.ts
+  # Superseded vaults, kept indexed so /log does not lose the verdicts that
+  # really settled against them. Every migration adds a source here rather than
+  # re-pointing an existing one, because re-pointing would silently rewrite
+  # history to claim those settlements happened on a contract that did not exist
+  # yet. All three share one ABI: the three original event signatures were held
+  # byte-identical across both redeployments precisely so this stays additive.
+  #
+  # 1. 0xBA3387ea — IRREVERSIBLE_ABOVE was a compile-time 100 USDC, which no
+  #    balance this project holds could reach, so the step-up guard was dead.
+  # 2. 0x9d2a0Fbf — lowered that to 1 USDC, but its verdict digest did not cover
+  #    the action, so a signed verdict authorized a decision without binding the
+  #    payment. Drained and replaced; see contracts/test/ActionBinding.t.sol.
+  - kind: ethereum
+    name: BondedVaultLegacy
+    network: arc-testnet
+    source:
+      address: "0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE"
       abi: BondedVault
       startBlock: 61233680
     mapping:
@@ -47,17 +84,11 @@ dataSources:
         - event: StepUpConfirmed(indexed bytes32)
           handler: handleStepUpConfirmed
       file: ./src/mappings.ts
-  # The superseded vault, kept indexed so /log does not lose the verdicts
-  # that really settled against it. Its IRREVERSIBLE_ABOVE was 100 USDC,
-  # which no balance this project holds could ever reach, which is why it
-  # was replaced rather than reconfigured — the constant is compile-time.
-  # Same ABI, same handlers, same entities: history stays queryable and
-  # new settlements land on the current vault.
   - kind: ethereum
-    name: BondedVaultLegacy
+    name: BondedVaultLegacy2
     network: arc-testnet
     source:
-      address: "0xBA3387ea45a2F21d52830d60aaeC8E98B1bA37BE"
+      address: "0x9d2a0Fbf98E9e2F3B2EE2C1A8E9525B3001614A8"
       abi: BondedVault
       startBlock: 61233680
     mapping:
