@@ -36,6 +36,7 @@ dataSources:
       entities:
         - VerdictRecord
         - StepUpRecord
+        - Agent
       abis:
         - name: BondedVault
           file: ./abis/BondedVault.json
@@ -46,6 +47,13 @@ dataSources:
           handler: handleStepUpArmed
         - event: StepUpConfirmed(indexed bytes32)
           handler: handleStepUpConfirmed
+        # Only the current vault emits these — the superseded deployments had no
+        # agent authorization at all, which is why they are declared here and
+        # not on the legacy sources below.
+        - event: AgentAuthorized(indexed address,indexed address)
+          handler: handleAgentAuthorized
+        - event: AgentRevoked(indexed address,indexed address)
+          handler: handleAgentRevoked
       file: ./src/mappings.ts
   # Superseded vaults, kept indexed so /log does not lose the verdicts that
   # really settled against them. Every migration adds a source here rather than

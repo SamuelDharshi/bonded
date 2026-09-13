@@ -27,12 +27,46 @@ type VerdictRecord @entity(immutable: true) {
 # Mutable: created on StepUpArmed (confirmed: false), then updated in
 # place on StepUpConfirmed (confirmedAt/confirmed set) — see
 # handleStepUpArmed / handleStepUpConfirmed.
+#
+# `owner` is resolved from the Agent entity rather than from the event, which
+# carries only the agent. The StepUpArmed signature was held byte-identical
+# across two vault redeployments so the older data sources keep indexing, so
+# widening it was not an option — and it is not needed, because authorizing an
+# agent necessarily precedes any settlement by it.
 type StepUpRecord @entity(immutable: false) {
   id: ID!          # proposalHash
   proposalHash: Bytes!
   agent: Bytes!
+  owner: Bytes
   armedAt: BigInt!
+  # The settle() call that armed the hold. The amount and recipient are not in
+  # the StepUpArmed event, so this is how the owner-facing surface recovers
+  # them: decode the action from this transaction, then check its hash against
+  # stepUpActionHash on-chain. That makes the displayed amount provably the one
+  # that was armed rather than merely plausible — and an owner asked to confirm
+  # a payment has to be shown what they are confirming.
+  armedTxHash: Bytes!
   confirmedAt: BigInt
   confirmed: Boolean!
-  verdict: VerdictRecord!
+  # Nullable, and necessarily so: HELD_FOR_STEPUP deliberately does not mark the
+  # proposal settled and emits no VerdictSettled, so a pending hold has no
+  # VerdictRecord yet. Declaring this non-null made every query touching
+  # stepUpRecords fail outright with "Null value resolved for non-null field",
+  # which took the agents list down with it.
+  verdict: VerdictRecord
+}
+
+# Mutable: one entity per agent address, flipped by authorize/revoke.
+#
+# The vault stores ownerOf(agent) but cannot enumerate an owner's agents — a
+# mapping has no keys. This is what lets the dashboard answer "which agents can
+# spend my deposit", which is a question an owner has to be able to ask.
+type Agent @entity(immutable: false) {
+  id: ID!          # agent address
+  agent: Bytes!
+  owner: Bytes!
+  revoked: Boolean!
+  authorizedAt: BigInt!
+  revokedAt: BigInt
+  transactionHash: Bytes!
 }

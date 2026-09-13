@@ -36,6 +36,10 @@ const links: NavLink[] = [
   { label: "Policy", href: "/policy" },
   { label: "Corpus", href: "/corpus" },
   { label: "Architecture", href: "/architecture" },
+  // The owner's own console. Last in the list but first in the actual flow:
+  // nothing on the other pages can happen until someone has set a policy,
+  // funded a vault and authorized an agent here.
+  { label: "Your account", href: "/app" },
 ];
 
 function scrollTo(id: string) {

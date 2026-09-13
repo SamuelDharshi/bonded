@@ -207,6 +207,20 @@ export const VAULT_ABI = [
   },
   {
     type: 'function',
+    name: 'periodStart',
+    stateMutability: 'view',
+    inputs: [{ name: 'owner', type: 'address' }],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    type: 'function',
+    name: 'PERIOD_DURATION',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    type: 'function',
     name: 'enrolledSigner',
     stateMutability: 'view',
     inputs: [],
@@ -239,6 +253,13 @@ export const VAULT_ABI = [
     stateMutability: 'view',
     inputs: [{ name: 'proposalHash', type: 'bytes32' }],
     outputs: [{ type: 'address' }],
+  },
+  {
+    type: 'function',
+    name: 'stepUpActionHash',
+    stateMutability: 'view',
+    inputs: [{ name: 'proposalHash', type: 'bytes32' }],
+    outputs: [{ type: 'bytes32' }],
   },
   {
     type: 'function',
