@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LOGO_HANDOVER_END, LOGO_HANDOVER_START } from "./HeroLogo";
 
 /**
  * The site's single navigation bar, used by the landing page and by every
@@ -63,16 +65,36 @@ export default function Navbar() {
   const inApp = pathname.startsWith(APP_HREF);
 
   const [scrolled, setScrolled] = useState(false);
+  /**
+   * How much of the mark the BAR owns, 0..1 — the exact inverse of HeroLogo's.
+   * Shares LOGO_HANDOVER_START/END with it so the two can never both be
+   * half-visible, which is the failure mode that makes a crossfade look broken.
+   *
+   * Off the landing page there is no hero to hand over from, so the bar owns it
+   * outright from the first frame.
+   */
   const [active, setActive] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const [logoOwnership, setLogoOwnership] = useState(0);
+
   /* ── scroll detection ── */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      if (!onLanding) {
+        setLogoOwnership(1);
+        return;
+      }
+      if (y <= LOGO_HANDOVER_START) setLogoOwnership(0);
+      else if (y >= LOGO_HANDOVER_END) setLogoOwnership(1);
+      else setLogoOwnership((y - LOGO_HANDOVER_START) / (LOGO_HANDOVER_END - LOGO_HANDOVER_START));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [onLanding]);
 
   /* ── active section via IntersectionObserver. Landing page only: off it
         there are no sections to observe, and the route match below decides
@@ -128,9 +150,37 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between h-[60px] px-6 md:px-[48px] max-w-[1400px] mx-auto">
 
-        {/* ── Logo ── */}
+        {/* ── Logo ──
+            The mark arrives as the hero's copy leaves. While the hero owns it,
+            the small square swatch stands in so the bar is never empty on the
+            left — a gap there reads as a broken image rather than a deliberate
+            handover. The wordmark stays put throughout; only the glyph swaps,
+            so nothing beside it shifts as you scroll. */}
         <Link href="/" className="flex items-center gap-[10px] shrink-0 group">
-          <span className="w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform" />
+          <span className="relative w-[26px] h-[26px] grid place-items-center shrink-0">
+            {/* Stand-in, visible only while the hero holds the logo. */}
+            <span
+              aria-hidden
+              className="absolute w-[10px] h-[10px] bg-[#1E7BB8] group-hover:scale-110 transition-transform"
+              style={{ opacity: 1 - logoOwnership }}
+            />
+            {/* The mark itself. Rounded corners as asked; it scales up slightly
+                into place rather than simply appearing. */}
+            <Image
+              src="/media/bonded_logo.png"
+              alt=""
+              width={52}
+              height={52}
+              aria-hidden={logoOwnership === 0}
+              className="absolute w-[26px] h-[26px] object-contain rounded-[8px] group-hover:scale-105"
+              style={{
+                opacity: logoOwnership,
+                transform: `scale(${0.82 + logoOwnership * 0.18})`,
+                filter: `blur(${(1 - logoOwnership) * 2.5}px)`,
+                transition: "opacity 120ms linear, transform 160ms ease-out, filter 120ms linear",
+              }}
+            />
+          </span>
           <span className="font-mono text-[13px] font-bold text-[#10314A] tracking-[0.5px]">
             Bonded
           </span>

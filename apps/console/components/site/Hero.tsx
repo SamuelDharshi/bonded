@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { HeroVideo } from "@/components/landing/HeroVideo";
 import { TypewriterHeadline } from "@/components/landing/TypewriterHeadline";
+import { HeroLogo } from "@/components/site/HeroLogo";
 
 /**
  * Hero — BONDED_PRD.md §6: "headline stating the mechanism, one line of
@@ -57,6 +58,12 @@ export default function Hero() {
             for the small type is bought back by darkening it below instead. */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_62%_72%_at_50%_46%,rgba(255,255,255,0.62)_0%,rgba(255,255,255,0.5)_45%,rgba(255,255,255,0.22)_74%,transparent_100%)]" />
       </div>
+
+      {/* Logo. Visible while the hero is in view, handed over to the navbar on
+          scroll — see HeroLogo for why both halves share one scroll constant. */}
+      <HeroLogo />
+
+      <div className="h-5 md:h-[28px]" />
 
       {/* Badge */}
       <div className="relative z-10 flex items-center justify-center gap-[8px] h-[32px] px-[12px] md:px-[16px] bg-[#E7F1FA] border-2 border-[#1E7BB8]">

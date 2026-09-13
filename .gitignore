@@ -58,3 +58,14 @@ subgraph/node_modules/
 
 # CRE deploy build output
 cre/**/binary.wasm.br.b64
+
+# Presentation deck — local only for now, deliberately not published.
+# Includes the react-bits backdrops it pulls in and the shadcn config added
+# solely to fetch them.
+apps/console/app/deck/
+apps/console/components/deck/
+apps/console/components/GradientWaves.jsx
+apps/console/components/GradientWaves.css
+apps/console/components/Grainient.jsx
+apps/console/components/Grainient.css
+apps/console/components.json
