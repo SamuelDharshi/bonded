@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "withdraw": "tsx src/withdraw.ts",
     "recover-legacy": "tsx src/recover.ts",
-    "stepup": "tsx src/stepup.ts"
+    "stepup": "tsx src/stepup.ts",
+    "agent": "tsx src/agent.ts",
+    "publish-policy": "tsx src/publish-policy.ts",
+    "owner-confirm": "tsx src/owner-confirm.ts"
   },
   "dependencies": {
     "@bonded/compiler": "workspace:*",

@@ -52,3 +52,6 @@ cre-workflows/
 subgraph/build/
 subgraph/generated/
 subgraph/node_modules/
+.next-verify
+.pending-proposal.json
+.data/
