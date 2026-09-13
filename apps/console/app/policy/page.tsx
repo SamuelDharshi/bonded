@@ -147,7 +147,7 @@ export default async function PolicyPage() {
         <PolicyRecompile />
         <NextStep
           lead="This is one policy, committed by one address. Yours is compiled, committed and published from your account — nothing here is editable by the service that enforces it."
-          secondary={{ label: 'Watch a policy being enforced', href: '/live' }}
+          secondary={{ label: 'See what it settled', href: '/log' }}
         />
       </div>
     </Shell>

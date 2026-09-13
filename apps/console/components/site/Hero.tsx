@@ -106,15 +106,15 @@ export default function Hero() {
           className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#1E7BB8] hover:bg-[#17618F] transition-colors"
         >
           <span className="font-grotesk text-[12px] font-bold text-[#FFFFFF] tracking-[0.5px]">
-            Open your account
+            Connect &amp; get started
           </span>
         </Link>
         <Link
-          href="/live"
+          href="/log"
           className="flex items-center justify-center w-full sm:w-[220px] h-[56px] bg-[#FFFFFF] border-2 border-[#B4D3E9] hover:border-[#52738D] transition-colors"
         >
           <span className="font-mono text-[12px] text-[#52738D] tracking-[0.5px]">
-            Watch it refuse
+            See what it settled
           </span>
         </Link>
       </div>
@@ -126,8 +126,8 @@ export default function Hero() {
           "Open your account", which does need a wallet — so it says which path
           needs what, and states the part that stays true either way. */}
       <p className="relative z-10 font-mono text-[11px] text-[#52738D] tracking-[0.5px] text-center max-w-[520px]">
-        Watching it work needs nothing. An account needs a wallet — never a private key,
-        yours or your agent&apos;s.
+        Connect a wallet to set up an account. You are never asked for a private key — yours
+        or your agent&apos;s. Reading what it already settled needs nothing at all.
       </p>
 
       <div className="h-4" />

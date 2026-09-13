@@ -119,7 +119,7 @@ export default async function CorpusPage() {
 
         <NextStep
           lead="Those are undefended agents. Bonded refused every one of these actions, and the same enforcement applies to whatever you authorize your own agent to do."
-          secondary={{ label: 'Watch it refuse in real time', href: '/live' }}
+          secondary={{ label: 'See what it settled', href: '/log' }}
         />
       </div>
     </Shell>

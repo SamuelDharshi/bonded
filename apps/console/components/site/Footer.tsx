@@ -7,7 +7,8 @@ const productLinks = [
   // the evidence pages, so the one place an owner does anything was absent from
   // the site's own map of itself.
   { label: "Your account", href: "/app" },
-  { label: "Live enforcement", href: "/live" },
+  { label: "Set up an account", href: "/app/start" },
+  { label: "Approvals", href: "/app/approvals" },
   { label: "Decision log", href: "/log" },
   { label: "Policy", href: "/policy" },
   { label: "Attack corpus", href: "/corpus" },

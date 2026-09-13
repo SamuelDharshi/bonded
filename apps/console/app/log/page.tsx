@@ -226,7 +226,7 @@ export default async function LogPage() {
         )}
         <NextStep
           lead="Every entry here is a verdict that settled on-chain against a committed policy. Your own activity appears in the same place once your agents start proposing."
-          secondary={{ label: 'Watch a proposal being judged', href: '/live' }}
+          secondary={{ label: 'Read the architecture', href: '/architecture' }}
         />
       </div>
     </Shell>

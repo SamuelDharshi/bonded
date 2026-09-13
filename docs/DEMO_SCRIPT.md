@@ -7,14 +7,14 @@ it depends on so a failure points at what to fix.
 |---|---|---|---|---|
 | 1 | Attack token | Show the deployed `AttackToken` on the Arc explorer | The payload lives in a real `name()` field, on-chain, for a few cents | `contracts/src/AttackToken.sol` deployed |
 | 2 | `/corpus` | Show the naive-agent transcripts | Two of three real models called `approve_unlimited` unprompted; a third recognized and refused | `packages/attack-corpus`, `results.json` |
-| 3 | `/live` | Watch the stream, expand a `REFUSED` entry for `forbidden-action` | `enforce()` refuses via `POLICY_FORBIDDEN_ACTION` before any Graph query runs — no premise table at all | `packages/enforcer`, `/api/enforce` |
-| 4 | `/live` | Expand the `tvl-lie` entry | Premise diff shows claimed 412M vs. live-re-derived ~125M; `PREMISE_MISMATCH` | `packages/standardized` on the live Gateway |
-| 5 | `/live` | Expand the `irreversible` entry | 2 USDC against a 1 USDC threshold → `HELD_FOR_STEPUP`. No silent auto-approval above the threshold | `enforce()` step 5 |
-| 6 | `/live` step-up gate | Authorize the held proposal, watch it arm → confirm → settle | The hold is not a dead end. A human confirms, and only then does the vault release — three separate on-chain transactions | `/api/stepup`, `StepUpGate.tsx`, `BondedVault.confirmStepUp()` |
+| 3 | terminal | `pnpm --filter @bonded/settlement agent forbidden` | `enforce()` refuses via `POLICY_FORBIDDEN_ACTION` before any Graph query runs — the premise table comes back empty | `packages/enforcer`, `/api/v1/proposals` |
+| 4 | terminal | `pnpm --filter @bonded/settlement agent lie` | Premise diff shows claimed 412M vs. live-re-derived ~127M; `PREMISE_MISMATCH` | `packages/standardized` on the live Gateway |
+| 5 | terminal | `pnpm --filter @bonded/settlement agent big` | 2 USDC against a 1 USDC threshold → `HELD_FOR_STEPUP`. No silent auto-approval above the threshold | `enforce()` step 5 |
+| 6 | `/app/approvals` | Confirm the held payment from the owner wallet, then `agent resume` | The hold is not a dead end. A human confirms from their own address, and only then does the vault release — three separate on-chain transactions | `/app/approvals`, `BondedVault.confirmStepUp()` |
 | 7 | CRE simulation | `cre workflow simulate stepup-threshold --target staging-settings` | The confidential threshold check runs inside a TEE and returns only a boolean | `cre/stepup-threshold`, simulated (not yet deployed — see below) |
 | 8 | Arc explorer | Show the settled transactions | A CLEARED verdict really released USDC; a REFUSED verdict settled with none moved | `packages/settlement`, `BondedVault.settle()` |
 | 9 | `/log` | Scroll the decision log | Every entry — both vaults, before and after the redeploy — links to a real Arc explorer transaction | Subgraph deployed to Studio, indexing the live contracts |
-| 10 | `/policy` | Show the hash-match indicator | The compiled artifact's hash matches `BondedRegistry.currentPolicyHash()` on-chain, checked live | Policy committed on-chain |
+| 10 | `/app/policy` | Compile a policy, show the hash matching the on-chain commitment | The artifact is compiled, committed from the owner wallet and published — the enforcer only accepts one that hashes to the commitment | `/api/v1/policies/compile`, `BondedRegistry` |
 
 ## Current status against this script
 
@@ -31,10 +31,15 @@ it depends on so a failure points at what to fix.
   and each row's `repo` field states plainly that it is a harness-authored
   agent rather than a cloned kit. Describe them as models in the video, not
   as the shipped frameworks.
-- ✅ **Step 3, 4, 5** — fully live. `/live` re-derives every premise from
-  the live Graph Gateway against a real Uniswap V3 pool on Base, pinned to
-  a real block per proposal. No fixture path involved unless
-  `GRAPH_API_KEY` is unset, in which case the page says so plainly.
+- ✅ **Step 3, 4, 5** — fully live, now through the real API rather than a
+  demo page. `/live` was removed: it ran four scripted scenarios, and a
+  scripted scenario reads as a mock however real the Gateway call beneath it
+  is. The same three outcomes are produced by `packages/settlement`'s agent
+  script talking to `POST /api/v1/proposals` over HTTP with no privileged
+  access — which is stronger evidence, because an outsider can reproduce it.
+  Premises are re-derived from the live Gateway against a real Uniswap V3 pool
+  on Base, pinned per proposal. Without `GRAPH_API_KEY` the endpoint refuses
+  rather than falling back.
 - ✅ **Step 6** — real, and the strongest single beat in the demo. The
   step-up arc ran live against the current vault, as three separate
   transactions a judge can open:
@@ -46,7 +51,9 @@ it depends on so a failure points at what to fix.
   authorize control does not render until there is something to authorize,
   and the server re-derives the verdict rather than trusting the browser —
   so clicking authorize cannot approve anything other than what was armed.
-  Requires `STEPUP_DEMO_SIGNING=true`; leave it off outside the demo.
+  The confirmation is sent from the owner's own wallet at `/app/approvals` —
+  there is no longer any path by which the web tier signs, which is why
+  `STEPUP_DEMO_SIGNING` and `/api/stepup` no longer exist.
 - ✅ **Step 7** — the confidential workflow is real and simulates correctly
   for both branches (`docs/evidence/cre-stepup-threshold-simulation.txt`).
   **Not yet deployed** — CRE org access is enabled, but final key-linking is
@@ -94,12 +101,14 @@ cached from an earlier run points at the wrong contract.
 | `ENFORCER_SIGNER_ADDRESS` | `0xac13a62FC7E50d08945ba2e79B5Eaa190d8D7D9a` |
 | `IRREVERSIBLE_ABOVE` (contract) | `1000000` — 1 USDC |
 | `irreversible_above` (policy) | `1000000` — the two must agree |
-| Subgraph | v0.0.3, indexing the current **and** superseded vault |
+| Subgraph | v0.0.7, indexing the current vault and both superseded ones |
 
 Then, in order:
 
-1. `GRAPH_API_KEY` set, or `/live` will announce the fixture path on camera.
-2. `STEPUP_DEMO_SIGNING=true`, or step 6 has no authorize control.
+1. `GRAPH_API_KEY` set, or `/api/v1/proposals` refuses every proposal — correctly,
+   but there is nothing to film.
+2. A browser wallet holding the owner key, on Arc testnet — step 6 is a real
+   confirmation from your own address, not a server-side signature.
 3. Vault holds more than 2 USDC, or the step-up settle reverts on transfer.
    Check: `cast call $USDC_ADDRESS "balanceOf(address)(uint256)" $BONDED_VAULT_ADDRESS`
 4. `pnpm --filter @bonded/settlement commit-policy` reports a hash match, or

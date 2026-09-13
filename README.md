@@ -392,12 +392,18 @@ Bonded/
 ├── apps/console/                Next.js 15 App Router · React 19 · TS strict
 │   ├── app/
 │   │   ├── page.tsx             /              landing
-│   │   ├── live/                /live          proposal stream
+│   │   ├── app/                 /app           the owner's console
+│   │   │   ├── start/           onboarding, one step at a time
+│   │   │   ├── policy/          compile, commit, publish
+│   │   │   ├── funds/           deposit and withdraw
+│   │   │   ├── agents/          authorize and revoke
+│   │   │   ├── approvals/       the human gate
+│   │   │   └── activity/        settled verdicts + a live premise check
 │   │   ├── log/                 /log           decision log (from subgraph)
 │   │   ├── policy/              /policy        intent vs compiled artifact
 │   │   ├── corpus/              /corpus        attack corpus results
-│   │   ├── architecture/        /architecture  the four layers
-│   │   └── api/enforce/         POST — runs the real enforce()
+│   │   ├── architecture/        /architecture  the three layers
+│   │   └── api/v1/              the agent-facing API
 │   └── public/media/            captured + illustrative assets
 │
 ├── contracts/                   Foundry · Solidity · OZ v5.7 · via_ir
@@ -422,22 +428,34 @@ Bonded/
 
 ```
    /              →  the claim          "agents can't spend on their own word"
-   /live          →  the mechanism      watch it refuse, in real time
+   /app           →  the product        set the authority agents operate under
+   /app/start     →  onboarding         four steps, one at a time
+   /app/approvals →  the human gate     payments held for your signature
+   /app/activity  →  verification       your verdicts + a live premise check
    /log           →  the audit trail    every verdict, indexed, linkable
    /policy        →  the commitment     intent vs artifact vs on-chain hash
-   /corpus        →  the receipt        which starter kits complied
-   /architecture  →  the design         four layers, real addresses
+   /corpus        →  the receipt        undefended agents against the same token
+   /architecture  →  the design         three layers, real addresses
 ```
 
 **`/` Landing.** No wallet required. Reads the AttackToken's `name()` live from
 Arc testnet on every request — if the RPC fails it says so rather than printing
 a canned copy of the expected string.
 
-**`/live` — the one to look at.** A proposal stream. Proposals arrive every 6
-seconds, each one a real `enforce()` call against the live Graph Gateway at its
-own pinned Base block. Expand any entry for the premise diff — claimed vs
-re-derived vs tolerance vs verdict. Expanding a refusal plays the stamp. The
-feed stops at 12 entries rather than burning Gateway quota in a background tab.
+**`/app` — the one to look at.** The owner's console, and the only place
+anything is decided. Setup is a four-step wizard whose position is read from the
+chain rather than from which button was last pressed, so it resumes correctly
+after a reload or an account switch. Management then splits across pages:
+policy, funds, agents, approvals, activity.
+
+There used to be a `/live` page here: a stream of four scripted scenarios
+against the real Gateway. It was removed. Scripted scenarios read as a mock
+however real the query beneath them is, and a reader has no way to tell the
+difference — which made the most technically honest page in the project look
+like the least. Its one genuinely valuable part, the claimed-versus-re-derived
+premise table, now runs on `/app/activity` against the owner's own committed
+policy, with nothing invented to trigger it. Removing it also deleted the only
+code path where the web tier held the enforcer signing key.
 
 **`/log` Decision log.** Backed by Bonded's own deployed subgraph, not a
 database. Every hash links to a real Arc explorer transaction.
@@ -490,9 +508,9 @@ required to run the test suite; each variable unlocks a live path.
 
 | Variable | Unlocks | Notes |
 |---|---|---|
-| `GRAPH_API_KEY` | Live premise re-derivation on `/live` | Without it, `/live` falls back to fixtures **and says so** |
+| `GRAPH_API_KEY` | Premise re-derivation | Without it `POST /api/v1/proposals` refuses rather than approving on the agent's word |
 | `GRAPH_GATEWAY_BASE_URL` | — | Defaults to `https://gateway.thegraph.com/api`. The **decentralised Gateway**, for reading third-party subgraphs |
-| `GRAPH_GATEWAY_URL` | `/log` | This project's **own** subgraph query endpoint on Studio. Not the same thing as the above — see Troubleshooting |
+| `GRAPH_GATEWAY_URL` | `/log`, `/app` | This project's **own** subgraph query endpoint on Studio. Not the same thing as the above — see Troubleshooting |
 | `ARC_RPC_URL` | Live token read on `/` | Arc testnet RPC |
 | `ANTHROPIC_API_KEY` | Attack-corpus naive-agent runs | Requires account credit |
 
@@ -512,29 +530,45 @@ pnpm --filter @bonded/console dev     # http://localhost:3000
 
 ### Watch it refuse — the 60-second path
 
-1. `pnpm --filter @bonded/console dev`, open **http://localhost:3000/live**
-2. Wait. Proposals arrive on their own, one every 6 seconds, cycling through
-   four scenarios.
-3. Watch the verdict badges: **CLEARED** (green), **REFUSED** (red),
-   **HELD_FOR_STEPUP** (amber).
-4. **Click any entry to expand it.** That is where the argument lives — the
-   premise diff showing what the agent claimed against what was independently
-   re-derived, with the pinned block and the query path.
-5. Expand a **REFUSED** entry to see the stamp.
+No browser needed, and nothing scripted: this is an outside client hitting the
+public API and settling its own transaction.
 
-### What each scenario demonstrates
+1. `pnpm --filter @bonded/console dev`
+2. `pnpm --filter @bonded/settlement agent lie`
 
-| Scenario | Outcome | What to notice |
+   The agent reads the pool honestly, then inflates the TVL it claims. The
+   enforcer re-derives the real figure and returns **REFUSED /
+   PREMISE_MISMATCH**, printing claimed against re-derived side by side. The
+   refusal is then settled on-chain, recording that nothing moved.
+
+3. Try the others: `agent` (honest, CLEARED), `agent forbidden` (refused with an
+   empty premise table — no Graph query runs at all), `agent big` (held for your
+   confirmation), `agent rogue` (a valid signature from an unauthorized address,
+   refused 403 — a signature is not authority).
+
+### Set up an account — the browser path
+
+1. `pnpm --filter @bonded/console dev`, open **http://localhost:3000/app**
+2. Connect a wallet on Arc testnet. You are never asked for a private key.
+3. Follow the four steps: compile and commit your rules, deposit, authorize an
+   agent's **address**, and you are running.
+4. `/app/activity` then shows what your premises evaluate to against live data,
+   and every verdict that settled for your agents.
+
+### What each agent mode demonstrates
+
+| Mode | Outcome | What to notice |
 |---|---|---|
-| **Legitimate swap** | `CLEARED` | claimed == re-derived. The system says yes when it should. |
-| **Injected token — approve_unlimited** | `REFUSED (3)` | **No premise table at all.** Refused at the forbidden-action check, before a single Graph query ran. The cheapest check comes first. |
-| **Claimed vs re-derived TVL disagree** | `REFUSED (1)` | Agent claims $412M. Re-derivation reads ~$125M off the live Base pool. Disagreement → refusal. |
-| **Large, otherwise-valid transfer** | `HELD_FOR_STEPUP (6)` | Every premise passes. Amount exceeds `irreversible_above`. Held, not auto-approved. |
+| `agent` | `CLEARED` | claimed == re-derived. The system says yes when it should. |
+| `agent forbidden` | `REFUSED (3)` | **No premise table at all.** Refused at the forbidden-action check, before a single Graph query ran. The cheapest check comes first. |
+| `agent lie` | `REFUSED (1)` | Agent claims $412M. Re-derivation reads ~$127M off the live Base pool. Disagreement → refusal. |
+| `agent big` | `HELD_FOR_STEPUP (6)` | Every premise passes. Amount exceeds `irreversible_above`. Held, not auto-approved. Confirm it at `/app/approvals`, then `agent resume`. |
+| `agent rogue` | `403`, nothing signed | A valid signature from an address no owner authorized. A signature is not authority. |
 
-On the `HELD_FOR_STEPUP` entry, look at the claimed vs re-derived TVL closely —
-they usually differ slightly. That is genuine drift between two real reads
-seconds apart, absorbed by the policy's 200bps tolerance. The tolerance is
-doing real work, not decoration.
+On a cleared run, look at claimed against re-derived closely — they usually
+differ slightly. That is genuine drift between two real reads seconds apart,
+absorbed by the policy's 200bps tolerance. The tolerance is doing real work, not
+decoration.
 
 ### Verify the claims yourself
 
@@ -546,101 +580,81 @@ cast call 0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5 "name()(string)" \
 # 2. The Graph query really resolves. One schema, any DEX-AMM protocol.
 pnpm --filter @bonded/standardized proof
 
-# 3. The enforcer really refuses. Same function the unit tests call.
-curl -s -X POST http://localhost:3000/api/enforce \
-  -H 'content-type: application/json' \
-  -d '{"scenario":"tvl-lie"}' | jq '.verdict, .premises'
+# 3. The enforcer really refuses — driven by an outside HTTP client that holds
+#    no privileged access and signs its own proposal.
+pnpm --filter @bonded/settlement agent lie
+
 # 4. A verdict really settles on Arc, end to end:
-#    enforce() -> sign -> BondedVault.settle() -> subgraph -> /log
-pnpm --filter @bonded/settlement settle tvl-lie    # refusal, moves no money
-pnpm --filter @bonded/settlement fund-vault 5
-pnpm --filter @bonded/settlement settle legit      # releases 1 USDC
+#    propose -> re-derive -> sign -> BondedVault.settle() -> subgraph -> /log
+pnpm --filter @bonded/settlement fund-vault 5      # approve + deposit, credited to you
+pnpm --filter @bonded/settlement publish-policy    # so the enforcer can read your rules
+pnpm --filter @bonded/settlement agent             # honest proposal, releases 0.5 USDC
 ```
 
-The settle script never forces an outcome. If the enforcer refuses it settles
-the refusal; if the verdict is `HELD_FOR_STEPUP` it stops and says why, because
-releasing those funds needs a confirmation only a real enclave can produce.
+Neither script ever forces an outcome. If the enforcer refuses, the refusal is
+what settles; if the verdict is `HELD_FOR_STEPUP` it stops and says who has to
+confirm, because releasing those funds needs a transaction from the owner's own
+address.
 
 ---
 
 ## The HTTP API
 
-### `POST /api/enforce`
+### `POST /api/v1/proposals`
 
-Runs the real `enforce()` from `@bonded/enforcer` — the same function the unit
-tests call. No heuristic, no canned verdict.
+The endpoint an agent actually calls. Submit what you want to do plus the facts
+you claim justify it; get a verdict, the claimed-versus-re-derived premise table,
+and on `CLEARED` a signature the vault accepts **for that exact transfer**.
+
+No API key. The agent signs its proposal with the key it already needs in order
+to settle, and the owner authorized that address on-chain. A server-issued
+credential would prove less and add a second thing to steal.
+
+The service never transacts. It returns the signature and the exact arguments;
+the agent sends its own settlement and pays its own gas — so there is no path
+from this service to anyone's funds that does not run through their own agent.
 
 **Request**
 
 ```json
-{ "scenario": "legit" | "forbidden-action" | "tvl-lie" | "irreversible" }
-```
-
-**Response**
-
-```json
 {
-  "scenario": "tvl-lie",
-  "proposal": { "id": "0x…", "action": { "kind": "swap", "valueUSDC": "50000000" } },
-  "verdict": {
-    "outcome": 1,
-    "outcomeName": "REFUSED",
-    "reasonCode": 1,
-    "blockChecked": "51151137",
-    "logRef": "0x…"
+  "proposal": {
+    "id":        "0x…32 bytes",
+    "agent":     "0x…",
+    "action":    { "kind": "swap", "target": "0x…",
+                   "calldata": "0x", "valueUSDC": "500000" },
+    "premises":  [{ "premiseId": "tvl", "claimedValue": "…" }],
+    "createdAt": 1789283000
   },
-  "premises": [
-    {
-      "premiseId": "tvl",
-      "claimedValue": "412000000000000000000000000",
-      "derivedValue": "124351602694068552555504851",
-      "toleranceBps": 200,
-      "passed": false
-    }
-  ],
-  "queryPath": "live-gateway",
-  "pinnedBlock": "51151137",
-  "poolId": "0x6c561b446416e1a00e8e93e221854d6ea4171372"
+  "signature": "0x…"
 }
 ```
 
-`queryPath` is always reported. It is `live-gateway` when `GRAPH_API_KEY` is
-set, `fixture` when it is not. **The route never silently substitutes canned
-data for the thing it claims to prove.**
+`signature` is EIP-191 over `proposalDigest()` from `@bonded/seam`, which binds
+the chain, the vault, the agent, the proposal id, the action and every premise
+claim in order. A field outside that digest would be a field an attacker could
+edit after signing.
 
-If the key *is* set and the Gateway then fails, there is deliberately **no
-fallback**: the query returns null, the enforcer records
-`PREMISE_UNRESOLVABLE`, and refuses. An unreachable premise is not an approval.
+`GET` the same path for discovery: addresses, the enforcer's signer, and the
+onboarding steps in order.
 
----
+### Other endpoints
 
-## Reason codes
-
-Enumerated, never a free string — free strings are how injected text reaches a
-UI.
-
-| Code | Name | Meaning |
-|---|---|---|
-| `0` | `OK` | Cleared |
-| `1` | `PREMISE_MISMATCH` | Claimed vs re-derived exceeded tolerance |
-| `2` | `PREMISE_UNRESOLVABLE` | Subgraph query failed or returned no entity |
-| `3` | `POLICY_FORBIDDEN_ACTION` | `action.kind` is in `policy.forbid` |
-| `4` | `BUDGET_EXCEEDED` | Would exceed the period budget |
-| `5` | `STALE_POLICY` | Proposal's policy hash ≠ current committed hash |
-| `6` | `IRREVERSIBLE_UNCONFIRMED` | Over threshold, step-up not yet confirmed |
-| `7` | `ATTESTATION_MISSING` | TEE attestation required but absent |
-
----
-
-## Current state — what is real right now
-
-Verified in this environment, not asserted.
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/v1/policies/compile` | Intent → canonical artifact + hash. Computes only; commits nothing. |
+| `POST /api/v1/policies` | Publish the artifact behind a commitment. Accepted only if it hashes to what that owner committed on-chain, which is why it needs no auth. |
+| `GET /api/v1/policies/:owner` | What would be enforced, and whether it still agrees with the chain. |
+| `GET /api/v1/owners/:owner` | Balances, limits, agents, holds. Reads only. |
+| `GET /api/v1/owners/:owner/activity` | Settled verdicts, plus what the premises evaluate to right now. |
+| `GET /api/v1/verdicts/:hash` | Where a proposal stands, read from the vault rather than from any cache. |
 
 ### Working end to end
 
-- **`/live` re-derives premises from the live Graph Gateway.** Real Messari
+- **The API re-derives premises from the live Graph Gateway.** Real Messari
   DEX-AMM subgraph, real Uniswap V3 WETH/USDC pool on Base, real pinned block
-  per proposal. All four verdict paths observed against live data.
+  per proposal. Every verdict path observed against live data, driven by an
+  outside HTTP client with no privileged access.
 - **Deployed on Arc testnet** (chain id `5042002`):
   [`BondedRegistry`](https://testnet.arcscan.app/address/0xB825225163aEf4353d0110BA63d0d811A17B8205) ·
   [`BondedVault`](https://testnet.arcscan.app/address/0x027C61c1418157b112B82F30894F8aC1F074AF85) ·
@@ -737,8 +751,8 @@ proof.
 
 **Landing page.** Decorative backdrop art on the marketing page is
 AI-assisted illustration; every piece of evidence on the site — the injected
-token's live `name()` read, the `/live` premise diffs, the settled
-transactions on Arc — is real data, sourced live, never illustrative.
+token's live `name()` read, the premise diffs, the settled transactions on Arc —
+is real data, sourced live, never illustrative.
 
 ---
 
@@ -749,9 +763,10 @@ Two Next.js processes are writing the same `.next` directory — usually a secon
 `next dev`, or a `next build` run while `next dev` was live. Kill every node
 process running `next`, delete `apps/console/.next`, start one server.
 
-**`/live` says `fixture` instead of `live-gateway`.**
-`GRAPH_API_KEY` is not set in the environment the Next server can see. The page
-reports this honestly rather than pretending.
+**`POST /api/v1/proposals` returns 503 `premise re-derivation is unavailable`.**
+`GRAPH_API_KEY` is not set in the environment the Next server can see. The
+endpoint refuses rather than approving on the agent's word — there is no fixture
+fallback on the API path.
 
 **Gateway returns `"invalid subgraph ID"` for an ID that exists.**
 You have a *deployment* ID (`Qm…`, 46 chars) being sent to `/subgraphs/id/`.
@@ -776,7 +791,7 @@ standardized subgraphs go through `GRAPH_GATEWAY_BASE_URL`.
   value — never that the re-derived value met the policy's *own* threshold. A
   pool with genuinely insufficient TVL, honestly reported, would have cleared.
   Fixed in `withinTolerance.ts` to require both conditions independently.
-- **Two URL bugs kept `/live` on fixtures for longer than they should have.**
+- **Two URL bugs kept premise re-derivation on fixtures longer than it should have been.**
   `buildGatewayUrl` could not address a deployment ID at all, and
   `GRAPH_GATEWAY_URL` was doing double duty as both this project's own subgraph
   endpoint and the third-party Gateway base. Both surfaced as plausible GraphQL

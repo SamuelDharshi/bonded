@@ -228,8 +228,8 @@ function ComparePanel({
         <p className="text-body text-manifest">Recording pending</p>
         <p className="text-small text-manifest/60">
           No screen recording has been captured for this side yet.{' '}
-          <Link href="/live" className="text-manifest underline underline-offset-4">
-            See /live for the real thing right now
+          <Link href="/log" className="text-manifest underline underline-offset-4">
+            See every verdict that settled on-chain
           </Link>
           .
         </p>

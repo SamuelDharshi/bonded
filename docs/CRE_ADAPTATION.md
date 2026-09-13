@@ -42,14 +42,19 @@ that one method. Requests must be signed by a key in `authorizedKeys`.
 
 ### 2. Wiring the port at the call sites — small
 
-Nothing constructs `ChainlinkCREAuthority` yet. Two call sites build an
-`EnforceContext` and would pass `requiresStepUp`:
+Nothing constructs `ChainlinkCREAuthority` yet, but the seam is now wired and in
+use. `apps/console/app/api/v1/proposals/route.ts` already passes a
+`requiresStepUp` implementation — it answers "over the threshold and not yet
+confirmed on-chain" — so adopting the enclave means replacing the threshold
+comparison inside that function, not finding a call site for it.
 
-- `apps/console/app/api/enforce/route.ts`
-- `packages/settlement/src/settle.ts`
+The other `EnforceContext` builder is `packages/settlement/src/settle.ts`, which
+still compares locally.
 
-Gate it on `CRE_WORKFLOW_ID` being set, so absence keeps today's local
-comparison and the console keeps reporting which path it used.
+Gate it on `CRE_WORKFLOW_ID` being set, so absence keeps today's local comparison
+and the API keeps reporting which path produced a verdict. Note that the
+confirmation check belongs on this side regardless of where the threshold lives:
+"already confirmed" is a fact about the chain, not about the threshold.
 
 ### 3. Verdict signing — NOT a configuration change
 

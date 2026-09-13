@@ -23,7 +23,7 @@ const LAYERS: {
     pkg: '@bonded/standardized',
     detail:
       'Re-derives every claimed premise from Messari-standardized subgraphs through the Graph Gateway, at a single pinned block. cache: no-store on the enforcement path — a stale premise is a correctness bug, not a latency optimisation.',
-    status: { label: 'Live — every proposal on /live', live: true },
+    status: { label: 'Live — every proposal through /api/v1/proposals', live: true },
   },
   {
     name: 'Enforcer',
@@ -31,7 +31,7 @@ const LAYERS: {
     pkg: '@bonded/enforcer',
     detail:
       'Zero LLM calls, never sees prompt text. Six-step fail-closed algorithm: policy hash -> forbidden action -> premises -> budget -> irreversible threshold -> clear. This is the product.',
-    status: { label: 'Live — 44 unit tests, same function /live calls', live: true },
+    status: { label: 'Live — 44 unit tests, the same function the API calls', live: true },
   },
   {
     name: 'Authority',
@@ -117,7 +117,7 @@ export default function ArchitecturePage() {
         </div>
         <NextStep
           lead="Three layers, of which the vault and the enforcer are deployed and settling today. Putting your own money behind them takes four steps in your account."
-          secondary={{ label: 'See it settle', href: '/live' }}
+          secondary={{ label: 'See what it settled', href: '/log' }}
         />
       </div>
     </Shell>

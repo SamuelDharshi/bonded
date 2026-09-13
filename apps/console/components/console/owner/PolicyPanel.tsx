@@ -61,6 +61,7 @@ export function PolicyPanel({
   busy,
   setBusy,
   onChanged,
+  startOpen = false,
 }: {
   account: `0x${string}`;
   status: 'ok' | 'not-committed' | 'not-published' | 'stale';
@@ -70,8 +71,10 @@ export function PolicyPanel({
   busy: boolean;
   setBusy: (b: boolean) => void;
   onChanged: () => void;
+  /** In the wizard the form is the step, so it opens without a click. */
+  startOpen?: boolean;
 }) {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(startOpen);
   const [budget, setBudget] = useState('500');
   const [threshold, setThreshold] = useState('1');
   const [minTvl, setMinTvl] = useState('50000000');

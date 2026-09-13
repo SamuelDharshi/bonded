@@ -72,11 +72,11 @@ function Panel({
         />
         <div className="absolute inset-0 bg-[rgba(6,19,27,0.55)]" />
         <Link
-          href="/live"
+          href="/app/start"
           className="relative font-mono text-[11px] font-bold tracking-[0.5px] hover:underline"
           style={{ color: accentOnStill }}
         >
-          Run it live at /live &gt;
+          Put your own rules behind it &gt;
         </Link>
       </div>
 

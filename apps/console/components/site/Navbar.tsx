@@ -43,7 +43,6 @@ const anchorLinks: NavLink[] = [
 ];
 
 const evidenceLinks: NavLink[] = [
-  { label: "Live", href: "/live" },
   { label: "Log", href: "/log" },
   { label: "Policy", href: "/policy" },
   { label: "Corpus", href: "/corpus" },
@@ -60,7 +59,8 @@ function scrollTo(id: string) {
 export default function Navbar() {
   const pathname = usePathname();
   const onLanding = pathname === "/";
-  const onApp = pathname === APP_HREF;
+  // Any /app route, not just /app itself: the sub-pages are the same place.
+  const inApp = pathname.startsWith(APP_HREF);
 
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("");
@@ -201,31 +201,26 @@ export default function Navbar() {
             Source
           </a>
 
-          {onApp ? (
-            <>
-              <span className="font-mono text-[10px] text-[#1E7BB8] tracking-[0.5px]">
-                Your account
-              </span>
-              <Link
-                href="/live"
-                className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
-              >
-                Watch it refuse
-              </Link>
-            </>
+          {inApp ? (
+            <Link
+              href="/app/start"
+              className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
+            >
+              Set up your account
+            </Link>
           ) : (
             <>
               <Link
-                href="/live"
+                href="/log"
                 className="font-mono text-[10px] text-[#6E8CA5] tracking-[0.5px] hover:text-[#10314A] transition-colors"
               >
-                Watch it refuse
+                See what it settled
               </Link>
               <Link
                 href={APP_HREF}
                 className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[9px] hover:bg-[#17618F] transition-colors"
               >
-                Open your account
+                Connect &amp; get started
               </Link>
             </>
           )}
@@ -271,13 +266,13 @@ export default function Navbar() {
           <Link
             href={APP_HREF}
             onClick={() => setMenuOpen(false)}
-            aria-current={onApp ? "page" : undefined}
+            aria-current={inApp ? "page" : undefined}
             className="flex items-center gap-2 w-full font-mono text-[12px] font-bold tracking-[0.5px] py-[14px] border-b border-[#E7F1FA] transition-colors"
-            style={{ color: onApp ? "#1E7BB8" : "#10314A" }}
+            style={{ color: inApp ? "#1E7BB8" : "#10314A" }}
           >
             <span
               className="w-[4px] h-[4px] rounded-full shrink-0"
-              style={{ background: onApp ? "#1E7BB8" : "#1E7BB8" }}
+              style={{ background: "#1E7BB8" }}
             />
             Your account
           </Link>
@@ -335,11 +330,11 @@ export default function Navbar() {
               Source
             </a>
             <Link
-              href={onApp ? "/live" : APP_HREF}
+              href={inApp ? "/app/start" : APP_HREF}
               onClick={() => setMenuOpen(false)}
               className="font-mono text-[11px] font-bold text-[#FFFFFF] bg-[#1E7BB8] tracking-[0.5px] px-[18px] py-[11px] text-center hover:bg-[#17618F] transition-colors"
             >
-              {onApp ? "Watch it refuse" : "Open your account"}
+              {inApp ? "Set up your account" : "Connect & get started"}
             </Link>
           </div>
         </nav>
