@@ -1,163 +1,69 @@
 import Image from "next/image";
 
-// Every link here resolves to something real — a working console route or the
-// public repo. No placeholder "#" hrefs, no pages that don't exist.
-const productLinks = [
-  // First, and named as an action rather than a page. The footer listed only
-  // the evidence pages, so the one place an owner does anything was absent from
-  // the site's own map of itself.
-  { label: "Your account", href: "/app" },
-  { label: "Set up an account", href: "/app/start" },
-  { label: "Approvals", href: "/app/approvals" },
-  { label: "Decision log", href: "/log" },
-  { label: "Policy", href: "/policy" },
-  { label: "Attack corpus", href: "/corpus" },
-];
-const resourceLinks = [
-  { label: "Architecture", href: "/architecture" },
-  { label: "Source", href: "https://github.com/SamuelDharshi/bonded" },
-];
-const chainLinks = [
-  { label: "BONDEDVAULT", href: "https://testnet.arcscan.app/address/0x027C61c1418157b112B82F30894F8aC1F074AF85" },
-  { label: "BONDEDREGISTRY", href: "https://testnet.arcscan.app/address/0xB825225163aEf4353d0110BA63d0d811A17B8205" },
-  { label: "ATTACKTOKEN", href: "https://testnet.arcscan.app/address/0x117E83CC8DcB5fe9D4F5a82c86B3bCe6c9355Ff5" },
-];
-
+/**
+ * The footer is the wordmark, and nothing else.
+ *
+ * It used to carry three link columns, a tagline, social buttons and a bottom
+ * bar of copyright and chain metadata. Every one of those links already exists
+ * in the navigation, so the footer was repeating the site's own map underneath
+ * every page. What is left is the brand device: the name, oversized, fading
+ * downward into the page edge.
+ */
 export default function Footer() {
   return (
     <footer className="relative flex flex-col w-full overflow-hidden bg-[#FFFFFF]">
-      {/* Backdrop for the whole footer. Purely decorative, so it is hidden
-          from assistive tech and its image carries an empty alt.
+      {/* Backdrop. Purely decorative, so it is hidden from assistive tech and
+          its image carries an empty alt.
 
           media/end.png is a glyph globe — the same visual family as the hero
           footage and near-black in the same way — so it gets the same
           conversion (`.glyph-art-light` + the #2E7FBF colour blend) instead of
-          being dropped in as a dark slab at the bottom of a white page. The
-          two bookend the landing page: world map at the top, globe at the end.
-          See globals.css for what the filter chain does, and why the opacity
-          has to sit on a wrapper rather than on the image itself. */}
+          being dropped in as a dark slab at the bottom of a white page. The two
+          bookend the landing page: world map at the top, globe at the end. See
+          globals.css for what the filter chain does, and why the opacity has to
+          sit on a wrapper rather than on the image itself. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[#FFFFFF]"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.5]"
       >
-        <div className="absolute inset-0 opacity-[0.72]">
-          <div className="absolute inset-0 isolate bg-[#FFFFFF]">
-            <Image
-              src="/media/end.png"
-              alt=""
-              fill
-              sizes="100vw"
-              /* Anchored to the bottom edge, which slides the visible window
-                 DOWN the source and so moves the globe UP in the frame. With a
-                 1008x449 source covering a ~440px-tall box there is about
-                 200px of vertical slack, so this is a real shift rather than
-                 the near-no-op it was when the footer still had its tail. */
-              className="object-cover object-bottom glyph-art-light"
-            />
-            <div className="absolute inset-0 bg-[#2E7FBF] mix-blend-color" />
-          </div>
-        </div>
-
-        {/* Reading veil. The footer is now exactly as tall as its content, so
-            the globe sits behind the columns rather than in empty space below
-            them — which means the veil has to do real work. It stays white
-            across the top edge so the section above hands over cleanly, then
-            settles to a constant ~0.62 through the body: enough for 11-12px
-            mono to hold, light enough that the globe is still an image and not
-            a rumour. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF] from-2% via-[rgba(255,255,255,0.66)] via-30% to-[rgba(255,255,255,0.6)]" />
-      </div>
-
-      {/* Top */}
-      <div className="relative z-10 flex flex-col md:flex-row gap-12 md:gap-[80px] px-6 md:px-[120px] py-12 md:py-[64px]">
-        {/* Brand */}
-        <div className="flex flex-col gap-6 md:w-[280px] md:shrink-0">
-          <div className="flex items-center gap-[12px]">
-            <div className="w-[32px] h-[32px] bg-[#1E7BB8] shrink-0" />
-            <span className="font-grotesk text-[16px] font-bold text-[#1E7BB8] tracking-[1px]">
-              Bonded
-            </span>
-          </div>
-          <p className="font-mono text-[11px] text-[#52738D] tracking-[1px] leading-[1.6] max-w-[260px]">
-            The spending account for agents that aren&apos;t trusted to report
-            the world — only to propose.
-          </p>
-          <div className="flex gap-[12px]">
-            {[{ label: "X" }, { label: "GH" }, { label: "LI" }].map((s) => (
-              <button
-                key={s.label}
-                className="flex items-center justify-center w-[36px] h-[36px] bg-[#F2F8FD] border border-[#CFE3F2] hover:border-[#52738D] transition-colors"
-              >
-                <span                   className="font-grotesk text-[10px] font-bold text-[#52738D]">
-                  {s.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Link columns */}
-        <div className="grid grid-cols-3 md:flex md:flex-1 gap-8 md:gap-[80px]">
-          {[
-            { heading: "Product", links: productLinks },
-            { heading: "Project", links: resourceLinks },
-            { heading: "On-chain", links: chainLinks },
-          ].map((col) => (
-            <div key={col.heading} className="flex flex-col gap-4 md:gap-[20px]">
-              <span className="font-grotesk text-[11px] font-bold text-[#10314A] tracking-[0.5px]">
-                {col.heading}
-              </span>
-              {col.links.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  {...(link.href.startsWith("http")
-                    ? { target: "_blank", rel: "noreferrer" }
-                    : {})}
-                  className="font-mono text-[12px] text-[#52738D] tracking-[1px] hover:text-[#2C4E68] transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          ))}
-        </div>
+        <Image
+          src="/media/end.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="glyph-art-light object-cover object-center"
+        />
       </div>
 
       {/* ── Wordmark ──
-          The bottom bar held a copyright line, a GitHub link and a chain label,
-          all of which already appear in the columns above. What is left is the
-          brand device: the name, oversized, fading downward into the page edge.
-
-          Set in the sans face and lowercase on purpose — at this size the mono
-          face's fixed advance widths open ugly gaps between letters, and the
-          tight tracking below is what stops the word reading as six separate
+          Sans and lowercase on purpose: at this size the mono face's fixed
+          advance widths open ugly gaps between letters, and the tight negative
+          tracking is what keeps the word reading as one shape rather than six
           characters.
 
-          `text` rather than an image so it stays crisp at any width, and it is
-          clipped by the footer's overflow rather than sized in px, so it fills
-          the width on a phone and on a 32-inch display without a breakpoint. */}
+          Text rather than an image so it stays crisp at any width, sized in vw
+          and clipped by the footer's overflow, so it fills the width on a phone
+          and on a 32-inch display without a breakpoint. */}
       <div
         aria-hidden
-        className="relative z-0 w-full overflow-hidden select-none pointer-events-none mt-6 md:mt-10"
+        className="relative z-10 w-full overflow-hidden select-none pointer-events-none pt-16 md:pt-24"
       >
         <span
           className="block font-sans font-bold lowercase leading-[0.78] text-center whitespace-nowrap
-                     text-[22vw] tracking-[-0.055em] text-[#10314A]"
+                     text-[23vw] tracking-[-0.055em]"
           style={{
-            // Fades out downward: solid at the top of the glyphs, gone by the
+            // Fades out downward — solid at the top of the glyphs, gone by the
             // baseline, so the word appears to sink into the page.
             backgroundImage:
-              'linear-gradient(to bottom, rgba(16,49,74,0.13) 0%, rgba(16,49,74,0.06) 45%, rgba(16,49,74,0) 88%)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent',
+              "linear-gradient(to bottom, rgba(16,49,74,0.16) 0%, rgba(16,49,74,0.07) 48%, rgba(16,49,74,0) 90%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
           }}
         >
           bonded
         </span>
       </div>
-
     </footer>
   );
 }

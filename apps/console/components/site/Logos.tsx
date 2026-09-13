@@ -4,13 +4,16 @@ import Image from "next/image";
 // are the three sponsor stacks it's actually built on, each load-bearing:
 // remove any one and a layer of the architecture stops working.
 //
-// Rendered as the real marks rather than as their names in text, and blacked
-// out: `brightness-0` crushes every logo to solid black regardless of its own
-// palette, then opacity lifts it back to the same weight as the caption above.
-// That is what lets three logos in three different brand colours — and one JPEG
-// with a baked-in white background — sit in a row without one of them shouting.
-// Colour belongs on /architecture, where each mark is labelling a specific
-// layer; here they are a provenance strip, so they should read as one texture.
+// Monochrome via `grayscale`, NOT `brightness-0`. The first attempt used
+// brightness-0 to black them out, which works on a transparent PNG and destroys
+// a JPEG: arc_logo.jpg has an opaque background, so forcing every pixel to black
+// turned the whole rectangle into a black slab with the mark invisible inside
+// it. Grayscale desaturates without touching luminance, so a transparent PNG
+// stays a mark and an opaque JPEG keeps its own background.
+//
+// Opacity is 85, not the 30 it was — a provenance strip should be quiet, but
+// these were so faint they read as missing. Colour is reserved for
+// /architecture, where each mark labels a specific layer.
 const logos = [
   { src: "/media/thegraph_logo.png", alt: "The Graph" },
   { src: "/media/arc_logo.jpg", alt: "Arc" },
@@ -31,10 +34,11 @@ export default function Logos() {
             src={logo.src}
             alt={logo.alt}
             title={logo.alt}
-            width={200}
-            height={56}
-            className="h-[24px] md:h-[30px] w-auto object-contain rounded-[6px]
-                       brightness-0 opacity-30 hover:opacity-55 transition-opacity duration-500"
+            width={240}
+            height={72}
+            className="h-[30px] md:h-[40px] w-auto object-contain rounded-[6px]
+                       grayscale opacity-85 hover:grayscale-0 hover:opacity-100
+                       transition-all duration-500"
           />
         ))}
       </div>
