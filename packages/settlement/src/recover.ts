@@ -4,21 +4,26 @@ import { ERC20_ABI, REGISTRY_ABI, VAULT_ABI, addr, clients, explorerTx, required
 import { POLICY, buildProposal, createLiveContext } from './policy.js';
 
 /**
- * Drain a vault back to the enrolled signer.
+ * Drain a LEGACY vault back to the enrolled signer.
  *
- * BondedVault has no withdraw function by design — USDC only leaves through
- * settle(), against a verdict the enforcer actually produced. So "recovering"
- * funds is not an escape hatch: it is the ordinary settlement path, pointed at
- * the signer instead of a counterparty, and it still has to satisfy every
- * premise and stay under the policy's thresholds like anything else.
+ * This targets a vault running the pre-ownership bytecode: no deposit
+ * accounting, no withdraw(), and a verdict digest that does not cover the
+ * action. USDC could only leave such a vault through settle(), so recovery is
+ * the ordinary settlement path pointed at the signer, and it still has to
+ * satisfy every premise and stay under the policy thresholds.
  *
- * That constraint is why this drains in chunks at or below
- * policy.irreversible_above rather than in one transfer: a larger single
- * action would be held for step-up, which is correct behaviour and exactly
- * what this script must not route around.
+ * That constraint is why it drains in chunks at or below
+ * policy.irreversible_above: a larger single action would be held for step-up,
+ * which is correct behaviour and exactly what this must not route around.
  *
- * Needed when migrating to a redeployed vault, since enrolledSigner is
- * immutable and a new deployment cannot adopt the old one's balance.
+ * The digest below is computed the OLD way on purpose — encodePacked over the
+ * verdict fields with no actionHash — because that is what the deployed
+ * bytecode verifies. Do not "fix" it to match @bonded/seam; that would make it
+ * stop working against the very contracts it exists to empty.
+ *
+ * For a current vault this script is unnecessary: the owner calls withdraw()
+ * and gets their own credited balance back. Use `pnpm --filter
+ * @bonded/settlement withdraw <amount>` instead.
  *
  * Usage: pnpm --filter @bonded/settlement recover
  */

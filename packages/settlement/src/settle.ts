@@ -1,13 +1,16 @@
-import { encodeAbiParameters, encodePacked, formatUnits, keccak256 } from 'viem';
+import { formatUnits, keccak256 } from 'viem';
 import { enforce, hashPolicy } from '@bonded/enforcer';
 import {
   ERC20_ABI,
   REGISTRY_ABI,
   VAULT_ABI,
   addr,
+  arcTestnet,
   clients,
+  encodeTransferAction,
   explorerTx,
   required,
+  verdictDigest,
 } from './chain.js';
 import { POLICY, buildProposal, createLiveContext, type ScenarioId } from './policy.js';
 
@@ -155,31 +158,47 @@ async function main(): Promise<void> {
     }
   }
 
-  // ── 4. Sign the digest the vault will recompute and verify ───────────────
-  // Must match BondedVault.settle exactly:
-  //   keccak256(abi.encodePacked(proposalHash, policyHash, outcome, reasonCode,
-  //                              blockChecked, logRef))
-  // then EIP-191. viem's signMessage({ raw }) applies the same prefix the
-  // contract's toEthSignedMessageHash() does.
-  const digest = keccak256(
-    encodePacked(
-      ['bytes32', 'bytes32', 'uint8', 'uint16', 'uint64', 'bytes32'],
-      [
-        verdict.proposalHash,
-        verdict.policyHash,
-        verdict.outcome,
-        verdict.reasonCode,
-        verdict.blockChecked,
-        verdict.logRef,
-      ],
-    ),
-  );
-  const enforcerSig = await account.signMessage({ message: { raw: digest } });
+  // ── 3b. The settling address must be an authorized agent ─────────────────
+  // In this CLI the one key is enforcer, owner and agent at once, which is a
+  // demo convenience rather than the intended split: in the product the owner
+  // is a human wallet, the agent is a bot key, and the enforcer is neither.
+  {
+    const recordedOwner = await publicClient.readContract({
+      address: vault, abi: VAULT_ABI, functionName: 'ownerOf', args: [account.address],
+    });
+    if (recordedOwner === '0x0000000000000000000000000000000000000000') {
+      fail(
+        `${account.address} is not an authorized agent on this vault.
+` +
+          '    Run:  pnpm --filter @bonded/settlement fund-vault 5',
+      );
+    }
+  }
 
-  const action = encodeAbiParameters(
-    [{ type: 'address' }, { type: 'bytes' }, { type: 'uint256' }],
-    [proposal.action.target, proposal.action.calldata as `0x${string}`, valueUSDC],
-  );
+  // ── 4. Sign the digest the vault will recompute and verify ───────────────
+  // The action is built FIRST, because its hash is part of what gets signed.
+  // The digest binds the chain, the vault, the settling agent, the verdict and
+  // the action, so this signature authorizes exactly one payment and cannot be
+  // reused for a different target or amount. Definition lives in @bonded/seam;
+  // the contract recomputes it in verdictDigest().
+  const action = encodeTransferAction(proposal.action.target as `0x${string}`, valueUSDC);
+
+  const digest = verdictDigest({
+    chainId: BigInt(arcTestnet.id),
+    vault,
+    agent: account.address,
+    proposalHash: verdict.proposalHash,
+    policyHash: verdict.policyHash,
+    outcome: verdict.outcome,
+    reasonCode: verdict.reasonCode,
+    blockChecked: verdict.blockChecked,
+    logRef: verdict.logRef,
+    actionHash: keccak256(action),
+  });
+
+  // EIP-191: viem's signMessage({ raw }) applies the same prefix the contract's
+  // toEthSignedMessageHash() does.
+  const enforcerSig = await account.signMessage({ message: { raw: digest } });
 
   // ── 5. Settle ─────────────────────────────────────────────────────────────
   console.log('\n  sending settle()…');

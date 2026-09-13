@@ -118,38 +118,13 @@ export const REGISTRY_ABI = [
   },
 ] as const;
 
-export const VAULT_ABI = [
-  {
-    type: 'function',
-    name: 'settle',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'proposalHash', type: 'bytes32' },
-      { name: 'policyHash', type: 'bytes32' },
-      { name: 'outcome', type: 'uint8' },
-      { name: 'reasonCode', type: 'uint16' },
-      { name: 'blockChecked', type: 'uint64' },
-      { name: 'logRef', type: 'bytes32' },
-      { name: 'action', type: 'bytes' },
-      { name: 'enforcerSig', type: 'bytes' },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'enrolledSigner',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ type: 'address' }],
-  },
-  {
-    type: 'function',
-    name: 'settled',
-    stateMutability: 'view',
-    inputs: [{ name: 'proposalHash', type: 'bytes32' }],
-    outputs: [{ type: 'bool' }],
-  },
-] as const;
+/**
+ * The vault ABI and the verdict digest both come from @bonded/seam, so the
+ * scripts, the console and the contract tests cannot drift apart. They did
+ * once, and a signed verdict ended up authorizing a decision without binding
+ * the payment.
+ */
+export { VAULT_ABI, verdictDigest, encodeTransferAction, VERDICT_TYPEHASH } from '@bonded/seam';
 
 export const ERC20_ABI = [
   {
@@ -168,5 +143,25 @@ export const ERC20_ABI = [
       { name: 'amount', type: 'uint256' },
     ],
     outputs: [{ type: 'bool' }],
+  },
+  {
+    type: 'function',
+    name: 'approve',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ type: 'bool' }],
+  },
+  {
+    type: 'function',
+    name: 'allowance',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    outputs: [{ type: 'uint256' }],
   },
 ] as const;

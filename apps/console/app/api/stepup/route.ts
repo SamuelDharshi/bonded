@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, defineChain, encodeAbiParameters, encodePacked, http, keccak256 } from 'viem';
+import { createPublicClient, createWalletClient, defineChain, http, keccak256 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { enforce, hashPolicy, type QueryFn } from '@bonded/enforcer';
 import {
@@ -7,7 +7,13 @@ import {
   KNOWN_DEPLOYMENTS,
   type GatewayConfig,
 } from '@bonded/standardized';
-import type { Policy, Proposal } from '@bonded/seam';
+import {
+  VAULT_ABI,
+  encodeTransferAction,
+  verdictDigest,
+  type Policy,
+  type Proposal,
+} from '@bonded/seam';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -72,18 +78,9 @@ const POLICY: Policy = {
     enough that the vault can actually cover the release. */
 const DEMO_VALUE_USDC = 2_000_000n;
 
-const VAULT_ABI = [
-  { type: 'function', name: 'settle', stateMutability: 'nonpayable', inputs: [
-      { name: 'proposalHash', type: 'bytes32' }, { name: 'policyHash', type: 'bytes32' },
-      { name: 'outcome', type: 'uint8' }, { name: 'reasonCode', type: 'uint16' },
-      { name: 'blockChecked', type: 'uint64' }, { name: 'logRef', type: 'bytes32' },
-      { name: 'action', type: 'bytes' }, { name: 'enforcerSig', type: 'bytes' }], outputs: [] },
-  { type: 'function', name: 'confirmStepUp', stateMutability: 'nonpayable', inputs: [
-      { name: 'proposalHash', type: 'bytes32' }, { name: 'deviceSig', type: 'bytes' }], outputs: [] },
-  { type: 'function', name: 'stepUpArmed', stateMutability: 'view', inputs: [{ type: 'bytes32' }], outputs: [{ type: 'bool' }] },
-  { type: 'function', name: 'stepUpConfirmed', stateMutability: 'view', inputs: [{ type: 'bytes32' }], outputs: [{ type: 'bool' }] },
-] as const;
-
+// ABI and digest both come from @bonded/seam, the single definition the
+// contract tests recompute from first principles. This route used to carry its
+// own copy of each, which is how the digest came to omit the action.
 const ERC20_ABI = [
   { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }] },
 ] as const;
@@ -180,22 +177,29 @@ async function liveQuery(): Promise<{ query: QueryFn; block: bigint }> {
   return { query, block: BigInt(meta._meta.block.number) };
 }
 
-/** The digest BondedVault.settle recomputes, then EIP-191. */
-function verdictDigest(v: {
+/** The digest BondedVault.settle recomputes, then EIP-191. The action hash is
+    part of it, so a signature authorizes one exact payment. */
+function digestFor(v: {
+  agent: `0x${string}`;
   proposalHash: `0x${string}`; policyHash: `0x${string}`; outcome: number;
-  reasonCode: number; blockChecked: bigint; logRef: `0x${string}`;
+  reasonCode: number; blockChecked: bigint; logRef: `0x${string}`; action: `0x${string}`;
 }) {
-  return keccak256(encodePacked(
-    ['bytes32', 'bytes32', 'uint8', 'uint16', 'uint64', 'bytes32'],
-    [v.proposalHash, v.policyHash, v.outcome, v.reasonCode, v.blockChecked, v.logRef],
-  ));
+  return verdictDigest({
+    chainId: BigInt(arcTestnet.id),
+    vault: VAULT,
+    agent: v.agent,
+    proposalHash: v.proposalHash,
+    policyHash: v.policyHash,
+    outcome: v.outcome,
+    reasonCode: v.reasonCode,
+    blockChecked: v.blockChecked,
+    logRef: v.logRef,
+    actionHash: keccak256(v.action),
+  });
 }
 
 function actionBytes(value: bigint) {
-  return encodeAbiParameters(
-    [{ type: 'address' }, { type: 'bytes' }, { type: 'uint256' }],
-    [RECIPIENT, '0x', value],
-  );
+  return encodeTransferAction(RECIPIENT, value);
 }
 
 function fmtUSDC(v: bigint): string {
@@ -283,25 +287,43 @@ function holdPhase(): Response {
       artifact: `proposal   ${verdict.proposalHash}\nreason     ${verdict.reasonCode} IRREVERSIBLE_UNCONFIRMED\nblock      ${verdict.blockChecked}\ntvl        claimed ${tvl}\n           derived ${tvl}` });
 
     // ── 2. Funding preflight, stated before anything is spent ────────────
-    const vaultBal = await pub.readContract({ address: USDC, abi: ERC20_ABI, functionName: 'balanceOf', args: [VAULT] });
-    const fundsOk = vaultBal >= DEMO_VALUE_USDC;
+    // The vault spends an OWNER's credited deposit, not whatever USDC happens
+    // to sit at the address, so that is what has to be checked. A raw transfer
+    // into the vault credits nobody and cannot be spent.
+    const [credited, recordedOwner] = await Promise.all([
+      pub.readContract({ address: VAULT, abi: VAULT_ABI, functionName: 'balanceOf', args: [acct.address] }),
+      pub.readContract({ address: VAULT, abi: VAULT_ABI, functionName: 'ownerOf', args: [acct.address] }),
+    ]);
+    const authorized = recordedOwner !== '0x0000000000000000000000000000000000000000';
+    const fundsOk = credited >= DEMO_VALUE_USDC;
+
+    if (!authorized) {
+      send({ n: 2, name: 'Vault preflight', ok: false,
+        detail: `${acct.address} is not an authorized agent on this vault, so the vault will refuse to settle for it. Run: pnpm --filter @bonded/settlement fund-vault 5`,
+        artifact: null });
+      return;
+    }
+
     send({ n: 2, name: 'Vault preflight', ok: fundsOk,
       detail: fundsOk
-        ? `vault holds ${fmtUSDC(vaultBal)} USDC — enough to execute`
-        : `vault holds ${fmtUSDC(vaultBal)} USDC, this action needs ${fmtUSDC(DEMO_VALUE_USDC)}. Arming and authorization are on-chain regardless; execution will be refused by the vault until it is funded.`,
+        ? `${fmtUSDC(credited)} USDC credited to this owner — enough to execute`
+        : `${fmtUSDC(credited)} USDC credited to this owner, this action needs ${fmtUSDC(DEMO_VALUE_USDC)}. Arming and authorization are on-chain regardless; execution will be refused by the vault until it is funded.`,
       artifact: null });
 
     // ── 3. Arm the gate on-chain ─────────────────────────────────────────
-    const sig = await acct.signMessage({ message: { raw: verdictDigest({
+    const armAction = actionBytes(DEMO_VALUE_USDC);
+    const sig = await acct.signMessage({ message: { raw: digestFor({
+      agent: acct.address,
       proposalHash: verdict.proposalHash, policyHash: verdict.policyHash,
       outcome: 2, reasonCode: verdict.reasonCode,
       blockChecked: verdict.blockChecked, logRef: verdict.logRef,
+      action: armAction,
     }) } });
 
     const hash = await wallet.writeContract({
       address: VAULT, abi: VAULT_ABI, functionName: 'settle',
       args: [verdict.proposalHash, verdict.policyHash, 2, verdict.reasonCode,
-             verdict.blockChecked, verdict.logRef, actionBytes(DEMO_VALUE_USDC), sig],
+             verdict.blockChecked, verdict.logRef, armAction, sig],
     });
     const receipt = await pub.waitForTransactionReceipt({ hash });
     if (receipt.status !== 'success') throw new Error(`arming reverted: ${hash}`);
@@ -331,12 +353,12 @@ function authorizePhase(proposalHash: string): Response {
     const hash32 = proposalHash as `0x${string}`;
 
     // ── 4. Record the human authorization on-chain ───────────────────────
-    // Digest matches BondedVault.confirmStepUp: keccak256("STEPUP:" || hash).
-    const stepUpSig = await acct.signMessage({
-      message: { raw: keccak256(encodePacked(['string', 'bytes32'], ['STEPUP:', hash32])) },
-    });
+    // confirmStepUp takes no signature: the vault requires the transaction to
+    // come FROM the owner whose funds are at stake. It used to accept a
+    // signature from enrolledSigner, which made the enforcer the confirmer of
+    // its own holds — a human gate in name only.
     const confirmTx = await wallet.writeContract({
-      address: VAULT, abi: VAULT_ABI, functionName: 'confirmStepUp', args: [hash32, stepUpSig],
+      address: VAULT, abi: VAULT_ABI, functionName: 'confirmStepUp', args: [hash32],
     });
     const confirmReceipt = await pub.waitForTransactionReceipt({ hash: confirmTx });
     if (confirmReceipt.status !== 'success') throw new Error(`confirmStepUp reverted: ${confirmTx}`);
@@ -346,22 +368,28 @@ function authorizePhase(proposalHash: string): Response {
       artifact: null, tx: confirmTx });
 
     // ── 5. Execute — the vault decides, not us ───────────────────────────
-    const vaultBal = await pub.readContract({ address: USDC, abi: ERC20_ABI, functionName: 'balanceOf', args: [VAULT] });
-    if (vaultBal < DEMO_VALUE_USDC) {
+    const credited = await pub.readContract({
+      address: VAULT, abi: VAULT_ABI, functionName: 'balanceOf', args: [acct.address],
+    });
+    if (credited < DEMO_VALUE_USDC) {
       send({ n: 5, name: 'Execute', ok: false,
-        detail: `not attempted — vault holds ${fmtUSDC(vaultBal)} USDC and this releases ${fmtUSDC(DEMO_VALUE_USDC)}. Sending it would revert on transfer and waste gas. Fund the vault and the same authorization still stands; it is recorded on-chain.`,
+        detail: `not attempted — ${fmtUSDC(credited)} USDC is credited to this owner and this releases ${fmtUSDC(DEMO_VALUE_USDC)}. Sending it would revert and waste gas. Deposit more and the same authorization still stands; it is recorded on-chain.`,
         artifact: null });
       return;
     }
 
-    const clearedSig = await acct.signMessage({ message: { raw: verdictDigest({
+    // Exactly the action that was armed and confirmed. The vault compares its
+    // hash against what it recorded at arm time and refuses anything else.
+    const execAction = actionBytes(DEMO_VALUE_USDC);
+    const clearedSig = await acct.signMessage({ message: { raw: digestFor({
+      agent: acct.address,
       proposalHash: hash32, policyHash: armed.policyHash, outcome: 0, reasonCode: 0,
-      blockChecked: armed.blockChecked, logRef: armed.logRef,
+      blockChecked: armed.blockChecked, logRef: armed.logRef, action: execAction,
     }) } });
     const execTx = await wallet.writeContract({
       address: VAULT, abi: VAULT_ABI, functionName: 'settle',
       args: [hash32, armed.policyHash, 0, 0, armed.blockChecked, armed.logRef,
-             actionBytes(DEMO_VALUE_USDC), clearedSig],
+             execAction, clearedSig],
     });
     const execReceipt = await pub.waitForTransactionReceipt({ hash: execTx });
     if (execReceipt.status !== 'success') throw new Error(`execution reverted: ${execTx}`);

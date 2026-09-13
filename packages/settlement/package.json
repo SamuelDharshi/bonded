@@ -8,7 +8,8 @@
     "settle": "tsx src/settle.ts",
     "fund-vault": "tsx src/fund-vault.ts",
     "typecheck": "tsc --noEmit",
-    "recover": "tsx src/recover.ts"
+    "withdraw": "tsx src/withdraw.ts",
+    "recover-legacy": "tsx src/recover.ts"
   },
   "dependencies": {
     "@bonded/compiler": "workspace:*",
