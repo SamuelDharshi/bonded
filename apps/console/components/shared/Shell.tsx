@@ -21,11 +21,17 @@ import Navbar from '../site/Navbar';
  * This is a server component: nothing here needs state any more. Navbar owns
  * the scroll and active-route behaviour and marks itself 'use client'.
  *
- * The authority-layer status that lived in the sidebar's footer is kept below
- * the bar. It reports something true and load-bearing — Chainlink CRE is not
- * deployed — and losing a caveat this project states carefully would be the
- * worst possible casualty of a layout change. It stays on the console routes
- * only, which is where it was and where it is relevant.
+ * There used to be a status strip below the bar reading "Authority layer —
+ * Chainlink CRE not deployed". It was kept deliberately while it was true, so a
+ * layout change could not quietly drop a caveat the project states carefully.
+ * It is gone because the statement is now false: the workflow is deployed and
+ * ACTIVE, and the enforcer calls it on every proposal over the threshold.
+ *
+ * The remaining nuance — that Chainlink's enclave DON is not yet provisioned, so
+ * the verdict falls back to the policy artifact — is reported where it can be
+ * acted on: per-response in `evidence.thresholdPath`, and on /architecture with
+ * the rest of the layer statuses. A persistent banner on every console page was
+ * the wrong place for it even when it was accurate.
  */
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -34,13 +40,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       {/* pt-[60px] clears the fixed bar. */}
       <div className="flex min-w-0 flex-1 flex-col pt-[60px]">
-        <div className="flex items-center gap-2 border-b border-hairline bg-deepwater px-6 py-2 md:px-12">
-          <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-hold" />
-          <span className="font-mono text-[11px] tracking-[0.5px] text-[#52738D]">
-            Authority layer — Chainlink CRE not deployed
-          </span>
-        </div>
-
         <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
