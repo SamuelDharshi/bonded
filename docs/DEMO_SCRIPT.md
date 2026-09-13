@@ -1,5 +1,9 @@
 # Demo script
 
+> **Recording the video?** Read [`DEMO_RUNBOOK.md`](DEMO_RUNBOOK.md) instead —
+> what to say, what to click, in what order. This file is the technical
+> checklist that proves each surface works before you point a camera at it.
+
 Run this end to end, cold, before recording. Each step names the file/route
 it depends on so a failure points at what to fix.
 
