@@ -1,0 +1,36 @@
+{
+  "owner": "0xac13a62fc7e50d08945ba2e79b5eaa190d8d7d9a",
+  "policy": {
+    "version": 1,
+    "budget": {
+      "asset": "USDC",
+      "period": "7d",
+      "max": "500000000"
+    },
+    "premises": [
+      {
+        "id": "tvl",
+        "schema": "messari-dex-amm",
+        "field": "liquidityPool.totalValueLockedUSD",
+        "op": "gte",
+        "value": "50000000000000000000000000",
+        "tolerance_bps": 200
+      },
+      {
+        "id": "pool_age",
+        "schema": "messari-dex-amm",
+        "field": "liquidityPool.createdTimestamp",
+        "op": "older_than",
+        "value": "2592000"
+      }
+    ],
+    "forbid": [
+      "approve_unlimited",
+      "delegatecall",
+      "selfdestruct"
+    ],
+    "irreversible_above": "1000000"
+  },
+  "policyHash": "0x105a3284b9c2e970a034010ddcdeb4baa6a6ef5856d241ee17c187745ef55e25",
+  "publishedAt": "2026-09-13T14:48:09.987Z"
+}

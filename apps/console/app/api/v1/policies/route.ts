@@ -82,6 +82,22 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
+  if (result.status === 'not-persisted') {
+    // Valid and accepted, but it will not survive this instance. Said plainly
+    // rather than reported as success.
+    return NextResponse.json(
+      {
+        status: 'not-persisted',
+        owner: owner.toLowerCase(),
+        policyHash: result.policyHash,
+        detail:
+          `The artifact matches your commitment but could not be stored: ${result.detail}. ` +
+          'On ephemeral hosting, ship it in apps/console/policies/ so it is served from the build.',
+      },
+      { status: 507 },
+    );
+  }
+
   return NextResponse.json({
     status: 'published',
     owner: owner.toLowerCase(),
