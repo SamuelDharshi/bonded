@@ -37,6 +37,18 @@ export function parseBigInt(value: string): bigint {
 }
 
 /**
+ * Is this string a plain integer this module can compare numerically?
+ *
+ * Deliberately strict: anything that is not digits (with an optional single
+ * decimal point, which parseBigInt truncates) is treated as non-numeric and
+ * routed to string equality rather than coerced. Guessing here is how 'true'
+ * became a BigInt conversion error.
+ */
+export function isNumericString(value: string): boolean {
+  return /^\d+(\.\d+)?$/.test(value.trim());
+}
+
+/**
  * Apply tolerance to a derived value, returning the [lower, upper] window.
  * Integer basis-point arithmetic only. No floats.
  *
@@ -99,6 +111,33 @@ export function withinTolerance(
       // Pool must have been created less than minAgeSecs ago
       return poolAge < minAgeSecs;
     }
+  }
+
+  // Non-numeric equality.
+  //
+  // `eq` is the only operator meaningful on a value that is not a number, and
+  // commerce premises need exactly that: a seller is on an allowlist or is not
+  // ('true' / 'false'), an event is 'scheduled' or 'cancelled'. There is no
+  // ordering on those and no tolerance band that means anything.
+  //
+  // This branch exists because of a real crash, not a hypothetical one. Every
+  // value used to go through parseBigInt, so `sellerAuthorized eq 'true'` threw
+  // `Cannot convert true to a BigInt` — and a throw inside enforce() does not
+  // become a refusal, it propagates. Fail-closed stopped holding at exactly the
+  // moment it matters most. The DeFi premises this was written for were all
+  // numeric, so nothing surfaced it until a second domain arrived.
+  //
+  // Tolerance is ignored rather than rejected here: an author who writes
+  // tolerance_bps on a boolean has made a harmless mistake, and refusing an
+  // otherwise well-formed premise over a field that cannot change the answer
+  // would fail a purchase for a typo.
+  if (op === 'eq' && !isNumericString(derived)) {
+    if (policyValue === undefined) {
+      throw new Error(`policyValue (the policy's own threshold) required for op: eq`);
+    }
+    // Both conditions, for the same reason they are kept separate below:
+    // reality must satisfy the policy, AND the claim must match reality.
+    return derived === policyValue && claimed === derived;
   }
 
   // For numeric comparisons, parse values appropriately

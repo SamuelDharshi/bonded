@@ -4,5 +4,6 @@
  * Import from '@bonded/seam', never from deep paths.
  */
 export * from './types.js';
+export * from './schemas.js';
 export * from './vault.js';
 export * from './proposal.js';

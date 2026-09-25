@@ -191,3 +191,54 @@ describe('withinTolerance — exhaustive unit tests', () => {
     });
   });
 });
+
+/**
+ * Non-numeric equality.
+ *
+ * Regression for a crash found when Bonded moved from DeFi to commerce premises.
+ * Every value went through parseBigInt, so `sellerAuthorized eq 'true'` threw
+ * `Cannot convert true to a BigInt`. A throw here is worse than a wrong answer:
+ * it escapes enforce()'s fail-closed path instead of becoming a refusal.
+ *
+ * The DeFi vocabulary was entirely numeric — TVL, timestamps — so nothing
+ * exercised it until a second domain arrived.
+ */
+describe('withinTolerance — non-numeric eq', () => {
+  it('accepts a matching string on both conditions', () => {
+    expect(withinTolerance('true', 'true', 'eq', 0, 'true')).toBe(true);
+    expect(withinTolerance('scheduled', 'scheduled', 'eq', 0, 'scheduled')).toBe(true);
+  });
+
+  it('refuses when reality does not satisfy the policy', () => {
+    // The agent honestly reports an unauthorised seller. Claim matches reality,
+    // but reality fails the policy.
+    expect(withinTolerance('false', 'false', 'eq', 0, 'true')).toBe(false);
+    expect(withinTolerance('cancelled', 'cancelled', 'eq', 0, 'scheduled')).toBe(false);
+  });
+
+  it('refuses when the claim disagrees with reality', () => {
+    // The agent claims authorised; re-derivation says otherwise. This is the
+    // scalper case, and it must fail even though the claim matches the policy.
+    expect(withinTolerance('true', 'false', 'eq', 0, 'true')).toBe(false);
+    expect(withinTolerance('scheduled', 'cancelled', 'eq', 0, 'scheduled')).toBe(false);
+  });
+
+  it('does not throw on a non-numeric value', () => {
+    // The actual bug. Anything other than a clean boolean return would escape
+    // the fail-closed path.
+    expect(() => withinTolerance('true', 'true', 'eq', 0, 'true')).not.toThrow();
+    expect(() => withinTolerance('issuer-primary', 'issuer-primary', 'eq', 0, 'issuer-primary')).not.toThrow();
+  });
+
+  it('still compares numeric eq numerically, ignoring leading zeros', () => {
+    // '045' and '45' are the same number and must stay so — routing numerics
+    // through string equality would silently break this.
+    expect(withinTolerance('045', '45', 'eq', 0, '45')).toBe(true);
+  });
+
+  it('ignores tolerance on a non-numeric premise rather than failing', () => {
+    // A tolerance band on a boolean is a harmless authoring mistake; refusing a
+    // purchase over a field that cannot change the answer would not be.
+    expect(withinTolerance('true', 'true', 'eq', 500, 'true')).toBe(true);
+  });
+});
