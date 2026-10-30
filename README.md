@@ -3,8 +3,7 @@
 **The model proposes. It cannot approve itself.**
 
 A spending-authority layer for autonomous onchain agents.
-Built for ETHOnline 2026 · The Graph · Arc · Chainlink CRE
-Submitted to Legal Hack 2026 (DoraHacks)
+Built for Legal Hack 2026 (DoraHacks) · Chainlink CRE · The Graph · Arc
 
 **Live app:** https://bondedfi.vercel.app · **Source:** https://github.com/SamuelDharshi/bonded
 
