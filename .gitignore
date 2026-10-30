@@ -69,3 +69,9 @@ apps/console/components/GradientWaves.css
 apps/console/components/Grainient.jsx
 apps/console/components/Grainient.css
 apps/console/components.json
+
+# Other env/key files
+.env.*
+!.env.example
+*.pem
+*.key
