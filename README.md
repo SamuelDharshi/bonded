@@ -4,11 +4,15 @@
 
 A spending-authority layer for autonomous onchain agents.
 Built for ETHOnline 2026 · The Graph · Arc · Chainlink CRE
+Submitted to Legal Hack 2026 (DoraHacks)
+
+**Live app:** https://bondedfi.vercel.app · **Source:** https://github.com/SamuelDharshi/bonded
 
 ---
 
 ## Table of contents
 
+- [Chainlink CRE at a glance](#chainlink-cre-at-a-glance)
 - [The problem](#the-problem)
 - [The idea](#the-idea)
 - [How it works — sequence diagram](#how-it-works--sequence-diagram)
@@ -27,6 +31,45 @@ Built for ETHOnline 2026 · The Graph · Arc · Chainlink CRE
 - [Troubleshooting](#troubleshooting)
 - [The hacky parts worth naming](#the-hacky-parts-worth-naming)
 - [What is deliberately not built](#what-is-deliberately-not-built)
+
+---
+
+## Chainlink CRE at a glance
+
+Chainlink CRE is the **Authority** layer: it decides whether a payment is large
+enough to need human step-up, without ever revealing the threshold.
+
+| | |
+|---|---|
+| **Workflow** | [`cre/stepup-threshold/workflow.ts`](cre/stepup-threshold/workflow.ts), a confidential workflow registered with `cre.handlerInTee` |
+| **Secret** | `IRREVERSIBLE_THRESHOLD_USDC` lives in the Vault DON and is read with `runtime.getSecret()` only inside the enclave |
+| **Output** | One boolean (`amount > threshold`). The threshold is never logged or returned |
+| **Caller** | The enforcer, through `EnforceContext.requiresStepUp`, using a JWT signed by the enrolled key ([`apps/console/lib/bonded/cre.ts`](apps/console/lib/bonded/cre.ts)) |
+| **Failure mode** | Fail-closed. If the enclave cannot answer, the payment is held rather than cleared |
+| **Deployment** | `bonded-stepup-threshold-staging` is ACTIVE ([evidence](docs/evidence/cre-stepup-threshold-deployment.txt)) |
+
+```text
+proposal passes policy + Graph re-derivation
+        │
+        ▼
+ enforcer ──JWT──▶ CRE workflow (TEE) ──▶ amount > secret threshold ?
+        │                                      │ only a boolean leaves
+        ▼                                      ▼
+   CLEARED (sign, vault settles)   or   HELD_FOR_STEPUP (owner confirms)
+```
+
+**Status, stated plainly.** The workflow is deployed and the enforcer invokes it,
+but Chainlink's confidential-workflow enclave DON is in private beta and is not
+provisioned for this org. Executions fail with `DON members not set`. Until it
+is, the enforcer falls back to comparing the policy artifact. That path is
+correct but not confidential, and every API response says which path decided it
+(`evidence.thresholdPath`). Set `CRE_REQUIRE_ENCLAVE=true` to hold instead of
+falling back. Details: [`docs/CRE_INTEGRATION_REPORT.md`](docs/CRE_INTEGRATION_REPORT.md).
+
+```bash
+cre workflow list --target staging-settings         # ACTIVE
+cre execution list bonded-stepup-threshold-staging  # invocations from the enforcer
+```
 
 ---
 
